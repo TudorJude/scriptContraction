@@ -1585,3 +1585,9 @@ handlers.buyChest = function(args, context)
        };
   return r;
 }
+
+handlers.getServerTime = function(args, context)
+{
+	var t = new Date();
+	return t.getTime();
+}
