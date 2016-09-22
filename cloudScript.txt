@@ -128,7 +128,7 @@ log.debug("user is in subdivision " + subDivision);
   if(userArray.length < 6)
   {
     log.debug("adding " + currentPlayerId + " to str: " + str);
-    str = titleDataVal.Data["Rec_" + args.envIndex + "_" + args.courseIndex];
+    str = titleDataVal.Data["RecSubDivision"+subDivision];
     
     if(str)
       str += "," + currentPlayerId + "_" + winRatio.toString() + "_"+ args.envIndex + "_" + args.courseIndex;
