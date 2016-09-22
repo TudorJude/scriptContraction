@@ -11,7 +11,7 @@ handlers.endGame = function(args, context) {
   });
   if(ps.Statistics.length != 0)
   {
-      wlStat = ps.Statistics[0].Value;
+      wlStat = ps.Statistics[0].Value.toString();
       log.debug("wlStat " + wlStat);
   }
   var wins = 0;
