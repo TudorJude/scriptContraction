@@ -131,9 +131,9 @@ log.debug("user is in subdivision " + subDivision);
     str = titleDataVal.Data["Rec_" + args.envIndex + "_" + args.courseIndex];
     
     if(str)
-      str += "," + currentPlayerId;
+      str += "," + currentPlayerId + "_" + winRatio.toString() + "_"+ args.envIndex + "_" + args.courseIndex;
     else
-      str = currentPlayerId;
+      str = currentPlayerId + "_" + winRatio.toString() + "_"+ args.envIndex + "_" + args.courseIndex;
     
   }
   else
@@ -142,7 +142,7 @@ log.debug("user is in subdivision " + subDivision);
     {
       userArray[i - 1] = userArray[i];
     }
-    userArray[userArray.length - 1] = currentPlayerId;
+    userArray[userArray.length - 1] = currentPlayerId + "_" + winRatio.toString() + "_"+ args.envIndex + "_" + args.courseIndex;
     str = userArray[0] + ",";
     for(var i = 1; i < userArray.length - 1; i++)
     {
@@ -156,7 +156,7 @@ log.debug("user is in subdivision " + subDivision);
   
   var titleData = server.SetTitleInternalData(
     {
-      Key: "Rec" + "_" + args.envIndex + "_" + args.courseIndex, //Recording_0_0
+      Key: "RecSubDivision"+subDivision, //Recording_0_0
       Value: str
     }
     );
