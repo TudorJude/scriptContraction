@@ -1,16 +1,88 @@
 //github
-handlers.setSplitPlayerRecording = function(args, context) {
+handlers.endGame = function(args, context) {
+  //let's recalculate the player's win/loss ratio
+  var wlStat = "01";
+  var temp = "0";
+  if(args.outcome == "rWin")temp="1";
+  var ps=server.GetPlayerStatistics(
+  {
+     PlayFabId: currentPlayerId,
+     StatisticNames: ["WinLoss"]
+  });
+  if(ps.Statistics.length != 0)
+  {
+      wlStat = ps.Statistics[0].Value;
+  }
+  if(wlStat.length<50) // remember stats from last 50 matches
+  {
+	wlStat += temp; 
+  }
+  //let's get some relevant titlewidedata
+    var titleDataRequest = server.GetTitleData(
+    {
+      Key: ["LeagueSubdivisions","SubdivisionTrophyRanges"] 
+    }
+    );  
+  //let's update user trophies
+  var trophyCount = 0;
+  var initTrophyCount = 0;
+  var tc=server.GetPlayerStatistics(
+  {
+     PlayFabId: currentPlayerId,
+     StatisticNames: ["TrophyCount"]
+  });
+  if(tc.Statistics.length != 0)
+  {
+    trophyCount = tc.Statistics[0].Value;
+  }
+  initTrophyCount = trophyCount;
+  if(args.val == "rWin") 
+  {
+  	if(trophyCount<=0)
+  		trophyCount = 30;
+  	else
+  		trophyCount += 60;
+  }
+  //update stats on server
+  var suArray = [];
+  var su = {StatisticName : "WinLoss", Version : "0", Value: wlStat};
+  suArray.push(su);  
+  var sut = {StatisticName : "TrophyCount", Version : "0", Value: trophyCount};
+  suArray.push(sut); 
+  var updateRequest = server.UpdatePlayerStatistics(
+  {
+    PlayFabId: currentPlayerId,
+    Statistics: suArray
+  }
+  );  
+  //user ran out of time so we don't store recording
+  if(args.val == "rOot") return;
+
+  //let's see which Subdivision this player is in
+  var sdval = titleDataRequest.Data["SubdivisionTrophyRanges"];
+  var sdvalParsed = JSON.parse(sdval);
+  var subDivision;
+  for(var i = 0; i < sdvalParsed.subdivisions.length; i++) 
+  {
+  	if(initTrophyCount<sdvalParsed.subdivisions[i])
+  	{
+		subDivision = i;
+		break;
+  	}
+  }
+log.debug("user is in subdivision " + subDivision);
+	//let's save the player's recording
  var dict = [];
     dict.push({
-        Key:   args.keyPos+"_"+args.envIndex+"_"+args.courseIndex, 
+        Key:   args.envIndex+"_"+args.courseIndex+"_RecPos", 
         Value: args.recordingPos
     });  
       dict.push({
-            Key:   args.keyRot+"_"+args.envIndex+"_"+args.courseIndex, 
+            Key:  args.envIndex+"_"+args.courseIndex+"_RecRot", 
         Value: args.recordingRot
     });  
        dict.push({
-            Key:   args.keyHeader+"_"+args.envIndex+"_"+args.courseIndex, 
+            Key:  args.envIndex+"_"+args.courseIndex+"_RecHeader", 
         Value: args.recordingHeader
     });  
   var playerData = server.UpdateUserReadOnlyData( 
