@@ -23,7 +23,7 @@ handlers.endGame = function(args, context) {
 	totalGames = wlStat.length;
 	for(var i = 0; i < wlStat.length; i++)
 	{
-		if(wlStat[i] == "1") win++;
+		if(wlStat[i] == "1") wins++;
 	}
 	log.debug("wlStatNew " + wlStat);
   }
@@ -33,10 +33,10 @@ handlers.endGame = function(args, context) {
   	for(var i = 0; i < wlStat.length-1; i++)
   	{
   		wlStat[i] = wlStat[i+1];
-  		if(wlStat[i] == "1") win++;
+  		if(wlStat[i] == "1") wins++;
   	}
   	wlStat[wlStat.length-1] = curWL;
-  	if(curWL == "1") win++;
+  	if(curWL == "1") wins++;
   	log.debug("wlStatNewMoreThanMax " + wlStat);
   }
   winRatio = Math.round( 100* (wins/totalGames));
