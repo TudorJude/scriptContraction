@@ -9,6 +9,10 @@ handlers.setSplitPlayerRecording = function(args, context) {
             Key:   args.keyRot+"_"+args.envIndex+"_"+args.courseIndex, 
         Value: args.recordingRot
     });  
+       dict.push({
+            Key:   args.keyHeader+"_"+args.envIndex+"_"+args.courseIndex, 
+        Value: args.recordingHeader
+    });  
   var playerData = server.UpdateUserReadOnlyData( 
     {
       PlayFabId: currentPlayerId,
@@ -78,7 +82,7 @@ handlers.requestSplitPlayerRecording = function(args, context) {
   var recordingData = server.GetUserReadOnlyData(
     {
       PlayFabId: opponentId,
-      Keys: [("RecPos_" + args.envIndex + "_" + args.courseIndex) , ("RecRot_" + args.envIndex + "_" + args.courseIndex)] 
+      Keys: [("RecPos_" + args.envIndex + "_" + args.courseIndex) , ("RecRot_" + args.envIndex + "_" + args.courseIndex), ("RecHeader_" + args.envIndex + "_" + args.courseIndex)] 
     }
     );
   var oI = server.GetPlayerCombinedInfo(
@@ -90,6 +94,7 @@ handlers.requestSplitPlayerRecording = function(args, context) {
   return {
     PosData: recordingData.Data["RecPos_" + args.envIndex + "_" + args.courseIndex].Value,
     RotData: recordingData.Data["RecRot_" + args.envIndex + "_" + args.courseIndex].Value,
+    HeaderData: recordingData.Data["RecHeader_" + args.envIndex + "_" + args.courseIndex].Value,
     Opp: oI.InfoResultPayload.AccountInfo.TitleInfo.DisplayName
          };
 }
