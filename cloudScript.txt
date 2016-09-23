@@ -158,7 +158,59 @@ log.debug("user is in subdivision " + subDivision);
   		{
 			uniqueKeyExists = true;
 			recArray[i] = recObj;
-			break;
+			if(recArray.length == 1) break; //if it's the only recording there is no use to sort anymore
+			if(i > 0) // if not first
+			{
+				if(recArray[i].wl > recArray[i-1].wl) // if bigger than left we start comparing to elements to the right
+				{
+					if(i == recArray.length-1) break; // there are no more elements to the right so no more sorting required
+					for(var j = i + 1; j < recArray.length; j++) // we check elements i+1 to length-1
+					{
+						if(recArray[j - 1].wl > recArray[j].wl) // if wl of element j - 1 is greater than that of element j we swap them
+						{
+							var aux = recArray[j];
+							recArray[j] = recArray[j - 1];
+							recArray[j - 1] = aux;
+						}
+						else // the element stays where it is 
+						{
+							break;
+						}
+					}
+				}
+				else // not bigger than the left let's start comparing with elements to the left
+				{
+					for(var j = i - 1; j >= 0; j--) // we check elements i-1 to 0
+					{
+						if(recArray[j + 1].wl < recArray[j].wl) // if wl of element j + 1 is smaller than that of element j we swap them
+						{
+							var aux = recArray[j];
+							recArray[j] = recArray[j + 1];
+							recArray[j + 1] = aux;
+						}
+						else // the element stays where it is 
+						{
+							break;
+						}
+					}
+				}
+		    } // if(i > 0)
+		    else
+		    {
+					for(var j = i + 1; j < recArray.length; j++) // we check elements i+1 to length-1
+					{
+						if(recArray[j - 1].wl > recArray[j].wl) // if wl of element j - 1 is greater than that of element j we swap them
+						{
+							var aux = recArray[j];
+							recArray[j] = recArray[j - 1];
+							recArray[j - 1] = aux;
+						}
+						else // the element stays where it is 
+						{
+							break;
+						}
+					}
+		    }
   		}
   	}
   	if(uniqueKeyExists == false)
