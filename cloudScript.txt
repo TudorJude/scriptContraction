@@ -138,14 +138,14 @@ log.debug("user is in subdivision " + subDivision);
   	}
   	recArray.push(recObj);
   	titleKeyVal = recArray
-  	JSON.Stringify(titleKeyVal);  
+  	JSON.stringify(titleKeyVal);  
   	log.debug("recArray: " + titleKeyVal);
   }
   else
   {
   	recArray = JSON.parse(recPool);  
   	titleKeyVal = recArray;
-  	JSON.Stringify(titleKeyVal);  
+  	JSON.stringify(titleKeyVal);  
   	log.debug("recArrayLN: " + recArray.length);
   }
   
