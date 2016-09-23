@@ -143,6 +143,7 @@ log.debug("user is in subdivision " + subDivision);
   else
   {
   	recArray = JSON.parse(recPool);  
+  	log.debug("recArray: " + recArray);
   	var recObj =
   	{
   		"wl": winRatio,
@@ -150,9 +151,11 @@ log.debug("user is in subdivision " + subDivision);
   		"c": args.courseIndex,
   		"uId": currentPlayerId
   	}
+  	log.debug("recArrayLNbefore: " + recArray.length);
   	recArray.push(recObj);
+  	log.debug("recArrayLNafter: " + recArray.length);
   	titleKeyVal = JSON.stringify(recArray);  
-  	log.debug("recArrayLN: " + recArray.length);
+  	log.debug("titleKeyVal: " + titleKeyVal);
   }
   
   var titleData = server.SetTitleInternalData(
