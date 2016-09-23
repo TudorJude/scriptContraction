@@ -147,7 +147,7 @@ log.debug("user is in subdivision " + subDivision);
   var titleData = server.SetTitleInternalData(
     {
       Key: "RecSubDivision"+subDivision, //Recording_0_0
-      Value: recArray
+      Value: recArray.toString()
     }
     );
   
