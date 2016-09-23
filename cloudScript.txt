@@ -1746,6 +1746,7 @@ handlers.openChest = function(args, context)
 	}
 	if(args.carCardsRequestSize>0)
 	{
+		log.debug("size car cards:" + args.carCardsRequestSize);
 		var carsToGrant = new Array(args.carCardsRequestSize);
 		log.debug(args.carCardsRequest);
 		for(var p in args.carCardsRequest)
@@ -1766,6 +1767,7 @@ handlers.openChest = function(args, context)
 	}
 	if(args.partCardsRequestSize>0)
 	{
+		log.debug("size part cards:" + args.partCardsRequestSize);
 		var partsToGrant = new Array(args.partCardsRequestSize);
 		log.debug(args.partCardsRequest);
 		for(var p in args.partCardsRequest)
