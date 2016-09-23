@@ -74,12 +74,12 @@ handlers.endGame = function(args, context) {
   suArray.push(su);  
   var sut = {StatisticName : "TrophyCount", Version : "0", Value: trophyCount};
   suArray.push(sut); 
-  var updateRequest = server.UpdatePlayerStatistics(
-  {
-    PlayFabId: currentPlayerId,
-    Statistics: suArray
-  }
-  );  
+  //var updateRequest = server.UpdatePlayerStatistics(
+  //{
+  //  PlayFabId: currentPlayerId,
+  //  Statistics: suArray
+ // }
+  //);  
   //user ran out of time so we don't store recording
   if(args.val == "rOot") return;
 
