@@ -125,6 +125,7 @@ log.debug("user is in subdivision " + subDivision);
   var recPool = titleDataVal.Data["RecSubDivision"+subDivision];
   log.debug("recPool: " + recPool);
   var recArray;
+  var titleKeyVal;
   if(recPool == undefined)
   {
   	recArray = [];
@@ -136,18 +137,20 @@ log.debug("user is in subdivision " + subDivision);
   		uId: currentPlayerId
   	}
   	recArray.push(recObj);
-  	log.debug("recArray: " + recArray);
+  	titleKeyVal = JSON.parse(recArray);  
+  	log.debug("recArray: " + titleKeyVal);
   }
   else
   {
   	recArray = JSON.parse(recPool);  
+  	titleKeyVal = recArray;
   	log.debug("recArrayLN: " + recArray.length);
   }
   
   var titleData = server.SetTitleInternalData(
     {
       Key: "RecSubDivision"+subDivision, //Recording_0_0
-      Value: recArray.toString()
+      Value: titleKeyVal.toString()
     }
     );
   
