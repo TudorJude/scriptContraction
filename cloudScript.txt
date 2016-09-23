@@ -122,42 +122,30 @@ log.debug("user is in subdivision " + subDivision);
       Key: "RecSubDivision"+subDivision, //i.e RecSubDivision0,
     }
     );  
-  var str2 = titleDataVal.Data["RecSubDivision"+subDivision] || "";
-  var userArray = str2.split(",");
-  var str;  
-  if(userArray.length < 6)
+  var recPool = titleDataVal.Data["RecSubDivision"+subDivision];
+  var recArray;
+  if(recPool == undefined)
   {
-    log.debug("adding " + currentPlayerId + " to str: " + str);
-    str = titleDataVal.Data["RecSubDivision"+subDivision];
-    
-    if(str)
-      str += "," + currentPlayerId + "_" + winRatio.toString() + "_"+ args.envIndex + "_" + args.courseIndex;
-    else
-      str = currentPlayerId + "_" + winRatio.toString() + "_"+ args.envIndex + "_" + args.courseIndex;
-    
+  	recArray = [];
+  	var recObj =
+  	{
+  		wl: winRatio,
+  		e: args.envIndex,
+  		c: args.courseIndex,
+  		uId: currentPlayerId
+  	}
+  	recArray.push(recObj);
   }
   else
   {
-    for(var i = 1; i < userArray.length; i++)
-    {
-      userArray[i - 1] = userArray[i];
-    }
-    userArray[userArray.length - 1] = currentPlayerId + "_" + winRatio.toString() + "_"+ args.envIndex + "_" + args.courseIndex;
-    str = userArray[0] + ",";
-    for(var i = 1; i < userArray.length - 1; i++)
-    {
-      str += userArray[i] + ",";
-    }
-    
-    str += userArray[userArray.length-1];
+  	recArray = JSON.parse(recPool);  
+  	log.debug("recArrayLN: " + recArray.length);
   }
-  
-  log.debug("users: " + str);
   
   var titleData = server.SetTitleInternalData(
     {
       Key: "RecSubDivision"+subDivision, //Recording_0_0
-      Value: str
+      Value: recArray
     }
     );
   
