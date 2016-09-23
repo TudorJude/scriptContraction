@@ -1730,6 +1730,10 @@ handlers.grantItems = function(args)
 handlers.openChest = function(args, context)
 {
 	log.debug(args.dictRequest);
+	for(var p in args.dictRequest)
+	{
+		log.debug(args.dictRequest[p]);
+	}
 }
 handlers.buyChest = function(args, context)
 {
