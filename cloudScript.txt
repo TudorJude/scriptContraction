@@ -1729,10 +1729,20 @@ handlers.grantItems = function(args)
 }
 handlers.openChest = function(args, context)
 {
-	log.debug(args.dictRequest);
-	for(var p in args.dictRequest)
+	log.debug(args.currencyReq);
+	for(var p in args.currencyReq)
 	{
-		log.debug(args.dictRequest[p]);
+		log.debug(args.currencyReq[p]);
+	}
+	log.debug(args.carCardsRequest);
+	for(var p in args.carCardsRequest)
+	{
+		log.debug(args.carCardsRequest[p]);
+	}
+	log.debug(args.partCardsRequest);
+	for(var p in args.partCardsRequest)
+	{
+		log.debug(args.partCardsRequest[p]);
 	}
 }
 handlers.buyChest = function(args, context)
