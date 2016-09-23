@@ -1729,21 +1729,62 @@ handlers.grantItems = function(args)
 }
 handlers.openChest = function(args, context)
 {
+	var addUserCurrencyResult;
 	log.debug(args.currencyReq);
 	for(var p in args.currencyReq)
 	{
 		log.debug(args.currencyReq[p]);
+		if(args.currencyReq[p] > 0)
+		  addUserCurrencyResult = server.AddUserVirtualCurrency(
+		  {
+		    PlayFabId: currentPlayerId,
+		    VirtualCurrency : p,
+		    Amount: args.currencyReq[p]
+		  }
+		  );
+
 	}
+	var carsToGrant = [];
 	log.debug(args.carCardsRequest);
 	for(var p in args.carCardsRequest)
 	{
 		log.debug(args.carCardsRequest[p]);
+		for(var i = 0; i < args.carCardsRequest[p]; i++)
+		{
+			carsToGrant.push(p);
+		}		
 	}
+	if(carsToGrant.length > 0)
+	{
+		   var carsGrantVar = server.GrantItemsToUser(
+   			{
+ 			    CatalogVersion : "CarCards",
+			    PlayFabId: currentPlayerId,
+			    ItemIds : carsToGrant
+ 			}
+			);
+	}
+	var partsToGrant = [];
 	log.debug(args.partCardsRequest);
 	for(var p in args.partCardsRequest)
 	{
 		log.debug(args.partCardsRequest[p]);
+		for(var i = 0; i < args.partCardsRequest[p]; i++)
+		{
+			partsToGrant.push(p);
+		}	
 	}
+	if(partsToGrant.length > 0)
+	{
+		   var partsGrantVar = server.GrantItemsToUser(
+   			{
+ 			    CatalogVersion : "PartCards",
+			    PlayFabId: currentPlayerId,
+			    ItemIds : partsToGrant
+ 			}
+			);
+	}
+
 }
 handlers.buyChest = function(args, context)
 {
