@@ -1731,6 +1731,7 @@ handlers.openChest = function(args, context)
 {
 	var addUserCurrencyResult;
 	log.debug(args.currencyReq);
+
 	for(var p in args.currencyReq)
 	{
 		log.debug(args.currencyReq[p]);
@@ -1744,6 +1745,7 @@ handlers.openChest = function(args, context)
 		  );
 
 	}
+	var currIdx = 0;
 	if(args.carCardsRequestSize>0)
 	{
 		log.debug("size car cards:" + args.carCardsRequestSize);
@@ -1751,11 +1753,15 @@ handlers.openChest = function(args, context)
 		log.debug(args.carCardsRequest);
 		for(var p in args.carCardsRequest)
 		{
-			log.debug("adding " + args.carCardsRequest[p] + " " + p);
-			for(var i = 0; i < args.carCardsRequest[p]; i++)
+			if (args.carCardsRequest.hasOwnProperty(p)) 
 			{
-				carsToGrant[i] = p;
-			}		
+				log.debug("adding " + args.carCardsRequest[p] + " " + p);
+				for(var i = 0; i < args.carCardsRequest[p]; i++)
+				{
+					carsToGrant[currIdx] = p;
+					currIdx++;
+				}		
+			}
 		}
 			var carsGrantVar = server.GrantItemsToUser(
 		   	{
@@ -1767,16 +1773,21 @@ handlers.openChest = function(args, context)
 	}
 	if(args.partCardsRequestSize>0)
 	{
+		currIdx = 0;
 		log.debug("size part cards:" + args.partCardsRequestSize);
 		var partsToGrant = new Array(args.partCardsRequestSize);
 		log.debug(args.partCardsRequest);
 		for(var p in args.partCardsRequest)
 		{
-			log.debug("adding " + args.partCardsRequest[p] + " " + p);
-			for(var i = 0; i < args.partCardsRequest[p]; i++)
+			if (args.partCardsRequest.hasOwnProperty(p)) 
 			{
-				partsToGrant[i] = p;
-			}	
+				log.debug("adding " + args.partCardsRequest[p] + " " + p);
+				for(var i = 0; i < args.partCardsRequest[p]; i++)
+				{
+					partsToGrant[currIdx] = p;
+					currIdx++;
+				}	
+			}
 		}
 		if(partsToGrant.length > 0)
 		{
