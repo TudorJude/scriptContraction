@@ -131,10 +131,10 @@ log.debug("user is in subdivision " + subDivision);
   	recArray = [];
   	var recObj =
   	{
-  		wl: winRatio,
-  		e: args.envIndex,
-  		c: args.courseIndex,
-  		uId: currentPlayerId
+  		"wl": winRatio,
+  		"e": args.envIndex,
+  		"c": args.courseIndex,
+  		"uId": currentPlayerId
   	}
   	recArray.push(recObj);
   	titleKeyVal = recArray
