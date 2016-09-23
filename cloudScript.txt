@@ -137,15 +137,13 @@ log.debug("user is in subdivision " + subDivision);
   		"uId": currentPlayerId
   	}
   	recArray.push(recObj);
-  	titleKeyVal = recArray
-  	JSON.stringify(titleKeyVal);  
+  	titleKeyVal = JSON.stringify(recArray); 
   	log.debug("recArray: " + titleKeyVal);
   }
   else
   {
   	recArray = JSON.parse(recPool);  
-  	titleKeyVal = recArray;
-  	JSON.stringify(titleKeyVal);  
+  	titleKeyVal = JSON.stringify(recArray);  
   	log.debug("recArrayLN: " + recArray.length);
   }
   
