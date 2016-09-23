@@ -1748,14 +1748,12 @@ handlers.openChest = function(args, context)
 	var currIdx = 0;
 	if(args.carCardsRequestSize>0)
 	{
-		log.debug("size car cards:" + args.carCardsRequestSize);
 		var carsToGrant = new Array(args.carCardsRequestSize);
 		log.debug(args.carCardsRequest);
 		for(var p in args.carCardsRequest)
 		{
 			if (args.carCardsRequest.hasOwnProperty(p)) 
 			{
-				log.debug("adding " + args.carCardsRequest[p] + " " + p);
 				for(var i = 0; i < args.carCardsRequest[p]; i++)
 				{
 					carsToGrant[currIdx] = p;
@@ -1774,14 +1772,12 @@ handlers.openChest = function(args, context)
 	if(args.partCardsRequestSize>0)
 	{
 		currIdx = 0;
-		log.debug("size part cards:" + args.partCardsRequestSize);
 		var partsToGrant = new Array(args.partCardsRequestSize);
 		log.debug(args.partCardsRequest);
 		for(var p in args.partCardsRequest)
 		{
 			if (args.partCardsRequest.hasOwnProperty(p)) 
 			{
-				log.debug("adding " + args.partCardsRequest[p] + " " + p);
 				for(var i = 0; i < args.partCardsRequest[p]; i++)
 				{
 					partsToGrant[currIdx] = p;
