@@ -151,9 +151,22 @@ log.debug("user is in subdivision " + subDivision);
   		"c": args.courseIndex,
   		"uId": currentPlayerId
   	}
-  	log.debug("recArrayLNbefore: " + recArray.length);
-  	recArray.push(recObj);
-  	log.debug("recArrayLNafter: " + recArray.length);
+  	var uniqueKeyExists = false;
+  	for(var i = 0; i < recArray.length; i++)
+  	{
+  		if((recArray[i].e == args.envIndex)&&(recArray[i].c == args.courseIndex))
+  		{
+			uniqueKeyExists = true;
+			recArray[i] = recObj;
+			break;
+  		}
+  	}
+  	if(uniqueKeyExists == false)
+  	{
+  	  log.debug("recArrayLNbefore: " + recArray.length);
+  	  recArray.push(recObj);
+  	  log.debug("recArrayLNafter: " + recArray.length);
+    }
   	titleKeyVal = JSON.stringify(recArray);  
   	log.debug("titleKeyVal: " + titleKeyVal);
   }
