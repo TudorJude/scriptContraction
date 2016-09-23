@@ -1751,7 +1751,7 @@ handlers.openChest = function(args, context)
 		log.debug(args.carCardsRequest);
 		for(var p in args.carCardsRequest)
 		{
-			log.debug(args.carCardsRequest[p]);
+			log.debug("adding " + args.carCardsRequest[p] + " " + p);
 			for(var i = 0; i < args.carCardsRequest[p]; i++)
 			{
 				carsToGrant[i] = p;
@@ -1772,7 +1772,7 @@ handlers.openChest = function(args, context)
 		log.debug(args.partCardsRequest);
 		for(var p in args.partCardsRequest)
 		{
-			log.debug(args.partCardsRequest[p]);
+			log.debug("adding " + args.partCardsRequest[p] + " " + p);
 			for(var i = 0; i < args.partCardsRequest[p]; i++)
 			{
 				partsToGrant[i] = p;
