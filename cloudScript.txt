@@ -1727,6 +1727,10 @@ handlers.grantItems = function(args)
     generateErrObj("Error: "+err);
   }
 }
+handlers.openChest = function(args, context)
+{
+	log.debug(args.dictRequest);
+}
 handlers.buyChest = function(args, context)
 {
   var userInventoryObject=server.GetUserInventory(
