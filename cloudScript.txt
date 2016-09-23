@@ -143,6 +143,14 @@ log.debug("user is in subdivision " + subDivision);
   else
   {
   	recArray = JSON.parse(recPool);  
+  	var recObj =
+  	{
+  		"wl": winRatio,
+  		"e": args.envIndex,
+  		"c": args.courseIndex,
+  		"uId": currentPlayerId
+  	}
+  	recArray.push(recObj);
   	titleKeyVal = JSON.stringify(recArray);  
   	log.debug("recArrayLN: " + recArray.length);
   }
