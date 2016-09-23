@@ -123,6 +123,7 @@ log.debug("user is in subdivision " + subDivision);
     }
     );  
   var recPool = titleDataVal.Data["RecSubDivision"+subDivision];
+  log.debug("recPool: " + recPool);
   var recArray;
   if(recPool == undefined)
   {
@@ -135,6 +136,7 @@ log.debug("user is in subdivision " + subDivision);
   		uId: currentPlayerId
   	}
   	recArray.push(recObj);
+  	log.debug("recArray: " + recArray);
   }
   else
   {
