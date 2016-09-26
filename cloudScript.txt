@@ -1969,6 +1969,7 @@ handlers.openChest = function(args, context)
   var itemFound = false;
   var newAmount = 0;
   //car cards
+  log.debug("ffff: " + args.carCardsRequest);
   for(var p in args.carCardsRequest)
     {
       if (args.carCardsRequest.hasOwnProperty(p)) 
