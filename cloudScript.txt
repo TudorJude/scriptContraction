@@ -633,8 +633,7 @@ handlers.purchaseBMItem = function(args, context)
       if((userInventoryObject.Inventory[i].ItemId == userArray[0]) && (userInventoryObject.Inventory[i].CatalogVersion == catalogName))
       {
         log.debug("found it!");
-        cardInstance = userInventoryObject.Inventory[i].ItemInstanceId;    
-        log.debug("CE CACAT!?: " + userInventoryObject.Inventory[i].ItemInstanceId);    
+        cardInstance = userInventoryObject.Inventory[i].ItemInstanceId;     
         if(userInventoryObject.Inventory[i].CustomData == undefined)
         {
           log.debug("no custom data. creating ...");
@@ -642,12 +641,14 @@ handlers.purchaseBMItem = function(args, context)
         }
         else
         {
-          log.debug("wtf");
+          if(userInventoryObject.Inventory[i].CustomData.Amount == undefined) 
+            cardData = {"Amount" : 1};
+          else
+          {
           var tempAmount = Number(userInventoryObject.Inventory[i].CustomData.Amount) + 1;
           if(isNaN(tempAmount)) tempAmount = 1;
-          log.debug("isNaN(tempAmount): " + isNaN(tempAmount));
-          log.debug("we have custom data! Amount is now: " + tempAmount);
           cardData = {"Amount" : tempAmount};
+          }
         }
 
         server.UpdateUserInventoryItemCustomData(
@@ -963,8 +964,9 @@ handlers.purchaseItems = function(args, context)
         log.debug("user has enough currency. Let's check for card balance");
         
         var cardCost = parseInt(cardInfo.baseCardCost) + (parseInt(car.CustomData.CarLvl) * parseInt(cardInfo.cardCostPerLvl));
-      log.debug("cardCost: " + cardCost);
-        var cardFound = false;                                                  
+        log.debug("cardCost: " + cardCost);
+        var cardFound = false;      
+        var cardData;                                            
         for(var i = 0; i < userInventoryObject.Inventory.length; i++)
         {
           if((userInventoryObject.Inventory[i].ItemId == args.carId) && (userInventoryObject.Inventory[i].CatalogVersion == "CarCards"))
@@ -973,13 +975,45 @@ handlers.purchaseItems = function(args, context)
             cardFound = true;
             try
             {
-            var itemConsumptionResult = server.ConsumeItem(
+              //old consume code
+            // var itemConsumptionResult = server.ConsumeItem(
+            //  {
+            //    PlayFabId: currentPlayerId,
+            //    ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
+            //    ConsumeCount:cardCost
+            //  }
+            //);
+            //new consume code
+              if(userInventoryObject.Inventory[i].CustomData == undefined)//let's check if item has custom data
               {
-                PlayFabId: currentPlayerId,
-                ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
-                ConsumeCount:cardCost
+                return generateFailObj("Insufficient cards");
               }
-        );
+              else
+              {
+                if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)//let's check if item has amount custom data
+                {
+                  return generateFailObj("Insufficient cards");
+                }
+                else // let's check and see if the user has sufficent cards
+                {
+                  if(userInventoryObject.Inventory[i].CustomData.Amount >= cardCost) // he does so let's remove the appropriate amount
+                  {
+                    userInventoryObject.Inventory[i].CustomData.Amount -= cardCost;
+                    cardData = {"Amount" : userInventoryObject.Inventory[i].CustomData.Amount};
+                    server.UpdateUserInventoryItemCustomData(
+                    {
+                      PlayFabId: currentPlayerId,
+                      ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
+                      Data: cardData
+                    }
+                    );
+                  }
+                  else
+                  {
+                    return generateFailObj("Insufficient cards");
+                  }
+                }
+              }
             }
             catch(err)
             {
@@ -988,14 +1022,13 @@ handlers.purchaseItems = function(args, context)
             }
             break;
           }
-        } 
-        
-        log.debug("user has enough cards to purchase upgrade!");
-        
+        }    
+       
         if(cardFound == false)
         {
             return generateFailObj("No cards found");
         }
+        log.debug("user has enough cards to purchase upgrade!");
 
         var newLvl = (parseInt(car.CustomData.CarLvl) + 1);
         var newPr = recalculateCarPr(car.CustomData, car.ItemId);
@@ -1028,7 +1061,7 @@ handlers.purchaseItems = function(args, context)
           {
             ItemId : args.carId,
             CatalogVersion: "CarCards",
-            RemainingUses: itemConsumptionResult.RemainingUses
+            CustomData: cardData
           },
           {
             ItemId : args.carId,
@@ -1056,8 +1089,10 @@ handlers.purchaseItems = function(args, context)
       }
       else
       {
-            log.debug("user doesn't have car: " +  args.carId + "... looking for card");
+          log.debug("user doesn't have car: " +  args.carId + "... looking for card");
           var cardFound = false; 
+          var cardData;
+          var carCardInstance;
           for(var i = 0; i < userInventoryObject.Inventory.length; i++)
           {
             if((userInventoryObject.Inventory[i].ItemId == args.carId) && (userInventoryObject.Inventory[i].CatalogVersion == "CarCards"))
@@ -1066,13 +1101,39 @@ handlers.purchaseItems = function(args, context)
               cardFound = true;
               try
               {
-              var itemConsumptionResult = server.ConsumeItem(
+              //old consume code
+              //var itemConsumptionResult = server.ConsumeItem(
+              // {
+              //  PlayFabId: currentPlayerId,
+              // ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
+              //ConsumeCount: cardInfo.baseCardCost
+              //  }
+              //  );
+                          //new consume code
+              if(userInventoryObject.Inventory[i].CustomData == undefined)//let's check if item has custom data
+              {
+                return generateFailObj("Insufficient cards");
+              }
+              else
+              {
+                if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)//let's check if item has amount custom data
                 {
-                  PlayFabId: currentPlayerId,
-                  ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
-                  ConsumeCount: cardInfo.baseCardCost
+                  return generateFailObj("Insufficient cards");
                 }
-          );
+                else // let's check and see if the user has sufficent cards
+                {
+                  if(userInventoryObject.Inventory[i].CustomData.Amount >= cardInfo.baseCardCost) // he does so let's remove the appropriate amount
+                  {
+                    carCardInstance = userInventoryObject.Inventory[i].ItemInstanceId;
+                    userInventoryObject.Inventory[i].CustomData.Amount -= cardInfo.baseCardCost;
+                    cardData = {"Amount" : userInventoryObject.Inventory[i].CustomData.Amount};
+                  }
+                  else
+                  {
+                    return generateFailObj("Insufficient cards");
+                  }
+                }
+              }
               }
               catch(err)
               {
@@ -1106,22 +1167,32 @@ handlers.purchaseItems = function(args, context)
           if(carToGive.ItemGrantResults[0].Result == false)
             {
               log.error("Something went wrong while giving user the item, refunding cards");
-              var cardsToRefund = [];
-        
-            for(var i = 0 ; i < cardInfo.baseCardCost; i++)
-            {
-                cardsToRefund.push(args.carId);
-            }
-        
-              var cardRefundResult = server.GrantItemsToUser(
-              {
-                CatalogVersion : "CarCards",
-                PlayFabId: currentPlayerId,
-                ItemIds : cardsToRefund
-              }
-              );
+              //old refund code
+              //var cardsToRefund = [];        
+              //for(var i = 0 ; i < cardInfo.baseCardCost; i++)
+              //{
+              //    cardsToRefund.push(args.carId);
+              //}        
+              //var cardRefundResult = server.GrantItemsToUser(
+              //{
+              //  CatalogVersion : "CarCards",
+              //  PlayFabId: currentPlayerId,
+              //  ItemIds : cardsToRefund
+              //}
+              //);
+              //new refund code
               return generateFailObj("Something went wrong while giving user the item, refunding cards.");              
             }  
+            else
+            {
+                server.UpdateUserInventoryItemCustomData(
+                {
+                   PlayFabId: currentPlayerId,
+                   ItemInstanceId: carCardInstance,
+                   Data: cardData
+                }
+                );
+            }
           var subtractUserCurrencyResult;
           if(cardInfo.baseCurrCost > 0){
             subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
@@ -1261,7 +1332,7 @@ handlers.purchaseItems = function(args, context)
                {
                  ItemId : args.carId,
                  CatalogVersion: "CarCards",
-                 RemainingUses: itemConsumptionResult.RemainingUses
+                 CustomData: cardData
                },
                {
                  ItemId : args.carId,
