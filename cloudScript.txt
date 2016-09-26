@@ -633,7 +633,8 @@ handlers.purchaseBMItem = function(args, context)
       if((userInventoryObject.Inventory[i].ItemId == userArray[0]) && (userInventoryObject.Inventory[i].CatalogVersion == catalogName))
       {
         log.debug("found it!");
-        cardInstance = userInventoryObject.Inventory[i].ItemInstanceId;        
+        cardInstance = userInventoryObject.Inventory[i].ItemInstanceId;    
+        log.debug("CE CACAT!?: " + userInventoryObject.Inventory[i].CustomData.Amount);    
         if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)
         {
           log.debug("no custom data. creating ...");
