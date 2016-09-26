@@ -630,7 +630,6 @@ handlers.purchaseBMItem = function(args, context)
     log.debug("searching for: " + userArray[0] + " in " + catalogName);
     for(var i = 0; i < userInventoryObject.Inventory.length; i++) // if we find it in the inventory we just give him the amount of cards we owe the player
     {
-      log.debug("itemId: " + userInventoryObject.Inventory[i].ItemId + " itemCatalog: " + userInventoryObject.Inventory[i].CatalogVersion);
       if((userInventoryObject.Inventory[i].ItemId == userArray[0]) && (userInventoryObject.Inventory[i].CatalogVersion == catalogName))
       {
         log.debug("found it!");
@@ -642,6 +641,7 @@ handlers.purchaseBMItem = function(args, context)
         }
         else
         {
+          log.debug("wtf");
           var tempAmount = Number(userInventoryObject.Inventory[i].CustomData.Amount) + 1;
           if(isNaN(tempAmount)) tempAmount = 1;
           log.debug("isNaN(tempAmount): " + isNaN(tempAmount));
