@@ -2022,7 +2022,7 @@ handlers.openChest = function(args, context)
             }
             ); 
 
-            itemData = {"Amount" : args.amount};
+            itemData = {"Amount" : args.carCardsRequest[p]};
             server.UpdateUserInventoryItemCustomData(
                  {
                     PlayFabId: currentPlayerId,
