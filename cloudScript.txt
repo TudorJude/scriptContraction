@@ -627,19 +627,19 @@ handlers.purchaseBMItem = function(args, context)
     var cardInstance;
     var cardAmount = 0;
     log.debug("searching for: " + userArray[0] + " in " + catalogName);
-    for(var i = 0; i < userInventoryObject.length; i++) // if we find it in the inventory we just give him the amount of cards we owe the player
+    for(var i = 0; i < userInventoryObject.Inventory.length; i++) // if we find it in the inventory we just give him the amount of cards we owe the player
     {
-      log.debug("itemId: " + userInventoryObject[i].ItemId + " itemCatalog: " + userInventoryObject[i].CatalogVersion);
-      if((userInventoryObject[i].ItemId == userArray[0]) && (userInventoryObject[i].CatalogVersion == catalogName))
+      log.debug("itemId: " + userInventoryObject.Inventory[i].ItemId + " itemCatalog: " + userInventoryObject.Inventory[i].CatalogVersion);
+      if((userInventoryObject.Inventory[i].ItemId == userArray[0]) && (userInventoryObject.Inventory[i].CatalogVersion == catalogName))
       {
         log.debug("found it!");
-        cardInstance = userInventoryObject[i].ItemInstanceId;
+        cardInstance = userInventoryObject.Inventory[i].ItemInstanceId;
         var cardData;
         if(userInventoryObject[i].CustomData.Amount == undefined)
           cardData = {"Amount" : 1};
         else
         {
-          var tempAmount = Number(userInventoryObject[i].CustomData.Amount) + 1;
+          var tempAmount = Number(userInventoryObject.Inventory[i].CustomData.Amount) + 1;
           if(isNaN(tempAmount)) tempAmount = 1;
           log.debug("isNaN(tempAmount): " + isNaN(tempAmount));
           log.debug("we have custom data! Amount is now: " + tempAmount);
