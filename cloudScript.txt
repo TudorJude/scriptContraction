@@ -635,7 +635,7 @@ handlers.purchaseBMItem = function(args, context)
         log.debug("found it!");
         cardInstance = userInventoryObject.Inventory[i].ItemInstanceId;    
         log.debug("CE CACAT!?: " + userInventoryObject.Inventory[i].ItemInstanceId);    
-        if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)
+        if(userInventoryObject.Inventory[i].CustomData == undefined)
         {
           log.debug("no custom data. creating ...");
           cardData = {"Amount" : 1};
