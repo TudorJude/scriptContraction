@@ -635,7 +635,7 @@ handlers.purchaseBMItem = function(args, context)
       {
         log.debug("found it!");
         cardInstance = userInventoryObject.Inventory[i].ItemInstanceId;        
-        if(userInventoryObject[i].CustomData.Amount == undefined)
+        if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)
           cardData = {"Amount" : 1};
         else
         {
