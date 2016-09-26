@@ -597,7 +597,7 @@ handlers.purchaseBMItem = function(args, context)
     Keys: keysToGet
   }
   );
-  log.debug("RETRIEVING USER CURRENCY");
+
   var userInventoryObject = server.GetUserInventory(
   {
     PlayFabId: currentPlayerId
@@ -624,15 +624,60 @@ handlers.purchaseBMItem = function(args, context)
   if(checkObj != "OK") return checkObj;
   try
   {
-    var itemsToGive = [];
-    itemsToGive.push(userArray[0]);
-    var grantRequest = server.GrantItemsToUser(
+    var cardInstance;
+    var cardAmount = 0;
+    for(var i = 0; i < userInventoryObject.length; i++) // if we find it in the inventory we just give him the amount of cards we owe the player
+    {
+      if((userInventoryObject[i].ItemId == userArray[0]) && (userInventoryObject[i].CatalogVersion == catalogName))
       {
-        CatalogVersion : catalogName,
-        PlayFabId: currentPlayerId,
-        ItemIds : itemsToGive
+        cardInstance = userInventoryObject[i].ItemInstanceId;
+        var cardData;
+        if(userInventoryObject[i].CustomData.Amount == undefined)
+          cardData = {"Amount" : 1};
+        else
+        {
+          var tempAmount = Number(userInventoryObject[i].CustomData.Amount) + 1;
+          if(isNaN(tempAmount)) tempAmount = 1;
+          cardData = {"Amount" : tempAmount};
+        }
+
+        server.UpdateUserInventoryItemCustomData(
+              {
+                PlayFabId: currentPlayerId,
+                ItemInstanceId: cardInstance,
+                Data: cardData
+              }
+              );
+
+        break;
       }
-      );
+    }
+    if(cardInstance == undefined)
+    {
+      var itemsToGive = [];
+      itemsToGive.push(userArray[0]);
+      var grantRequest = server.GrantItemsToUser(
+        {
+          CatalogVersion : catalogName,
+          PlayFabId: currentPlayerId,
+          ItemIds : itemsToGive
+        }
+        );
+      cardInstance = grantRequest.ItemGrantResults[0].ItemInstanceId;
+      if(cardInstance == undefined) 
+        generateErrObj("grantRequest denied");
+      else
+      {
+        cardData = {"Amount" : 1};
+        server.UpdateUserInventoryItemCustomData(
+          {
+            PlayFabId: currentPlayerId,
+            ItemInstanceId: cardInstance,
+            Data: cardData
+          }
+          );
+      }
+    }
     var subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
       {
         PlayFabId: currentPlayerId,
@@ -649,14 +694,12 @@ handlers.purchaseBMItem = function(args, context)
         PlayFabId : currentPlayerId,
         Data : dataToUpdate
       }  );
-    var uses = "1";
-    if(grantRequest.ItemGrantResults[0].RemainingUses != undefined) uses = grantRequest.ItemGrantResults[0].RemainingUses;
     var objectsUpdated = 
         [
         {
           ItemId : userArray[0],
           CatalogVersion: catalogName,
-          RemainingUses: uses
+          CustomData: cardData
         }
         ];
       
