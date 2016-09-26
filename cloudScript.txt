@@ -1452,9 +1452,7 @@ handlers.purchaseItems = function(args, context)
         if(carFound == false)
         {
               return generateFailObj("car with ID: " + args.carId + " not found in user inventory.");
-        }
-        log.debug("Checking to see whether user has enough money to upgrade part");
-      
+        }      
         log.debug("Checking to see if user has part and or has enough parts");
         var partFound = false;
         var part;
@@ -1483,19 +1481,51 @@ handlers.purchaseItems = function(args, context)
             CarDataToBeUpdated[tempDict[args.partId]] = newlvl;
             car.CustomData[tempDict[args.partId]] = newlvl;
             log.debug("we need: " + partsRequired + " cards");
-            
+            var updateCardData;
             var costCheckObj = checkBalance(cardInfo.currType, currCost, playerSC, playerHC);
             if(costCheckObj != "OK") return costCheckObj;
             log.debug("consuming part instance: " + userInventoryObject.Inventory[i].ItemInstanceId);
               try
               {
-              var itemConsumptionResult = server.ConsumeItem(
+              //old consume code
+              //var itemConsumptionResult = server.ConsumeItem(
+              //  {
+              //    PlayFabId: currentPlayerId,
+              //    ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
+              //    ConsumeCount: partsRequired
+              //  }
+              //  );
+                          //new consume code
+              if(userInventoryObject.Inventory[i].CustomData == undefined)//let's check if item has custom data
+              {
+                return generateFailObj("Insufficient cards");
+              }
+              else
+              {
+                if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)//let's check if item has amount custom data
                 {
-                  PlayFabId: currentPlayerId,
-                  ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
-                  ConsumeCount: partsRequired
+                  return generateFailObj("Insufficient cards");
                 }
-          );
+                else // let's check and see if the user has sufficent cards
+                {
+                  if(userInventoryObject.Inventory[i].CustomData.Amount >= partsRequired) // he does so let's remove the appropriate amount
+                  {
+                    userInventoryObject.Inventory[i].CustomData.Amount -= partsRequired;
+                    updateCardData = {"Amount" : userInventoryObject.Inventory[i].CustomData.Amount};
+                    server.UpdateUserInventoryItemCustomData(
+                    {
+                      PlayFabId: currentPlayerId,
+                      ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
+                      Data: updateCardData
+                    }
+                    );
+                  }
+                  else
+                  {
+                    return generateFailObj("Insufficient cards");
+                  }
+                }
+              }
               }
               catch(err)
               {
@@ -1535,7 +1565,7 @@ handlers.purchaseItems = function(args, context)
                {
                  ItemId : args.partId,
                  CatalogVersion: "PartCards",
-                 RemainingUses: itemConsumptionResult.RemainingUses
+                 CustomData: updateCardData
                },
                {
                  ItemId : args.carId,
@@ -1812,27 +1842,95 @@ handlers.giveMoney = function(args)
 
 handlers.grantItems = function(args)
 {
-  //args.itemId, args.catalogId, args.amount
-  var itemsToGrant = [];
-  for(var i = 0; i < args.amount; i++)
+  //retrieve user inventory
+  var userInventoryObject = server.GetUserInventory(
   {
-    itemsToGrant.push(args.itemId);
+    PlayFabId: currentPlayerId
   }
-  try
-  {
-   var grantVar = server.GrantItemsToUser(
-   {
-     CatalogVersion : args.catalogId,
-     PlayFabId: currentPlayerId,
-     ItemIds : itemsToGrant
-   }
-   ); 
+  );
+  //args.itemId, args.catalogId, args.amount
+
+  //old grant item code
+  //var itemsToGrant = [];
+  //for(var i = 0; i < args.amount; i++)
+  //{
+  //  itemsToGrant.push(args.itemId);
+  //}
+  //try
+  //{
+  // var grantVar = server.GrantItemsToUser(
+  // {
+  //  CatalogVersion : args.catalogId,
+  //   PlayFabId: currentPlayerId,
+  //   ItemIds : itemsToGrant
+  // }
+  // ); 
+  //new grant item code  
+  var itemData;  
+  var itemFound = false;
+  var newAmount;
+  for(var i = 0; i < userInventoryObject.Inventory.length; i++)
+        {
+          if((userInventoryObject.Inventory[i].ItemId == args.itemId) && (userInventoryObject.Inventory[i].CatalogVersion == args.catalogId))
+          {
+            log.debug("adding amount to: " + userInventoryObject.Inventory[i].ItemInstanceId);
+            if(userInventoryObject.Inventory[i].CustomData == undefined)
+            {
+              newAmount = args.amount;
+            }
+            else
+            {
+              if(userInventoryObject.Inventory[i].CustomData.Amount == undefined) 
+                newAmount = args.amount;
+              else
+              {
+                if(isNan(Number(userInventoryObject.Inventory[i].CustomData.Amount)))
+                  newAmount = args.amount;
+                else
+                  newAmount = Number(userInventoryObject.Inventory[i].CustomData.Amount) + args.amount;
+              }
+            }
+            itemData = {"Amount" : newAmount};
+            server.UpdateUserInventoryItemCustomData(
+                    {
+                      PlayFabId: currentPlayerId,
+                      ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
+                      Data: itemData
+                    }
+                    );
+            itemFound = true;
+            break;
+          }
+        }
+
+    if(itemFound == false)
+    {
+      var itemsToGrant = [];
+      itemsToGrant.push(args.itemId);
+      var grantVar = server.GrantItemsToUser(
+      {
+        CatalogVersion : args.catalogId,
+        PlayFabId: currentPlayerId,
+        ItemIds : itemsToGrant
+      }
+      ); 
+
+      itemData = {"Amount" : args.amount};
+      server.UpdateUserInventoryItemCustomData(
+           {
+              PlayFabId: currentPlayerId,
+              ItemInstanceId: grantVar.ItemGrantResults[0].ItemInstanceId,
+              Data: itemData
+           }
+           );
+    }
+   //for return
    var objectsUpdated = 
    [
    {
      ItemId : args.itemId,
      CatalogVersion: args.catalogId,
-     RemainingUses: grantVar.ItemGrantResults[0].RemainingUses
+     CustomData: itemData
    }
    ] ;
     var invChangeObj = 
@@ -1845,20 +1943,18 @@ handlers.grantItems = function(args)
       InventoryChange:invChangeObj
     };
    return returnObj;
-  }
-  catch(err)
-  {
-    generateErrObj("Error: "+err);
-  }
 }
 handlers.openChest = function(args, context)
 {
+  var userInventoryObject = server.GetUserInventory(
+  {
+    PlayFabId: currentPlayerId
+  }
+  );
+  //currency 
 	var addUserCurrencyResult;
-	log.debug(args.currencyReq);
-
 	for(var p in args.currencyReq)
 	{
-		log.debug(args.currencyReq[p]);
 		if(args.currencyReq[p] > 0)
 		  addUserCurrencyResult = server.AddUserVirtualCurrency(
 		  {
@@ -1869,57 +1965,71 @@ handlers.openChest = function(args, context)
 		  );
 
 	}
-	var currIdx = 0;
-	if(args.carCardsRequestSize>0)
-	{
-		var carsToGrant = new Array(args.carCardsRequestSize);
-		log.debug(args.carCardsRequest);
-		for(var p in args.carCardsRequest)
-		{
-			if (args.carCardsRequest.hasOwnProperty(p)) 
-			{
-				for(var i = 0; i < args.carCardsRequest[p]; i++)
-				{
-					carsToGrant[currIdx] = p;
-					currIdx++;
-				}		
-			}
-		}
-			var carsGrantVar = server.GrantItemsToUser(
-		   	{
-		 	   CatalogVersion : "CarCards",
-			   PlayFabId: currentPlayerId,
-			   ItemIds : carsToGrant
-		 	}
-			);
-	}
-	if(args.partCardsRequestSize>0)
-	{
-		currIdx = 0;
-		var partsToGrant = new Array(args.partCardsRequestSize);
-		log.debug(args.partCardsRequest);
-		for(var p in args.partCardsRequest)
-		{
-			if (args.partCardsRequest.hasOwnProperty(p)) 
-			{
-				for(var i = 0; i < args.partCardsRequest[p]; i++)
-				{
-					partsToGrant[currIdx] = p;
-					currIdx++;
-				}	
-			}
-		}
-		if(partsToGrant.length > 0)
-		{
-			   var partsGrantVar = server.GrantItemsToUser(
-	   			{
-	 			    CatalogVersion : "PartCards",
-				    PlayFabId: currentPlayerId,
-				    ItemIds : partsToGrant
-	 			}
-				);
-		}
-	}
+  var itemData;
+  var itemFound = false;
+  var newAmount = 0;
+  //part cards
+  for(var p in args.carCardsRequest)
+    {
+      if (args.carCardsRequest.hasOwnProperty(p)) 
+      { 
+        itemFound = false;
+        newAmount = 0;
+        for(var i = 0; i < userInventoryObject.Inventory.length; i++)
+              {
+                if((userInventoryObject.Inventory[i].ItemId == p) && (userInventoryObject.Inventory[i].CatalogVersion == "PartCards"))
+                {
+                  log.debug("adding amount to: " + userInventoryObject.Inventory[i].ItemInstanceId);
+                  if(userInventoryObject.Inventory[i].CustomData == undefined)
+                  {
+                    newAmount = Number(args.carCardsRequest[p]);
+                  }
+                  else
+                  {
+                    if(userInventoryObject.Inventory[i].CustomData.Amount == undefined) 
+                      newAmount = Number(args.carCardsRequest[p]);
+                    else
+                    {
+                      if(isNan(Number(userInventoryObject.Inventory[i].CustomData.Amount)))
+                        newAmount = Number(args.carCardsRequest[p]);
+                      else
+                        newAmount = Number(userInventoryObject.Inventory[i].CustomData.Amount) + Number(args.carCardsRequest[p]);
+                    }
+                  }
+                  itemData = {"Amount" : newAmount};
+                  server.UpdateUserInventoryItemCustomData(
+                          {
+                            PlayFabId: currentPlayerId,
+                            ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
+                            Data: itemData
+                          }
+                          );
+                  itemFound = true;
+                  break;
+                }
+              }
+        if(itemFound == false)
+        {
+            var itemsToGrant = [p];
+            var grantVar = server.GrantItemsToUser(
+            {
+              CatalogVersion : args.itemId,
+              PlayFabId: currentPlayerId,
+              ItemIds : itemsToGrant
+            }
+            ); 
+
+            itemData = {"Amount" : args.amount};
+            server.UpdateUserInventoryItemCustomData(
+                 {
+                    PlayFabId: currentPlayerId,
+                    ItemInstanceId: grantVar.ItemGrantResults[0].ItemInstanceId,
+                    Data: itemData
+                 }
+                 );
+        }
+      }
+    }
 
 }
 handlers.buyChest = function(args, context)
