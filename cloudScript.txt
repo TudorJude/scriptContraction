@@ -1975,6 +1975,7 @@ handlers.openChest = function(args, context)
       { 
         itemFound = false;
         newAmount = 0;
+        log.debug("looking for: " +p);
         for(var i = 0; i < userInventoryObject.Inventory.length; i++)
               {
                 if((userInventoryObject.Inventory[i].ItemId == p) && (userInventoryObject.Inventory[i].CatalogVersion == "CarCards"))
