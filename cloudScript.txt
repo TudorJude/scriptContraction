@@ -1717,7 +1717,7 @@ handlers.purchaseItems = function(args, context)
             i = 
                  {
                      Inventory: objectsUpdated,
-                   VirtualCurrency: currencyUpdated
+                     VirtualCurrency: currencyUpdated
                  };
           }      
       else
@@ -1946,6 +1946,9 @@ handlers.grantItems = function(args)
 }
 handlers.openChest = function(args, context)
 {
+  var objectsUpdated = [];
+  var currencyUpdated = [];
+  var invChangeObj;
   var userInventoryObject = server.GetUserInventory(
   {
     PlayFabId: currentPlayerId
@@ -2096,6 +2099,12 @@ handlers.openChest = function(args, context)
         }
       }
     }
+
+  return server.GetUserInventory(
+  {
+    PlayFabId: currentPlayerId
+  }
+  );
 }
 
 handlers.buyChest = function(args, context)
