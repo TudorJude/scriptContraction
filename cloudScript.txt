@@ -622,8 +622,8 @@ handlers.purchaseBMItem = function(args, context)
   var price = parseInt(userArray[2]) + parseInt(userArray[3])* parseInt(userArray[4]);
   var checkObj = checkBalance(userArray[1], price, playerMoney, playerMoney);
   if(checkObj != "OK") return checkObj;
-  try
-  {
+  //try
+  //{
     var cardInstance;
     var cardAmount = 0;
     var cardData;
@@ -634,7 +634,7 @@ handlers.purchaseBMItem = function(args, context)
       {
         log.debug("found it!");
         cardInstance = userInventoryObject.Inventory[i].ItemInstanceId;    
-        log.debug("CE CACAT!?: " + userInventoryObject.Inventory[i].CustomData.Amount);    
+        log.debug("CE CACAT!?: " + userInventoryObject.Inventory[i].ItemInstanceId);    
         if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)
         {
           log.debug("no custom data. creating ...");
@@ -728,11 +728,11 @@ handlers.purchaseBMItem = function(args, context)
         BMItemChange: b
       };
       return returnObj;
-  }
-  catch(err)
-  {
-    generateErrObj("Something went horribly wrong somewhere: " + err);
-  }
+  //}
+  //catch(err)
+  //{
+  //  generateErrObj("Something went horribly wrong somewhere: " + err);
+ // }
   
 }
 
