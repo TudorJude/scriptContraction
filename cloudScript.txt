@@ -629,6 +629,7 @@ handlers.purchaseBMItem = function(args, context)
     log.debug("searching for: " + userArray[0] + " in " + catalogName);
     for(var i = 0; i < userInventoryObject.length; i++) // if we find it in the inventory we just give him the amount of cards we owe the player
     {
+      log.debug("itemId: " + userInventoryObject[i].ItemId + " itemCatalog: " + userInventoryObject[i].CatalogVersion);
       if((userInventoryObject[i].ItemId == userArray[0]) && (userInventoryObject[i].CatalogVersion == catalogName))
       {
         log.debug("found it!");
