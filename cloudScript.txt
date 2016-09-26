@@ -626,10 +626,12 @@ handlers.purchaseBMItem = function(args, context)
   {
     var cardInstance;
     var cardAmount = 0;
+    log.debug("searching for: " + userArray[0] + " in " + catalogName);
     for(var i = 0; i < userInventoryObject.length; i++) // if we find it in the inventory we just give him the amount of cards we owe the player
     {
       if((userInventoryObject[i].ItemId == userArray[0]) && (userInventoryObject[i].CatalogVersion == catalogName))
       {
+        log.debug("found it!");
         cardInstance = userInventoryObject[i].ItemInstanceId;
         var cardData;
         if(userInventoryObject[i].CustomData.Amount == undefined)
@@ -638,6 +640,8 @@ handlers.purchaseBMItem = function(args, context)
         {
           var tempAmount = Number(userInventoryObject[i].CustomData.Amount) + 1;
           if(isNaN(tempAmount)) tempAmount = 1;
+          log.debug("isNaN(tempAmount): " + isNaN(tempAmount));
+          log.debug("we have custom data! Amount is now: " + tempAmount);
           cardData = {"Amount" : tempAmount};
         }
 
@@ -654,6 +658,7 @@ handlers.purchaseBMItem = function(args, context)
     }
     if(cardInstance == undefined)
     {
+      log.debug("cardInstance is undefined");
       var itemsToGive = [];
       itemsToGive.push(userArray[0]);
       var grantRequest = server.GrantItemsToUser(
