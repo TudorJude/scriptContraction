@@ -1968,7 +1968,7 @@ handlers.openChest = function(args, context)
   var itemData;
   var itemFound = false;
   var newAmount = 0;
-  //part cards
+  //car cards
   for(var p in args.carCardsRequest)
     {
       if (args.carCardsRequest.hasOwnProperty(p)) 
@@ -1977,7 +1977,7 @@ handlers.openChest = function(args, context)
         newAmount = 0;
         for(var i = 0; i < userInventoryObject.Inventory.length; i++)
               {
-                if((userInventoryObject.Inventory[i].ItemId == p) && (userInventoryObject.Inventory[i].CatalogVersion == "PartCards"))
+                if((userInventoryObject.Inventory[i].ItemId == p) && (userInventoryObject.Inventory[i].CatalogVersion == "CarCards"))
                 {
                   log.debug("adding amount to: " + userInventoryObject.Inventory[i].ItemInstanceId);
                   if(userInventoryObject.Inventory[i].CustomData == undefined)
@@ -2013,7 +2013,7 @@ handlers.openChest = function(args, context)
             var itemsToGrant = [p];
             var grantVar = server.GrantItemsToUser(
             {
-              CatalogVersion : args.itemId,
+              CatalogVersion : "CarCards",
               PlayFabId: currentPlayerId,
               ItemIds : itemsToGrant
             }
