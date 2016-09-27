@@ -279,7 +279,7 @@ handlers.startGame = function(args, context) {
   {
     if(trophyCount<sdvalParsed.subdivisions[i])
     {
-      subDivision = 15;
+      subDivision = i;
       break;
     }
   }
