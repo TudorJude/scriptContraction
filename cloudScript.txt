@@ -279,7 +279,7 @@ handlers.startGame = function(args, context) {
   {
     if(trophyCount<sdvalParsed.subdivisions[i])
     {
-      subDivision = i;
+      subDivision = 15;
       break;
     }
   }
@@ -290,9 +290,9 @@ handlers.startGame = function(args, context) {
       Keys : "RecSubDivision"+subDivision
     }
     ); 
-  var str = titleData.Data["RecSubDivision"+subDivision];
-  log.debug("titleData " + str);
-  var getPlayerArray = str.split(",");
+  var recPool = titleData.Data["RecSubDivision"+subDivision];
+  log.debug("titleData " + recPool);
+  var getPlayerArray = recPool.split(",");
   var opponentId = getPlayerArray[0];
   for(var i=0;i<getPlayerArray.length;i++)
   {
