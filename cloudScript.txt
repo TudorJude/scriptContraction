@@ -311,9 +311,10 @@ handlers.startGame = function(args, context) {
   var recordingData = server.GetUserReadOnlyData(
     {
       PlayFabId: opponentId,
-      Keys: [("RecPos_" + args.envIndex + "_" + args.courseIndex) , ("RecRot_" + args.envIndex + "_" + args.courseIndex), ("RecHeader_" + args.envIndex + "_" + args.courseIndex)] 
+      Keys: [(env + "_" + course + "_RecPos") , (env + "_" + course + "_RecRot"), (env + "_" + course + "_RecHeader")] 
     }
     );
+  if(recordingData) return generateErrObj("Did not find recording for this user"); // handle this later
   var oI = server.GetPlayerCombinedInfo(
     {
       PlayFabId:opponentId,
