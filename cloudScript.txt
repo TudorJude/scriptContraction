@@ -291,12 +291,16 @@ handlers.startGame = function(args, context) {
     }
     ); 
   var recPool = titleData.Data["RecSubDivision"+subDivision];
-  log.debug("titleData " + recPool);
-  var getPlayerArray = recPool.split(",");
-  var opponentId = getPlayerArray[0];
-  for(var i=0;i<getPlayerArray.length;i++)
+  if(recPool == undefined) generateErrObj("Recording pool for this subdivision is null");
+  var recPoolJson = Json.parse(recPool);
+  var opponentId = recArray[recArray.length - 1].uId;
+  for(var i = 0; i < recArray.length; i++) // write winstreak/losestreak code
   {
-    if(getPlayerArray[i]!=currentPlayerId){opponentId = getPlayerArray[i];break;}    
+    if(winRatio > recArray[i].wl)
+    {
+      opponentId = recArray[i].uId;
+      break;
+    }
   }
   var recordingData = server.GetUserReadOnlyData(
     {
