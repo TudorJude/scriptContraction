@@ -291,7 +291,9 @@ handlers.startGame = function(args, context) {
     }
     ); 
   var recPool = titleData.Data["RecSubDivision"+subDivision];
+  log.debug("recPool " + recPool);
   if(recPool == undefined) generateErrObj("Recording pool for this subdivision is null");
+  log.debug("parsing to json array");
   var recArray = JSON.parse(recPool);
   var opponentId = recArray[recArray.length - 1].uId;
   for(var i = 0; i < recArray.length; i++) // write winstreak/losestreak code
