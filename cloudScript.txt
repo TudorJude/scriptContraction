@@ -111,12 +111,14 @@ log.debug("user is in subdivision " + subDivision);
             Key:  args.envIndex+"_"+args.courseIndex+"_RecHeader", 
         Value: args.recordingHeader
     });  
+       log.debug("updating user read only data ");
   var playerData = server.UpdateUserReadOnlyData( 
     {
       PlayFabId: currentPlayerId,
-        Data:dict
+      Data:dict
     }
   );  
+  log.debug("updated user read only data for " + currentPlayerId + " " + playerData);
   var titleDataVal = server.GetTitleInternalData(
     {
       Key: "RecSubDivision"+subDivision, //i.e RecSubDivision0,
