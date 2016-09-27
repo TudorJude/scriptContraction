@@ -310,10 +310,12 @@ handlers.startGame = function(args, context) {
       break;
     }
   }
+  var urodkr = [(env + "_" + course + "_RecPos") , (env + "_" + course + "_RecRot"), (env + "_" + course + "_RecHeader")]; 
+  log.debug("requesting " + urodkr);
   var recordingData = server.GetUserReadOnlyData(
     {
       PlayFabId: opponentId,
-      Keys: [(env + "_" + course + "_RecPos") , (env + "_" + course + "_RecRot"), (env + "_" + course + "_RecHeader")] 
+      Keys: urodkr
     }
     );
   if(recordingData) return generateErrObj("Did not find recording for this user: " + opponentId); // handle this later
