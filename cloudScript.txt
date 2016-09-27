@@ -233,7 +233,7 @@ log.debug("user is in subdivision " + subDivision);
   return {dicVal : dict} ;
 }
 
-handlers.gameStart = function(args, context) {
+handlers.startGame = function(args, context) {
   //let's see what subleague we are in and what win/loss ration we have
   //wlratio
   var wlStat = "01"; // 50/50 for newtimers
@@ -287,10 +287,11 @@ handlers.gameStart = function(args, context) {
 
   var titleData = server.GetTitleInternalData(
     {
-      Keys : "Rec_" + args.envIndex + "_" + args.courseIndex //i.e Rec_1_1 
+      Keys : "RecSubDivision"+subDivision
     }
     ); 
-  var str = titleData.Data["Rec_" + args.envIndex + "_" + args.courseIndex];
+  var str = titleData.Data["RecSubDivision"+subDivision];
+  log.debug("titleData " + str);
   var getPlayerArray = str.split(",");
   var opponentId = getPlayerArray[0];
   for(var i=0;i<getPlayerArray.length;i++)
@@ -310,6 +311,7 @@ handlers.gameStart = function(args, context) {
     }
     );
   return {
+    Result :"OK",
     PosData: recordingData.Data["RecPos_" + args.envIndex + "_" + args.courseIndex].Value,
     RotData: recordingData.Data["RecRot_" + args.envIndex + "_" + args.courseIndex].Value,
     HeaderData: recordingData.Data["RecHeader_" + args.envIndex + "_" + args.courseIndex].Value,
@@ -775,7 +777,7 @@ handlers.purchaseBMItem = function(args, context)
           }
       var returnObj = {
         Result: "OK",
-      Message: "InventoryUpdate",
+        Message: "InventoryUpdate",
         InventoryChange:i,
         BMItemChange: b
       };
