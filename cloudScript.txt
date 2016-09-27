@@ -296,11 +296,15 @@ handlers.startGame = function(args, context) {
   log.debug("parsing to json array");
   var recArray = JSON.parse(recPool);
   var opponentId = recArray[recArray.length - 1].uId;
+  var env = recArray[recArray.length - 1].e;
+  var course = recArray[recArray.length - 1].c;
   for(var i = 0; i < recArray.length; i++) // write winstreak/losestreak code
   {
     if(winRatio > recArray[i].wl)
     {
       opponentId = recArray[i].uId;
+      env = recArray[i].e;
+      course = recArray[i].c;
       break;
     }
   }
@@ -318,9 +322,9 @@ handlers.startGame = function(args, context) {
     );
   return {
     Result :"OK",
-    PosData: recordingData.Data["RecPos_" + args.envIndex + "_" + args.courseIndex].Value,
-    RotData: recordingData.Data["RecRot_" + args.envIndex + "_" + args.courseIndex].Value,
-    HeaderData: recordingData.Data["RecHeader_" + args.envIndex + "_" + args.courseIndex].Value,
+    PosData: recordingData.Data[env + "_" + course + "_" + RecPos].Value, //0_0_RecPos
+    RotData: recordingData.Data[env + "_" + course + "_" + RecRot].Value,
+    HeaderData: recordingData.Data[env + "_" + course + "_" + RecHeader].Value,
     Opp: oI.InfoResultPayload.AccountInfo.TitleInfo.DisplayName
          };
 }
