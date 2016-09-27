@@ -240,6 +240,7 @@ handlers.startGame = function(args, context) {
   //wlratio
   var wlStat = "01"; // 50/50 for newtimers
   var winRatio = 50;
+  var wins = 1;
   var totalGames = 2;
   var ps=server.GetPlayerStatistics(
   {
