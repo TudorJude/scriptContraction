@@ -233,7 +233,9 @@ log.debug("user is in subdivision " + subDivision);
   return {dicVal : dict} ;
 }
 
-handlers.requestSplitPlayerRecording = function(args, context) {
+handlers.gameStart = function(args, context) {
+  //let's see what subleague we are in and what win/loss ration we have
+
   var titleData = server.GetTitleInternalData(
     {
       Keys : "Rec_" + args.envIndex + "_" + args.courseIndex //i.e Rec_1_1 
@@ -1167,19 +1169,6 @@ handlers.purchaseItems = function(args, context)
           if(carToGive.ItemGrantResults[0].Result == false)
             {
               log.error("Something went wrong while giving user the item, refunding cards");
-              //old refund code
-              //var cardsToRefund = [];        
-              //for(var i = 0 ; i < cardInfo.baseCardCost; i++)
-              //{
-              //    cardsToRefund.push(args.carId);
-              //}        
-              //var cardRefundResult = server.GrantItemsToUser(
-              //{
-              //  CatalogVersion : "CarCards",
-              //  PlayFabId: currentPlayerId,
-              //  ItemIds : cardsToRefund
-              //}
-              //);
               //new refund code
               return generateFailObj("Something went wrong while giving user the item, refunding cards.");              
             }  
@@ -1487,15 +1476,6 @@ handlers.purchaseItems = function(args, context)
             log.debug("consuming part instance: " + userInventoryObject.Inventory[i].ItemInstanceId);
               try
               {
-              //old consume code
-              //var itemConsumptionResult = server.ConsumeItem(
-              //  {
-              //    PlayFabId: currentPlayerId,
-              //    ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
-              //    ConsumeCount: partsRequired
-              //  }
-              //  );
-                          //new consume code
               if(userInventoryObject.Inventory[i].CustomData == undefined)//let's check if item has custom data
               {
                 return generateFailObj("Insufficient cards");
@@ -1954,6 +1934,20 @@ handlers.openChest = function(args, context)
     PlayFabId: currentPlayerId
   }
   );
+  //let's check if this is a chest from the store
+  if(args.currCost > 0)
+  {
+    var bO = checkBalance(args.currType, args.currCost, userInventoryObject.VirtualCurrency["SC"], userInventoryObject.VirtualCurrency["HC"])
+    if(bO != "OK") return generateFailObj("not enough money");
+
+    var subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
+    {
+      PlayFabId: currentPlayerId,
+      VirtualCurrency : args.currType,
+      Amount: args.currCost
+    }
+    ); 
+  }
   //currency 
 	var addUserCurrencyResult;
 	for(var p in args.currencyReq)
