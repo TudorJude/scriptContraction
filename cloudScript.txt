@@ -42,7 +42,7 @@ handlers.endGame = function(args, context) {
   }
   winRatio = Math.round( 100* (wins/totalGames));
   log.debug("winRatio " + winRatio);
-  //let's get some relevant titlewidedata
+  //let's get some relevant title wide data
     var titleDataRequest = server.GetTitleData(
     {
       Key: ["LeagueSubdivisions","SubdivisionTrophyRanges"] 
@@ -235,6 +235,55 @@ log.debug("user is in subdivision " + subDivision);
 
 handlers.gameStart = function(args, context) {
   //let's see what subleague we are in and what win/loss ration we have
+  //wlratio
+  var wlStat = "01"; // 50/50 for newtimers
+  var winRatio = 50;
+  var totalGames = 2;
+  var ps=server.GetPlayerStatistics(
+  {
+     PlayFabId: currentPlayerId,
+     StatisticNames: ["WinLoss"]
+  });
+  if(ps.Statistics.length != 0)
+  {
+      wlStat = ps.Statistics[0].Value.toString();
+      log.debug("wlStat " + wlStat);
+      totalGames = wlStat.length;
+      for(var i = 0; i < wlStat.length; i++)
+      {
+        if(wlStat[i] == "1") wins++;
+      }
+      winRatio = Math.round( 100* (wins/totalGames));
+  }
+  //trophy count and subleague distribution
+  var leagueTitleDataRequest = server.GetTitleData(
+    {
+      Key: ["LeagueSubdivisions","SubdivisionTrophyRanges"] 
+    }
+    );  
+  var tc=server.GetPlayerStatistics(
+  {
+     PlayFabId: currentPlayerId,
+     StatisticNames: ["TrophyCount"]
+  });
+  var trophyCount = 0;
+  if(tc.Statistics.length != 0)
+  {
+    trophyCount = tc.Statistics[0].Value;
+  }
+  var sdval = leagueTitleDataRequest.Data["SubdivisionTrophyRanges"];
+  var sdvalParsed = JSON.parse(sdval);
+  log.debug("SubdivisionTrophyRanges " + sdvalParsed);
+  var subDivision;
+  for(var i = 0; i < sdvalParsed.subdivisions.length; i++) 
+  {
+    if(trophyCount<sdvalParsed.subdivisions[i])
+    {
+      subDivision = i;
+      break;
+    }
+  }
+  log.debug("user is in subdivision " + subDivision);
 
   var titleData = server.GetTitleInternalData(
     {
@@ -2093,12 +2142,17 @@ handlers.openChest = function(args, context)
         }
       }
     }
-
-  return server.GetUserInventory(
-  {
-    PlayFabId: currentPlayerId
-  }
-  );
+   var invObj = server.GetUserInventory(
+    {
+      PlayFabId: currentPlayerId
+    }
+    );
+   var returnObj = {
+      Result: "OK",
+      Message: "InventoryUpdated",
+      InventoryChange:invObj
+    };
+   return returnObj;
 }
 
 handlers.buyChest = function(args, context)
