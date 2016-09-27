@@ -318,7 +318,7 @@ handlers.startGame = function(args, context) {
       Keys: urodkr
     }
     );
-  if(recordingData) return generateErrObj("Did not find recording for this user: " + opponentId); // handle this later
+  if(recordingData == undefined) return generateErrObj("Did not find recording for this user: " + opponentId); // handle this later
   var oI = server.GetPlayerCombinedInfo(
     {
       PlayFabId:opponentId,
