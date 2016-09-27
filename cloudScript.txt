@@ -316,7 +316,7 @@ handlers.startGame = function(args, context) {
       Keys: [(env + "_" + course + "_RecPos") , (env + "_" + course + "_RecRot"), (env + "_" + course + "_RecHeader")] 
     }
     );
-  if(recordingData) return generateErrObj("Did not find recording for this user"); // handle this later
+  if(recordingData) return generateErrObj("Did not find recording for this user: " + opponentId); // handle this later
   var oI = server.GetPlayerCombinedInfo(
     {
       PlayFabId:opponentId,
