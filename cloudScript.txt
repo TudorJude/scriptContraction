@@ -1064,7 +1064,7 @@ handlers.purchaseItems = function(args, context)
                 }
                 else // let's check and see if the user has sufficent cards
                 {
-                  if(userInventoryObject.Inventory[i].CustomData.Amount >= cardCost) // he does so let's remove the appropriate amount
+                  if(Number(userInventoryObject.Inventory[i].CustomData.Amount) >= cardCost) // he does so let's remove the appropriate amount
                   {
                     userInventoryObject.Inventory[i].CustomData.Amount -= cardCost;
                     cardData = {"Amount" : userInventoryObject.Inventory[i].CustomData.Amount};
@@ -1190,7 +1190,7 @@ handlers.purchaseItems = function(args, context)
                 }
                 else // let's check and see if the user has sufficent cards
                 {
-                  if(userInventoryObject.Inventory[i].CustomData.Amount >= cardInfo.baseCardCost) // he does so let's remove the appropriate amount
+                  if(Number(userInventoryObject.Inventory[i].CustomData.Amount) >= Number(cardInfo.baseCardCost)) // he does so let's remove the appropriate amount
                   {
                     carCardInstance = userInventoryObject.Inventory[i].ItemInstanceId;
                     userInventoryObject.Inventory[i].CustomData.Amount -= cardInfo.baseCardCost;
