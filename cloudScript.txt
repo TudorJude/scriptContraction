@@ -1054,13 +1054,13 @@ handlers.purchaseItems = function(args, context)
             //new consume code
               if(userInventoryObject.Inventory[i].CustomData == undefined)//let's check if item has custom data
               {
-                return generateFailObj("Insufficient cards");
+                return generateFailObj("Insufficient cards, CusotmData undefined");
               }
               else
               {
                 if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)//let's check if item has amount custom data
                 {
-                  return generateFailObj("Insufficient cards");
+                  return generateFailObj("Insufficient cards, CusotmData.Amount udnefined");
                 }
                 else // let's check and see if the user has sufficent cards
                 {
@@ -1078,7 +1078,7 @@ handlers.purchaseItems = function(args, context)
                   }
                   else
                   {
-                    return generateFailObj("Insufficient cards");
+                    return generateFailObj("Insufficient cards for real: " + userInventoryObject.Inventory[i].CustomData.Amount + " vs " + cardCost);
                   }
                 }
               }
@@ -1198,7 +1198,7 @@ handlers.purchaseItems = function(args, context)
                   }
                   else
                   {
-                    return generateFailObj("Insufficient cards");
+                    return generateFailObj("Insufficient cards: " + userInventoryObject.Inventory[i].CustomData.Amount + " vs " + cardInfo.baseCardCost+".");
                   }
                 }
               }
