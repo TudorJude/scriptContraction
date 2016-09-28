@@ -240,7 +240,6 @@ handlers.startGame = function(args, context) {
   //wlratio
   var wlStat = "01"; // 50/50 for newtimers
   var winRatio = 50;
-  var wins = 1;
   var totalGames = 2;
   var ps=server.GetPlayerStatistics(
   {
@@ -1181,13 +1180,13 @@ handlers.purchaseItems = function(args, context)
                           //new consume code
               if(userInventoryObject.Inventory[i].CustomData == undefined)//let's check if item has custom data
               {
-                return generateFailObj("Insufficient cards");
+                return generateFailObj("Insufficient cards, CustomData null");
               }
               else
               {
                 if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)//let's check if item has amount custom data
                 {
-                  return generateFailObj("Insufficient cards");
+                  return generateFailObj("Insufficient cards, CustomData.Amount null");
                 }
                 else // let's check and see if the user has sufficent cards
                 {
@@ -1206,7 +1205,7 @@ handlers.purchaseItems = function(args, context)
               }
               catch(err)
               {
-                return generateFailObj("Insufficient cards");
+                return generateFailObj("Insufficient cards: " + err);
               }
               break;
             }
