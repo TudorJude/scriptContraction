@@ -1125,7 +1125,8 @@ handlers.purchaseItems = function(args, context)
         log.debug("user has car: " +  args.carId + "... upgrading");
         
         //let's check that the user has enough money + cards
-        var currCost = parseInt(cardInfo.baseCurrCost) + (parseInt(car.CustomData.CarLvl) * parseInt(cardInfo.currCostPerLvl));
+        var newLvl = (parseInt(car.CustomData.CarLvl) + 1);
+        var currCost = parseInt(cardInfo.baseCurrCost) + (newLvl * parseInt(cardInfo.currCostPerLvl));
         var costCheckObj = checkBalance(cardInfo.currType, currCost, playerSC, playerHC);
         if(costCheckObj != "OK") return costCheckObj;
 
@@ -1199,7 +1200,7 @@ handlers.purchaseItems = function(args, context)
         }
         log.debug("user has enough cards to purchase upgrade!");
 
-        var newLvl = (parseInt(car.CustomData.CarLvl) + 1);
+        
         var newPr = recalculateCarPr(car.CustomData, car.ItemId, carCardsCatalog, undefined);
         log.debug("upgrading to car lvl: " +  newLvl + " and pr: " + newPr);
         var CarData = {
@@ -1632,9 +1633,8 @@ handlers.purchaseItems = function(args, context)
             //refactored code
             log.debug("calculating " + args.partId + " cost and modifying " + tempDict[args.partId]);
             var partsRequired = parseInt(cardInfo.baseCardCost, 10) + (parseInt(car.CustomData[tempDict[args.partId]], 10) * parseInt(cardInfo.cardCostPerLvl, 10));
-            var currCost = (Number(car.CustomData[tempDict[args.partId]]) * Number(cardInfo.currCostPerLvl));
-            //currCost += Number(cardInfo.baseCurrCost);
             var newlvl = parseInt(car.CustomData[tempDict[args.partId]]) + 1;
+            var currCost = Number(cardInfo.baseCurrCost) + (newlvl * Number(cardInfo.currCostPerLvl));         
             CarDataToBeUpdated[tempDict[args.partId]] = newlvl;
             car.CustomData[tempDict[args.partId]] = newlvl;
             log.debug("we need: " + partsRequired + " cards and " + currCost + " money => base: " + parseInt(cardInfo.baseCurrCost) + " lvls: " + parseInt(car.CustomData[tempDict[args.partId]]) + " perLvlCost: " + parseInt(cardInfo.currCostPerLvl) + " equalling: "  + ((parseInt(car.CustomData[tempDict[args.partId]], 10) * parseInt(cardInfo.currCostPerLvl, 10))));
