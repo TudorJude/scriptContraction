@@ -561,10 +561,10 @@ function calculateLeague(currentTrophies)
   });
   if(td.Data["LeagueSubdivisions"] == undefined) return league;
   if(td.Data["SubdivisionTrophyRanges"] == undefined) return league;
-  var leaguesSubdivisions = td.Data.LeagueSubdivisions.leagues;
-  var leaguesSubdivisionsParsed = JSON.parse(leaguesSubdivisions);
-  var sdvtr = td.Data.SubdivisionTrophyRanges.subdivisions;
-  var sdvtrParsed = JSON.parse(sdvtr);
+  var leaguesSubdivisions = JSON.parse(td.Data.LeagueSubdivisions);
+  var leaguesSubdivisionsParsed = leaguesSubdivisions.leagues;
+  var sdvtr = JSON.parse(td.Data.SubdivisionTrophyRanges);
+  var sdvtrParsed = sdvtr.subdivisions;
 
   for(var i = 0; i < leaguesSubdivisionsParsed.length; i++)
   {
