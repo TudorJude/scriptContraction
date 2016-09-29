@@ -242,6 +242,7 @@ handlers.startGame = function(args, context) {
   var wlStat = "01"; // 50/50 for newtimers
   var winRatio = 50;
   var totalGames = 2;
+  var wins = 0;
   var ps=server.GetPlayerStatistics(
   {
      PlayFabId: currentPlayerId,
