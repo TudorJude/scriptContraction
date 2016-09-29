@@ -274,6 +274,7 @@ handlers.startGame = function(args, context) {
   }
   //start game so we assume it'sa lose until it's a win
   wlStat += "0";
+  log.debug("wlStatBeforeshift " + wlStat);
    if(wlStat.length > 20)
    {
     wlStat.shift();
