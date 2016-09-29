@@ -82,7 +82,14 @@ handlers.endGame = function(args, context) {
   }
   );  
   //user ran out of time so we don't store recording
-  if(args.outcome == "rOot") return;
+  if(args.outcome == "rOot") 
+    {
+        var newPlayerStats = 
+        {
+          "TrophyCount" : trophyCount
+        }
+        return {Result : newPlayerStats};
+    }
 
   //let's see which Subdivision this player is in
   var sdval = titleDataRequest.Data["SubdivisionTrophyRanges"];
@@ -232,8 +239,11 @@ log.debug("user is in subdivision " + subDivision);
       Value: titleKeyVal
     }
     );
-  
-  return {dicVal : dict} ;
+  var newPlayerStats = 
+  {
+    "TrophyCount" : trophyCount
+  }
+  return {Result : newPlayerStats};
 }
 
 handlers.startGame = function(args, context) {
