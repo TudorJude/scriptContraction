@@ -344,8 +344,9 @@ handlers.startGame = function(args, context) {
   suArray.push(su);  
   var sut = {StatisticName : "TrophyCount", Version : "0", Value: trophyCount};
   suArray.push(sut); 
-  var sut = {StatisticName : "League", Version : "0", Value: cLeague};
-  suArray.push(sut); 
+  var sul = {StatisticName : "League", Version : "0", Value: cLeague};
+  suArray.push(sul); 
+  log.debug("updatingStats: " + suArray);
   var updateRequest = server.UpdatePlayerStatistics(
   {
     PlayFabId: currentPlayerId,
