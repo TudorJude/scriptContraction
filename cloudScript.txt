@@ -20,8 +20,13 @@ handlers.endGame = function(args, context) {
   var totalGames = 2;
   var winRatio = 0;
   log.debug("wlStat.length " + wlStat.length);
-
-	wlStat[wlStat.length-1] = curWL; 
+  var tempString = new Array[wlStat.length];
+  for(var i = 0 ; i < tempString.length - 1; i++)
+  {
+    tempString[i] = wlStat[i];
+  }
+	tempString[tempString.length-1] = curWL; 
+  wlStat = tempString;
 	totalGames = wlStat.length;
 	for(var i = 0; i < wlStat.length; i++)
 	{
@@ -255,8 +260,7 @@ handlers.startGame = function(args, context) {
   if(ps.Statistics.length != 0)
   {
       wlStatInt = ps.Statistics[0].Value.toString();
-      wlStat = Number(wlStatInt).toString(2)
-      log.debug("wlStat " + wlStat);
+      wlStat = Number(wlStatInt).toString(2);      
       totalGames = wlStat.length;
       for(var i = 0; i < wlStat.length; i++)
       {
@@ -270,6 +274,7 @@ handlers.startGame = function(args, context) {
    {
     wlStat.shift();
    }
+   log.debug("wlStat " + wlStat);
   //trophy count and subleague distribution
   var leagueTitleDataRequest = server.GetTitleData(
     {
