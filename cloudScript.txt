@@ -13,6 +13,7 @@ handlers.endGame = function(args, context) {
   if(ps.Statistics.length != 0)
   {
       wlStatInt = ps.Statistics[0].Value.toString();
+      log.debug("wlStatInt " + wlStatInt);
       wlStat = Number(wlStatInt).toString(2);
       log.debug("wlStat " + wlStat);
   }
