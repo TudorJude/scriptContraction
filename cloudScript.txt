@@ -68,6 +68,7 @@ handlers.endGame = function(args, context) {
   	else
   		trophyCount += 60;
   }
+  log.debug("trophies change: " + initTrophyCount + " => " + trophyCount);
   //update stats on server
   var suArray = [];
   var su = {StatisticName : "WinLoss", Version : "0", Value: wlStat};
