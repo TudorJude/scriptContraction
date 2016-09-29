@@ -574,28 +574,7 @@ function checkBalance(currType, cost, userSCBalance, userHCBalance)
   }
   return "OK";
 }
-handlers.tempFunc = function(args)
-{
-  var league = 1;
-  td = server.GetTitleData(
-  {
-    Keys : ["LeagueSubdivisions", "SubdivisionTrophyRanges"]
-  });
-  if(td.Data["LeagueSubdivisions"] == undefined) return league;
-  if(td.Data["SubdivisionTrophyRanges"] == undefined) return league;
-  var leaguesSubdivisions = JSON.parse(td.Data.LeagueSubdivisions);
-  var leaguesSubdivisionsParsed = leaguesSubdivisions.leagues;
-  var sdvtr = JSON.parse(td.Data.SubdivisionTrophyRanges);
-  var sdvtrParsed = sdvtr.subdivisions;
-  log.debug("leaguesSubdivisionsParsed.length: " + leaguesSubdivisionsParsed.length);
-  for(var i = 0; i < leaguesSubdivisionsParsed.length; i++)
-  {
-    log.debug("comparing: " + Number(args.t) + " vs " + Number(sdvtrParsed[leaguesSubdivisionsParsed[i]]));
-    if(Number(args.t) >= Number(sdvtrParsed[leaguesSubdivisionsParsed[i]]))
-      continue;
-      return i;
-  }
-}
+
 function calculateLeague(currentTrophies)
 {
   var league = 1;
@@ -612,7 +591,7 @@ function calculateLeague(currentTrophies)
 
   for(var i = 0; i < leaguesSubdivisionsParsed.length; i++)
   {
-    if(Number(currentTrophies) < Number(sdvtrParsed[leaguesSubdivisionsParsed[i]]))
+    if(Number(currentTrophies) > Number(sdvtrParsed[leaguesSubdivisionsParsed[i]]))
       continue;
       return i;
   }
