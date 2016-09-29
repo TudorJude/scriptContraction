@@ -340,11 +340,11 @@ handlers.startGame = function(args, context) {
   var cLeague = calculateLeague(trophyCount);
   //update stats on server
   var suArray = [];
-  var su = {StatisticName : "WinLoss", Version : "0", Value: wlStat};
+  var su = {StatisticName: "WinLoss", Version : "0", Value: wlStat};
   suArray.push(su);  
-  var sut = {StatisticName : "TrophyCount", Version : "0", Value: trophyCount};
+  var sut = {StatisticName: "TrophyCount", Version : "0", Value: trophyCount};
   suArray.push(sut); 
-  var sul = {StatisticName : "League", Version : "0", Value: cLeague};
+  var sul = {StatisticName: "League", Version : "0", Value: cLeague};
   suArray.push(sul); 
   log.debug("updatingStats: " + suArray);
   var updateRequest = server.UpdatePlayerStatistics(
