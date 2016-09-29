@@ -21,12 +21,15 @@ handlers.endGame = function(args, context) {
   var winRatio = 0;
   log.debug("wlStat.length " + wlStat.length);
   var tempString = new Array(wlStat.length);
+  log.debug("tempString.length " + tempString.length);
   for(var i = 0 ; i < tempString.length - 1; i++)
   {
     tempString[i] = wlStat[i];
   }
 	tempString[tempString.length-1] = curWL; 
+  log.debug("tempString " + tempString);
   wlStat = tempString;
+  log.debug("wlStat " + wlStat);
 	totalGames = wlStat.length;
 	for(var i = 0; i < wlStat.length; i++)
 	{
