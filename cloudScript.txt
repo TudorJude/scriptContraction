@@ -74,7 +74,6 @@ handlers.endGame = function(args, context) {
     if(wlStat[i] == "1")
       wlStatInt += Math.pow(2,i);
   }
-  log.debug("winLossInt is : " + wlStatInt + " from : " + wlStat + " parseInt(wlStat, 2): " + parseInt(wlStat, 2));
   //update stats on server
   var suArray = [];
   var su = {StatisticName : "WinLoss", Version : "0", Value: wlStatInt};
@@ -575,7 +574,27 @@ function checkBalance(currType, cost, userSCBalance, userHCBalance)
   }
   return "OK";
 }
+handlers.tempFunc = function(args)
+{
+  var league = 1;
+  td = server.GetTitleData(
+  {
+    Keys : ["LeagueSubdivisions", "SubdivisionTrophyRanges"]
+  });
+  if(td.Data["LeagueSubdivisions"] == undefined) return league;
+  if(td.Data["SubdivisionTrophyRanges"] == undefined) return league;
+  var leaguesSubdivisions = JSON.parse(td.Data.LeagueSubdivisions);
+  var leaguesSubdivisionsParsed = leaguesSubdivisions.leagues;
+  var sdvtr = JSON.parse(td.Data.SubdivisionTrophyRanges);
+  var sdvtrParsed = sdvtr.subdivisions;
 
+  for(var i = 0; i < leaguesSubdivisionsParsed.length; i++)
+  {
+    if(Number(args.t) < Number(sdvtrParsed[leaguesSubdivisionsParsed[i]]))
+      continue;
+      return i;
+  }
+}
 function calculateLeague(currentTrophies)
 {
   var league = 1;
