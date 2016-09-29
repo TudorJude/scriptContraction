@@ -2,6 +2,7 @@
 handlers.endGame = function(args, context) {
   //let's recalculate the player's win/loss ratio
   var wlStat = "01";
+  var wlStatInt = 0;
   var curWL = "0";
   if(args.outcome == "rWin")curWL="1";
   var ps=server.GetPlayerStatistics(
@@ -11,7 +12,8 @@ handlers.endGame = function(args, context) {
   });
   if(ps.Statistics.length != 0)
   {
-      wlStat = ps.Statistics[0].Value.toString();
+      wlStatInt = ps.Statistics[0].Value.toString();
+      wlStat = Number(wlStatInt).toString(2);
       log.debug("wlStat " + wlStat);
   }
   var wins = 0;
@@ -57,9 +59,10 @@ handlers.endGame = function(args, context) {
   }
   log.debug("trophies change: " + initTrophyCount + " => " + trophyCount);
   var cLeague = calculateLeague(trophyCount);
+  wlStatInt = parseInt(wlStat, 2);
   //update stats on server
   var suArray = [];
-  var su = {StatisticName : "WinLoss", Version : "0", Value: wlStat};
+  var su = {StatisticName : "WinLoss", Version : "0", Value: wlStatInt};
   suArray.push(su);  
   var sut = {StatisticName : "TrophyCount", Version : "0", Value: trophyCount};
   suArray.push(sut); 
@@ -240,6 +243,7 @@ handlers.startGame = function(args, context) {
   //let's see what subleague we are in and what win/loss ration we have
   //wlratio
   var wlStat = "01"; // 50/50 for newtimers
+  var wlStatInt = 0; // 50/50 for newtimers
   var winRatio = 50;
   var totalGames = 2;
   var wins = 0;
@@ -250,7 +254,8 @@ handlers.startGame = function(args, context) {
   });
   if(ps.Statistics.length != 0)
   {
-      wlStat = ps.Statistics[0].Value.toString();
+      wlStatInt = ps.Statistics[0].Value.toString();
+      wlStat = Number(wlStatInt).toString(2)
       log.debug("wlStat " + wlStat);
       totalGames = wlStat.length;
       for(var i = 0; i < wlStat.length; i++)
@@ -261,7 +266,7 @@ handlers.startGame = function(args, context) {
   }
   //start game so we assume it'sa lose until it's a win
   wlStat += "0";
-   if(wlStat.length > 50)
+   if(wlStat.length > 20)
    {
     wlStat.shift();
    }
@@ -336,11 +341,11 @@ handlers.startGame = function(args, context) {
   //found recording now let's reduce user's trophies
   trophyCount -= 30;
   if(trophyCount <= 0) trophyCount = 0;
-
+  wlStatInt = parseInt(wlStat, 2);
   var cLeague = calculateLeague(trophyCount);
   //update stats on server
   var suArray = [];
-  var su = {StatisticName: "WinLoss", Version : "0", Value: wlStat};
+  var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
   suArray.push(su);  
   var sut = {StatisticName: "TrophyCount", Version : "0", Value: trophyCount};
   suArray.push(sut); 
