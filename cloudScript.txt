@@ -587,9 +587,10 @@ handlers.tempFunc = function(args)
   var leaguesSubdivisionsParsed = leaguesSubdivisions.leagues;
   var sdvtr = JSON.parse(td.Data.SubdivisionTrophyRanges);
   var sdvtrParsed = sdvtr.subdivisions;
-
+  log.debug("leaguesSubdivisionsParsed.length: " + leaguesSubdivisionsParsed.length);
   for(var i = 0; i < leaguesSubdivisionsParsed.length; i++)
   {
+    log.debug("comparing: " + Number(args.t) + " vs " + Number(sdvtrParsed[leaguesSubdivisionsParsed[i]]));
     if(Number(args.t) < Number(sdvtrParsed[leaguesSubdivisionsParsed[i]]))
       continue;
       return i;
