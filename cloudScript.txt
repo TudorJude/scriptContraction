@@ -20,7 +20,7 @@ handlers.endGame = function(args, context) {
   var totalGames = 2;
   var winRatio = 0;
   log.debug("wlStat.length " + wlStat.length);
-  var tempString = new Array[wlStat.length];
+  var tempString = new Array[Number(wlStat.length)];
   for(var i = 0 ; i < tempString.length - 1; i++)
   {
     tempString[i] = wlStat[i];
