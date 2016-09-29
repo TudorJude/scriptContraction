@@ -615,6 +615,7 @@ function recalculateCarPr(CarData, carId, _carCardsCatalog, _partsCardCatalog)
     {
       carCardsCatalog = _carCardsCatalog;
     }
+    if(CarData == undefined) return Number(carCardInfo.basePr);
     for(var i = 0; i < carCardsCatalog.Catalog.length; i++)
     {
       if(carCardsCatalog.Catalog[i].ItemId == carId)
@@ -639,6 +640,7 @@ function recalculateCarPr(CarData, carId, _carCardsCatalog, _partsCardCatalog)
     {
       partCardsCatalog = _partsCardCatalog;
     }
+
     var tempDict = 
         {
           Exhaust: CarData.ExhaustLvl,
