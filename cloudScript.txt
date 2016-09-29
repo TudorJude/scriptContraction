@@ -1633,7 +1633,7 @@ handlers.purchaseItems = function(args, context)
             log.debug("calculating " + args.partId + " cost and modifying " + tempDict[args.partId]);
             var partsRequired = parseInt(cardInfo.baseCardCost, 10) + (parseInt(car.CustomData[tempDict[args.partId]], 10) * parseInt(cardInfo.cardCostPerLvl, 10));
             var currCost = (Number(car.CustomData[tempDict[args.partId]]) * Number(cardInfo.currCostPerLvl));
-            currCost += Number(cardInfo.baseCurrCost);
+            //currCost += Number(cardInfo.baseCurrCost);
             var newlvl = parseInt(car.CustomData[tempDict[args.partId]]) + 1;
             CarDataToBeUpdated[tempDict[args.partId]] = newlvl;
             car.CustomData[tempDict[args.partId]] = newlvl;
