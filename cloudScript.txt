@@ -68,7 +68,12 @@ handlers.endGame = function(args, context) {
   }
   log.debug("trophies change: " + initTrophyCount + " => " + trophyCount);
   var cLeague = calculateLeague(trophyCount);
-  wlStatInt = parseInt(tempString, 2);
+  wlStatInt = 0;
+  for(var i = 0 ; i < wlStat.length; i++ )
+  {
+    if(wlStat[i] == "1")
+      wlStatInt += Math.pow(2,i);
+  }
   log.debug("winLossInt is : " + wlStatInt + " from : " + wlStat + " parseInt(wlStat, 2): " + parseInt(wlStat, 2));
   //update stats on server
   var suArray = [];
