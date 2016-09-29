@@ -1636,7 +1636,7 @@ handlers.purchaseItems = function(args, context)
             var newlvl = parseInt(car.CustomData[tempDict[args.partId]]) + 1;
             CarDataToBeUpdated[tempDict[args.partId]] = newlvl;
             car.CustomData[tempDict[args.partId]] = newlvl;
-            log.debug("we need: " + partsRequired + " cards");
+            log.debug("we need: " + partsRequired + " cards and " + currCost + " money => base: " + parseInt(cardInfo.baseCurrCost) + " lvls: " + parseInt(car.CustomData[tempDict[args.partId]]) + " perLvlCost: " + parseInt(cardInfo.currCostPerLvl));
             var updateCardData;
             var costCheckObj = checkBalance(cardInfo.currType, currCost, playerSC, playerHC);
             if(costCheckObj != "OK") return costCheckObj;
