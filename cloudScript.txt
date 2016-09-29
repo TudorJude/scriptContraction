@@ -273,6 +273,7 @@ handlers.startGame = function(args, context) {
       winRatio = Math.round( 100* (wins/totalGames));
   }
   //start game so we assume it'sa lose until it's a win
+  log.debug("wlStatBeforeshiftandAdd " + wlStat);
   wlStat += "0";
   log.debug("wlStatBeforeshift " + wlStat);
    if(wlStat.length > 20)
