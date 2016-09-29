@@ -93,7 +93,8 @@ handlers.endGame = function(args, context) {
     {
         var newPlayerStats = 
         {
-          "TrophyCount" : trophyCount
+          "TrophyCount" : trophyCount,
+          "League" : cLeague
         }
         return {Result : newPlayerStats};
     }
@@ -246,10 +247,11 @@ log.debug("user is in subdivision " + subDivision);
       Value: titleKeyVal
     }
     );
-  var newPlayerStats = 
-  {
-    "TrophyCount" : trophyCount
-  }
+   var newPlayerStats = 
+     {
+          "TrophyCount" : trophyCount,
+          "League" : cLeague
+      }
   return {Result : newPlayerStats};
 }
 
