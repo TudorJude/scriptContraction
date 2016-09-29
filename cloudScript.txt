@@ -61,7 +61,7 @@ handlers.endGame = function(args, context) {
     trophyCount = tc.Statistics[0].Value;
   }
   initTrophyCount = trophyCount;
-  if(args.val == "rWin") 
+  if(args.outcome == "rWin") 
   {
   	if(trophyCount<=0)
   		trophyCount = 30;
@@ -82,7 +82,7 @@ handlers.endGame = function(args, context) {
   }
   );  
   //user ran out of time so we don't store recording
-  if(args.val == "rOot") return;
+  if(args.outcome == "rOot") return;
 
   //let's see which Subdivision this player is in
   var sdval = titleDataRequest.Data["SubdivisionTrophyRanges"];
