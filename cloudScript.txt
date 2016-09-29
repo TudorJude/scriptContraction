@@ -354,6 +354,7 @@ handlers.startGame = function(args, context) {
   trophyCount -= 30;
   if(trophyCount <= 0) trophyCount = 0;
   wlStatInt = parseInt(wlStat, 2);
+  log.debug("updating WL to:  " + wlStatInt);
   var cLeague = calculateLeague(trophyCount);
   //update stats on server
   var suArray = [];
