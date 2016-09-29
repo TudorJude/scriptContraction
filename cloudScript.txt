@@ -18,28 +18,15 @@ handlers.endGame = function(args, context) {
   var totalGames = 2;
   var winRatio = 0;
   log.debug("wlStat.length " + wlStat.length);
-  if(wlStat.length<50) // remember stats from last 50 matches
-  {
-	wlStat += curWL; 
+
+	wlStat[wlStat.length-1] = curWL; 
 	totalGames = wlStat.length;
 	for(var i = 0; i < wlStat.length; i++)
 	{
 		if(wlStat[i] == "1") wins++;
 	}
 	log.debug("wlStatNew " + wlStat);
-  }
-  else
-  {
-  	totalGames = wlStat.length;
-  	for(var i = 0; i < wlStat.length-1; i++)
-  	{
-  		wlStat[i] = wlStat[i+1];
-  		if(wlStat[i] == "1") wins++;
-  	}
-  	wlStat[wlStat.length-1] = curWL;
-  	if(curWL == "1") wins++;
-  	log.debug("wlStatNewMoreThanMax " + wlStat);
-  }
+
   winRatio = Math.round( 100* (wins/totalGames));
   log.debug("winRatio " + winRatio);
   //let's get some relevant title wide data
@@ -69,11 +56,14 @@ handlers.endGame = function(args, context) {
   		trophyCount += 60;
   }
   log.debug("trophies change: " + initTrophyCount + " => " + trophyCount);
+  var cLeague = calculateLeague(trophyCount);
   //update stats on server
   var suArray = [];
   var su = {StatisticName : "WinLoss", Version : "0", Value: wlStat};
   suArray.push(su);  
   var sut = {StatisticName : "TrophyCount", Version : "0", Value: trophyCount};
+  suArray.push(sut); 
+  var sut = {StatisticName : "League", Version : "0", Value: cLeague};
   suArray.push(sut); 
   var updateRequest = server.UpdatePlayerStatistics(
   {
@@ -269,6 +259,12 @@ handlers.startGame = function(args, context) {
       }
       winRatio = Math.round( 100* (wins/totalGames));
   }
+  //start game so we assume it'sa lose until it's a win
+  wlStat += "0";
+   if(wlStat.length > 50)
+   {
+    wlStat.shift();
+   }
   //trophy count and subleague distribution
   var leagueTitleDataRequest = server.GetTitleData(
     {
@@ -283,7 +279,7 @@ handlers.startGame = function(args, context) {
   var trophyCount = 0;
   if(tc.Statistics.length != 0)
   {
-    trophyCount = tc.Statistics[0].Value;
+    trophyCount = tc.Statistics[0].Value;    
   }
   var sdval = leagueTitleDataRequest.Data["SubdivisionTrophyRanges"];
   var sdvalParsed = JSON.parse(sdval);
@@ -337,6 +333,26 @@ handlers.startGame = function(args, context) {
       InfoRequestParameters: {"GetUserAccountInfo": true,"GetUserInventory": false,"GetUserVirtualCurrency": false,"GetUserData": false,"GetUserReadOnlyData": false,"GetCharacterInventories": false,"GetCharacterList": false, "GetTitleData": false,"GetPlayerStatistics": false}
     }
     );
+  //found recording now let's reduce user's trophies
+  trophyCount -= 30;
+  if(trophyCount <= 0) trophyCount = 0;
+
+  var cLeague = calculateLeague(trophyCount);
+  //update stats on server
+  var suArray = [];
+  var su = {StatisticName : "WinLoss", Version : "0", Value: wlStat};
+  suArray.push(su);  
+  var sut = {StatisticName : "TrophyCount", Version : "0", Value: trophyCount};
+  suArray.push(sut); 
+  var sut = {StatisticName : "League", Version : "0", Value: cLeague};
+  suArray.push(sut); 
+  var updateRequest = server.UpdatePlayerStatistics(
+  {
+    PlayFabId: currentPlayerId,
+    Statistics: suArray
+  }
+  );
+
   return {
     Result :"OK",
     PosData: recordingData.Data[env + "_" + course + "_RecPos"].Value, //0_0_RecPos
@@ -523,6 +539,28 @@ function checkBalance(currType, cost, userSCBalance, userHCBalance)
       return generateFailObj("NotEnoughHC");
   }
   return "OK";
+}
+
+function calculateLeague(currentTrophies)
+{
+  var league = 1;
+  td = server.GetTitleData(
+  {
+    Keys : ["LeagueSubdivisions", "SubdivisionTrophyRanges"]
+  });
+  if(td.Data["LeagueSubdivisions"] == undefined) return league;
+  if(td.Data["SubdivisionTrophyRanges"] == undefined) return league;
+  var leaguesSubdivisions = td.Data.LeagueSubdivisions.leagues;
+  var sdvtr = td.Data.SubdivisionTrophyRanges.subdivisions;
+  var leaguesTrophies = new Array(leaguesSubdivisions.length);
+
+  for(var i = 0; i < leaguesSubdivisions.length; i++)
+  {
+    leaguesTrophies[i] = sdvtr[leaguesSubdivisions[i]];
+    if(Number(currentTrophies) < Number(sdvtr[leaguesSubdivisions[i]]))
+      continue;
+      return i;
+  }
 }
 
 function recalculateCarPr(CarData, carId) 
