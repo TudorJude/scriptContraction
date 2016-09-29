@@ -488,12 +488,23 @@ handlers.requestInventory = function(args)
     PlayFabId: currentPlayerId,
   }
   );
+  //get catalog data for pr calculation
+    var carCardsCatalog = server.GetCatalogItems(
+         {
+           CatalogVersion : "CarCards"
+         }
+         );
+    var partCardsCatalog = server.GetCatalogItems(
+       {
+         CatalogVersion : "PartCards"
+       }
+       );
   for(var i = 0; i < userInventoryObject.Inventory.length; i++)
   {
     if(userInventoryObject.Inventory[i].CatalogVersion == "CarsProgress")
     {
       log.debug("found " + userInventoryObject.Inventory[i].ItemId);
-      userInventoryObject.Inventory[i].CustomData.Pr = recalculateCarPr(userInventoryObject.Inventory[i].CustomData, userInventoryObject.Inventory[i].ItemId); 
+      userInventoryObject.Inventory[i].CustomData.Pr = recalculateCarPr(userInventoryObject.Inventory[i].CustomData, userInventoryObject.Inventory[i].ItemId, carCardsCatalog, partCardsCatalog); 
       var d = {};
       d["Pr"] = userInventoryObject.Inventory[i].CustomData.Pr;
       server.UpdateUserInventoryItemCustomData(
@@ -551,26 +562,34 @@ function calculateLeague(currentTrophies)
   if(td.Data["LeagueSubdivisions"] == undefined) return league;
   if(td.Data["SubdivisionTrophyRanges"] == undefined) return league;
   var leaguesSubdivisions = td.Data.LeagueSubdivisions.leagues;
+  var leaguesSubdivisionsParsed = JSON.parse(leaguesSubdivisions);
   var sdvtr = td.Data.SubdivisionTrophyRanges.subdivisions;
-  var leaguesTrophies = new Array(leaguesSubdivisions.length);
+  var sdvtrParsed = JSON.parse(sdvtr);
 
-  for(var i = 0; i < leaguesSubdivisions.length; i++)
+  for(var i = 0; i < leaguesSubdivisionsParsed.length; i++)
   {
-    leaguesTrophies[i] = sdvtr[leaguesSubdivisions[i]];
-    if(Number(currentTrophies) < Number(sdvtr[leaguesSubdivisions[i]]))
+    if(Number(currentTrophies) < Number(sdvtrParsed[leaguesSubdivisionsParsed[i]]))
       continue;
       return i;
   }
 }
 
-function recalculateCarPr(CarData, carId) 
+function recalculateCarPr(CarData, carId, _carCardsCatalog, _partsCardCatalog) 
 {
     var pr = 0;
-    var carCardsCatalog = server.GetCatalogItems(
-       {
-         CatalogVersion : "CarCards"
-       }
-       );
+    var carCardsCatalog;
+    if(_carCardsCatalog == undefined)
+    {
+      carCardsCatalog = server.GetCatalogItems(
+         {
+           CatalogVersion : "CarCards"
+         }
+         );
+    }
+    else
+    {
+      carCardsCatalog = _carCardsCatalog;
+    }
     for(var i = 0; i < carCardsCatalog.Catalog.length; i++)
     {
       if(carCardsCatalog.Catalog[i].ItemId == carId)
@@ -582,12 +601,19 @@ function recalculateCarPr(CarData, carId)
     }
   
     //calcualte pr based on each part level
-    var partCardsCatalog = server.GetCatalogItems(
-     {
-       CatalogVersion : "PartCards"
-     }
-     );
-  
+    var partCardsCatalog;
+    if(_partsCardCatalog == undefined)
+    {
+      partCardsCatalog = server.GetCatalogItems(
+       {
+         CatalogVersion : "PartCards"
+       }
+       );
+    }
+    else
+    {
+      partCardsCatalog = _partsCardCatalog;
+    }
     var tempDict = 
         {
           Exhaust: CarData.ExhaustLvl,
@@ -1149,7 +1175,7 @@ handlers.purchaseItems = function(args, context)
         log.debug("user has enough cards to purchase upgrade!");
 
         var newLvl = (parseInt(car.CustomData.CarLvl) + 1);
-        var newPr = recalculateCarPr(car.CustomData, car.ItemId);
+        var newPr = recalculateCarPr(car.CustomData, car.ItemId, carCardsCatalog, undefined);
         log.debug("upgrading to car lvl: " +  newLvl + " and pr: " + newPr);
         var CarData = {
           "CarLvl" : newLvl,
@@ -1647,7 +1673,7 @@ handlers.purchaseItems = function(args, context)
                 }
                 );  
           }
-      var newPr = recalculateCarPr(car.CustomData, car.ItemId);
+      var newPr = recalculateCarPr(car.CustomData, car.ItemId, undefined, partsCatalog);
             CarDataToBeUpdated.Pr = newPr;
           server.UpdateUserInventoryItemCustomData(
               {
