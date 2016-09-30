@@ -333,6 +333,7 @@ handlers.startGame = function(args, context) {
   var course = recArray[recArray.length - 1].c;
   for(var i = 0; i < recArray.length; i++) // write winstreak/losestreak code
   {
+    if(recArray[i].uId == currentPlayerId) continue;
     if(winRatio < recArray[i].wl)
     {
       opponentId = recArray[i].uId;
