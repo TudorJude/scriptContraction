@@ -549,7 +549,7 @@ handlers.requestInventory = function(args)
 }
 function checkCarDataValidity(inventoryCarData, carCardsCatalog) 
 {
-  if(inventoryCarData.CutomData == undefined)
+  if(inventoryCarData.CustomData == undefined)
   {
     try
     {
