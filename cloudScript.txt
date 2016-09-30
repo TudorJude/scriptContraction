@@ -332,10 +332,10 @@ handlers.startGame = function(args, context) {
   var env = recArray[recArray.length - 1].e;
   var course = recArray[recArray.length - 1].c;
   for(var i = 0; i < recArray.length; i++) // write winstreak/losestreak code
-  {
-    if(recArray[i].uId == currentPlayerId) continue;
+  {    
     if(winRatio < recArray[i].wl)
     {
+      if(recArray[i].uId == currentPlayerId) continue;
       opponentId = recArray[i].uId;
       env = recArray[i].e;
       course = recArray[i].c;
