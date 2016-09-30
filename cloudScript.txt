@@ -529,6 +529,7 @@ handlers.requestInventory = function(args)
     if(userInventoryObject.Inventory[i].CatalogVersion == "CarsProgress")
     {
       var check = checkCarDataValidity(userInventoryObject.Inventory[i], carCardsCatalog);
+      log.debug("check " + check);
       if((check == "PlayFabError") || (check == undefined)) return generateErrObj("PlayfabError");
       else if(check == "OK") log.debug("Data for " + userInventoryObject.Inventory[i].ItemId + " OK");
            else userInventoryObject.Inventory[i].CustomData = check;
