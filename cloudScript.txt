@@ -170,6 +170,23 @@ log.debug("user is in subdivision " + subDivision);
   		"uId": currentPlayerId
   	}
   	var uniqueKeyExists = false;
+    //let's only keep 2 recordings per user per subdivision at max
+    var currentOccurencesOfPlayer = 0;
+    for(var i = 0; i < recArray.length; i++)
+    {
+      if(recArray[i].uId == currentPlayerId)
+        currentOccurencesOfPlayer++;
+    }
+    if(currentOccurencesOfPlayer > 2) // no use letting the user spam his recordings on the same subdivision
+    {
+      var newPlayerStats = 
+      {
+          "TrophyCount" : trophyCount,
+          "League" : cLeague
+      }
+      return {Result : newPlayerStats};
+    }
+    
   	for(var i = 0; i < recArray.length; i++)
   	{
   		if((recArray[i].e == args.envIndex)&&(recArray[i].c == args.courseIndex))
@@ -318,6 +335,9 @@ handlers.startGame = function(args, context) {
   }
   log.debug("user is in subdivision " + subDivision);
 
+  //matchmaking code
+  //let's get subdivision and neighbouring subdivisions
+  var subDivKeys = ["RecSubDivision"+subDivision];
   var titleData = server.GetTitleInternalData(
     {
       Keys : "RecSubDivision"+subDivision
@@ -327,21 +347,58 @@ handlers.startGame = function(args, context) {
   log.debug("recPool " + recPool);
   if(recPool == undefined) return generateErrObj("Recording pool for this subdivision is null");
   log.debug("parsing to json array");
+
   var recArray = JSON.parse(recPool);
   var opponentId = recArray[recArray.length - 1].uId;
   var env = recArray[recArray.length - 1].e;
   var course = recArray[recArray.length - 1].c;
-  for(var i = 0; i < recArray.length; i++) // write winstreak/losestreak code
+  log.debug("setting recording to index: " +  recArray.length-1 + " where opponent is: " + recArray[recArray.length - 1].uId + "as default");
+  var validRecArray = new Array(recArray.length);
+  var vrAidx = 0;
+  for(var i = 0; i < recArray.length; i++) // create valid rec pool
   {    
-    if(winRatio < recArray[i].wl)
+      if(recArray[i].uId == currentPlayerId) 
+        {
+          log.debug("found: " + recArray[i].uId + "... skipping");
+          continue;
+        }
+        validRecArray[vrAidx] = recArray[i];
+        vrAidx++;
+    
+  }
+  if(vrAidx == 0) return generateErrObj("no valid recording found for this subdivision");
+  var pivot = vrAidx - 1; //in case your WLRatio is the highest in the pool
+  for(var i = 0; i < vrAidx; i++) // write winstreak/losestreak code
+  {    
+    if(validRecArray[i].wl > winRatio) //let's find the pivot; we'll move it later based on WL ratio
     {
-      if(recArray[i].uId == currentPlayerId) continue;
-      opponentId = recArray[i].uId;
-      env = recArray[i].e;
-      course = recArray[i].c;
+      pivot = i;
       break;
+      //opponentId = recArray[i].uId;
+      //env = recArray[i].e;
+      //course = recArray[i].c;
     }
   }
+  var finalRecArraySize = Math.min(vrAidx, 3); // for now 3 is the max number of recordings in the random final pool
+  var finalRecArray = new Array(finalRecArraySize); // this array will be populated with the recordings around the pivot
+  for(var i = 0; i < finalRecArraySize - 1; i++)
+  {
+    if(pivot <= 0) // get rightmost recordings
+    {
+      finalRecArray[i] = validRecArray[i];
+      continue;
+    }
+    if(pivot >= vrAidx - 1) // get leftmost recordings
+    {
+      finalRecArray[i] = validRecArray[vrAidx - 1 - i];
+      continue;
+    }
+    finalRecArray[i] = validRecArray[(pivot - finalRecArraySize/2) + i]; // get inner recordings
+  }
+  var randIdx = Math.floor(Math.random() * finalRecArraySize); // let's get a random one from this final pool
+    opponentId = finalRecArray[randIdx].uId;
+    env = finalRecArray[randIdx].e;
+    course = finalRecArray[randIdx].c;
   var urodkr = [(env + "_" + course + "_RecPos") , (env + "_" + course + "_RecRot"), (env + "_" + course + "_RecHeader")]; 
   log.debug("requesting " + urodkr);
   var recordingData = server.GetUserReadOnlyData(
@@ -351,6 +408,8 @@ handlers.startGame = function(args, context) {
     }
     );
   if(recordingData == undefined) return generateErrObj("Did not find recording for this user: " + opponentId); // handle this later
+  //end matchmaking
+
   var oI = server.GetPlayerCombinedInfo(
     {
       PlayFabId:opponentId,
