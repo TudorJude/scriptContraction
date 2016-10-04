@@ -62,7 +62,7 @@ handlers.endGame = function(args, context) {
   initTrophyCount = trophyCount;
   if(args.outcome == "rWin") 
   {
-  	if(trophyCount<= 50) // first win jumps you to 50
+  	if(trophyCount < 20) // first win jumps you to 50
   		trophyCount = 50;
   	else
   		trophyCount += 60;
