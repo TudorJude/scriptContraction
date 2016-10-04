@@ -395,7 +395,7 @@ handlers.startGame = function(args, context) {
   }
 
 //let's give default recording if necessary
-if(isIncompleteSubDivision)
+if(isIncompleteSubDivision == true)
 {
   var envToGet = 0;
   var courseToGet = 0;
