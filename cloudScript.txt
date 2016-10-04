@@ -910,6 +910,17 @@ function recalculateCarPr(CarData, carId, _carCardsCatalog, _partsCardCatalog)
 
 function GenerateBlackMarket(currentPlayerId)
 {
+  //getting user league
+  var league = 1;
+  var ps=server.GetPlayerStatistics(
+  {
+     PlayFabId: currentPlayerId,
+     StatisticNames: ["League"]
+  });
+  if(ps.Statistics.length != 0)
+  {
+    league = ps.Statistics[0].Value.toString();
+  }
   //getting parts        
   var partsCatalog = server.GetCatalogItems(
      {
@@ -943,6 +954,7 @@ function GenerateBlackMarket(currentPlayerId)
   {
     carCardParsed = JSON.parse(carsCatalog.Catalog[i].CustomData)
     if(carCardParsed == undefined) return generateErrObj("Car card " + carsCatalog.Catalog[i].ItemId + " has no custom data.");
+    if(carCardParsed.unlockedAtRank > league) continue;
     if(carCardParsed.rareCar == "false")
       nonRareIndexes.push(carsCatalog.Catalog[i].ItemId + "_" + carCardParsed.BMCurrType + "_" + carCardParsed.BMbasePrice + "_" + 0 + "_" + carCardParsed.BMpriceIncrPerBuy);
     else
