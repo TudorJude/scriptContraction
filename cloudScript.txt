@@ -430,6 +430,27 @@ if(isIncompleteSubDivision == true)
         log.debug("defaultRecordingData: " + defaultRecordingData.Data);
         if((defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecPos"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecRot"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"] != undefined))
         { // looks like we found a valid default recording
+            //found recording now let's reduce user's trophies
+          trophyCount -= 30;
+          if(trophyCount <= 0) trophyCount = 0;
+          wlStatInt = parseInt(wlStat, 2);
+          log.debug("updating WL to:  " + wlStatInt);
+          var cLeague = calculateLeague(trophyCount);
+          //update stats on server
+          var suArray = [];
+          var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
+          suArray.push(su);  
+          var sut = {StatisticName: "TrophyCount", Version : "0", Value: trophyCount};
+          suArray.push(sut); 
+          var sul = {StatisticName: "League", Version : "0", Value: cLeague};
+          suArray.push(sul); 
+          log.debug("updatingStats: " + suArray);
+          var updateRequest = server.UpdatePlayerStatistics(
+          {
+            PlayFabId: currentPlayerId,
+            Statistics: suArray
+          }
+          );
           log.debug("found valid default rec");
           return {
             Result :"OK",
