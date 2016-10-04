@@ -597,12 +597,12 @@ var updateRequest = server.UpdatePlayerStatistics(
   Statistics: suArray
 }
 );
-var itemsToGive = [];
-itemsToGive.push("Decals");
-itemsToGive.push("PaintJobs");
-itemsToGive.push("Plates");
-itemsToGive.push("Rims");
-itemsToGive.push("WindshieldText");
+var itemsToGive = ["Decals","PaintJobs", "Plates", "Rims", "WindshieldText"];
+//itemsToGive.push("Decals");
+//itemsToGive.push("PaintJobs");
+//itemsToGive.push("Plates");
+//itemsToGive.push("Rims");
+//itemsToGive.push("WindshieldText");
 
 var grantRequest = server.GrantItemsToUser(
   {
@@ -657,20 +657,6 @@ server.UpdateUserInventoryItemCustomData(
   Data: CarData
 }
 );
-var addUserCurrencyResult = server.AddUserVirtualCurrency(
-{
-  PlayFabId: currentPlayerId,
-  VirtualCurrency : "SC",
-  Amount: 3000
-}
-);
-var addUserCurrencyResult = server.AddUserVirtualCurrency(
-{
-  PlayFabId: currentPlayerId,
-  VirtualCurrency : "HC",
-  Amount: 200
-}
-); 
 }
 handlers.requestInventory = function(args)
 {
@@ -690,10 +676,12 @@ handlers.requestInventory = function(args)
          CatalogVersion : "PartCards"
        }
        );
+  var hasCars = false;
   for(var i = 0; i < userInventoryObject.Inventory.length; i++)
   {
     if(userInventoryObject.Inventory[i].CatalogVersion == "CarsProgress")
     {
+      hasCars = true;
       var check = checkCarDataValidity(userInventoryObject.Inventory[i], carCardsCatalog);
       log.debug("check " + check);
       if((check == "PlayFabError") || (check == undefined)) return generateErrObj("PlayfabError");
@@ -711,6 +699,43 @@ handlers.requestInventory = function(args)
       );
     }
   }
+  if(hasCars == false) 
+    {
+      var carsToGive = [];
+      carsToGive.push("FordFocus");    
+      var carRequest = server.GrantItemsToUser(
+      {
+        CatalogVersion : "CarsProgress",
+        PlayFabId: currentPlayerId,
+        ItemIds : carsToGive
+      }
+      ); 
+      var CarData = {"CarLvl" : "1","EngineLvl" : "0","ExhaustLvl" : "0","GearboxLvl" : "0","SuspensionLvl" : "0"};
+      server.UpdateUserInventoryItemCustomData(
+      {
+        PlayFabId: currentPlayerId,
+        ItemInstanceId: carRequest.ItemGrantResults[0].ItemInstanceId,
+        Data: CarData
+      }
+      );
+      CarData = {"TiresLvl" : "0","TurboLvl" : "0","PaintId" : "0","DecalId" : "0","RimsId" : "0"};
+      server.UpdateUserInventoryItemCustomData(
+      {
+        PlayFabId: currentPlayerId,
+        ItemInstanceId: carRequest.ItemGrantResults[0].ItemInstanceId,
+        Data: CarData
+      }
+      );
+      CarData = {"PlatesId" : "0","WindshieldId" : "0","Pr" : "10"};
+      server.UpdateUserInventoryItemCustomData(
+      {
+        PlayFabId: currentPlayerId,
+        ItemInstanceId: carRequest.ItemGrantResults[0].ItemInstanceId,
+        Data: CarData
+      }
+      );
+      return generateErrObj("UserHasNoCars ... reiniting");
+    }
   return userInventoryObject;
 }
 function checkCarDataValidity(inventoryCarData, carCardsCatalog) 
