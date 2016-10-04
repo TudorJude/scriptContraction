@@ -403,7 +403,7 @@ if(isIncompleteSubDivision == true)
   {
     if(envCourseArray[i] == 0)// we found a missing recording <- e = i/5; c = i%5;
     {
-      envToGet = i/5;
+      envToGet = Math.floor(i/5);
       courseToGet = i%5;
       break;
     }
