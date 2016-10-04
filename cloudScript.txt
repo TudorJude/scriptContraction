@@ -408,6 +408,7 @@ if(isIncompleteSubDivision == true)
       break;
     }
   }
+   log.debug("gettingDefaultUser: env: " + envToGet + " course: " + courseToGet);
   //let's see who the master account is
     var masterAccountRequest = server.GetTitleData(
     {
@@ -416,6 +417,7 @@ if(isIncompleteSubDivision == true)
     ); 
     if(masterAccountRequest.Data["MasterUser"] != undefined)
     {
+      log.debug("master user: " + masterAccountRequest.Data["MasterUser"]);
       var defaultRecordingData = server.GetUserReadOnlyData(
       {
         PlayFabId: masterAccountRequest.Data["MasterUser"],
@@ -424,6 +426,7 @@ if(isIncompleteSubDivision == true)
       );
       if(defaultRecordingData.Data != undefined)
       {
+        log.debug("defaultRecordingData: " + defaultRecordingData.Data);
         if((defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecPos"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecRot"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"] != undefined))
         { // looks like we found a valid default recording
           return {
