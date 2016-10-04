@@ -954,7 +954,7 @@ function GenerateBlackMarket(currentPlayerId)
   {
     carCardParsed = JSON.parse(carsCatalog.Catalog[i].CustomData)
     if(carCardParsed == undefined) return generateErrObj("Car card " + carsCatalog.Catalog[i].ItemId + " has no custom data.");
-    if(carCardParsed.unlockedAtRank > league) continue;
+    if(carCardParsed.unlockedAtRank > league + 1) continue;
     if(carCardParsed.rareCar == "false")
       nonRareIndexes.push(carsCatalog.Catalog[i].ItemId + "_" + carCardParsed.BMCurrType + "_" + carCardParsed.BMbasePrice + "_" + 0 + "_" + carCardParsed.BMpriceIncrPerBuy);
     else
@@ -974,7 +974,7 @@ function GenerateBlackMarket(currentPlayerId)
     else
     {
         dataToUpdate["BMItem2"] = nonRareIndexes[Math.floor(Math.random() * nonRareIndexes.length)];
-      dataToUpdate["BMItem3"] = rareIndexes[Math.floor(Math.random() * rareIndexes.length)];
+        dataToUpdate["BMItem3"] = rareIndexes[Math.floor(Math.random() * rareIndexes.length)];
     }  
   server.UpdateUserInternalData(
     {
