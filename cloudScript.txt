@@ -345,9 +345,8 @@ handlers.startGame = function(args, context) {
     ); 
   var recPool = titleData.Data["RecSubDivision"+subDivision];
   var isIncompleteSubDivision = false;
-  log.debug("recPool " + recPool);
+  //log.debug("recPool " + recPool);
   if(recPool == undefined) isIncompleteSubDivision = true;
-  log.debug("parsing to json array");
   var recArray;
   var opponentId;
   var env;
@@ -378,6 +377,7 @@ handlers.startGame = function(args, context) {
 
   var validRecArray = new Array(recArray.length);
   var vrAidx = 0;
+  log.debug("iterating through recArray");
   for(var i = 0; i < recArray.length; i++) // create valid rec pool OR check for missing env/course if subDivision has missing recordings
   {    
       if(isIncompleteSubDivision == true)
@@ -393,7 +393,7 @@ handlers.startGame = function(args, context) {
         vrAidx++;
     
   }
-
+log.debug("isIncompleteSubDivision: " + isIncompleteSubDivision);
 //let's give default recording if necessary
 if(isIncompleteSubDivision == true)
 {
@@ -438,7 +438,7 @@ if(isIncompleteSubDivision == true)
       }
     }
 }
-
+log.debug("looking for user generated recording");
   if(vrAidx == 0) return generateErrObj("no valid recording found for this subdivision");
   var pivot = vrAidx - 1; //in case your WLRatio is the highest in the pool
   for(var i = 0; i < vrAidx; i++) // write winstreak/losestreak code
@@ -452,9 +452,11 @@ if(isIncompleteSubDivision == true)
       //course = recArray[i].c;
     }
   }
+  log.debug("pivot is: " + pivot);
   var finalRecArraySize = Math.min(vrAidx, 3); // for now 3 is the max number of recordings in the random final pool
+  log.debug("finalRecArraySize: " + finalRecArraySize);
   var finalRecArray = new Array(finalRecArraySize); // this array will be populated with the recordings around the pivot
-  for(var i = 0; i < finalRecArraySize - 1; i++)
+  for(var i = 0; i < finalRecArraySize; i++)
   {
     if(pivot <= 0) // get rightmost recordings
     {
@@ -468,6 +470,7 @@ if(isIncompleteSubDivision == true)
     }
     finalRecArray[i] = validRecArray[(pivot - finalRecArraySize/2) + i]; // get inner recordings
   }
+  log.debug("finalRecArray: " + finalRecArray);
   var randIdx = Math.floor(Math.random() * finalRecArraySize); // let's get a random one from this final pool
     opponentId = finalRecArray[randIdx].uId;
     env = finalRecArray[randIdx].e;
