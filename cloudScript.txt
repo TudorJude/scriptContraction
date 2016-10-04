@@ -1229,12 +1229,6 @@ handlers.retrieveBlackMarket = function(args, context)
       Keys : tK
     }
     );
-  
-  if(d.getTime() - parseInt(getInternalDataResult.Data.BMTime.Value) > parseInt(tData.Data.BlackMarketResetMinutes) *60*1000) // minutes *60*1000
-  {
-    log.debug("regenerating market");
-    return GenerateBlackMarket(currentPlayerId);
-  }
   if(args.reset == true)
   {
     log.debug("reseting market");
@@ -1253,6 +1247,15 @@ handlers.retrieveBlackMarket = function(args, context)
    
     if(cost > 0)
     {
+      var userInventoryObject = server.GetUserInventory(
+      {
+        PlayFabId: currentPlayerId
+      }
+      );
+      
+      var bO = checkBalance(curr, cost, userInventoryObject.VirtualCurrency.SC, userInventoryObject.VirtualCurrency.HC);
+      if(bO != "OK") return generateFailObj("not enough money");
+
       var subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
         {
           PlayFabId: currentPlayerId,
@@ -1272,6 +1275,12 @@ handlers.retrieveBlackMarket = function(args, context)
       return marketObject;
       ////////////////
     }
+    return GenerateBlackMarket(currentPlayerId);
+  }
+
+  if(d.getTime() - parseInt(getInternalDataResult.Data.BMTime.Value) > parseInt(tData.Data.BlackMarketResetMinutes) *60*1000) // minutes *60*1000
+  {
+    log.debug("regenerating market");
     return GenerateBlackMarket(currentPlayerId);
   }
   log.debug("get current market");
