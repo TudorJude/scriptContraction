@@ -324,7 +324,7 @@ handlers.startGame = function(args, context) {
   var sdval = leagueTitleDataRequest.Data["SubdivisionTrophyRanges"];
   var sdvalParsed = JSON.parse(sdval);
   log.debug("SubdivisionTrophyRanges " + sdvalParsed);
-  var subDivision;
+  var subDivision = 43;
   for(var i = 0; i < sdvalParsed.subdivisions.length; i++) 
   {
     if(trophyCount<sdvalParsed.subdivisions[i])
@@ -344,19 +344,46 @@ handlers.startGame = function(args, context) {
     }
     ); 
   var recPool = titleData.Data["RecSubDivision"+subDivision];
+  var isIncompleteSubDivision = false;
   log.debug("recPool " + recPool);
-  if(recPool == undefined) return generateErrObj("Recording pool for this subdivision is null");
+  if(recPool == undefined) isIncompleteSubDivision = true;
   log.debug("parsing to json array");
+  var recArray;
+  var opponentId;
+  var env;
+  var course;
+  if(isIncompleteSubDivision == false)
+  {
+    recArray = JSON.parse(recPool);
+    opponentId = recArray[recArray.length - 1].uId;
+    env = recArray[recArray.length - 1].e;
+    course = recArray[recArray.length - 1].c;
+  }
+  else
+  {
+    recArray = [];
+  }
 
-  var recArray = JSON.parse(recPool);
-  var opponentId = recArray[recArray.length - 1].uId;
-  var env = recArray[recArray.length - 1].e;
-  var course = recArray[recArray.length - 1].c;
-  log.debug("setting recording to index: " +  recArray.length-1 + " where opponent is: " + recArray[recArray.length - 1].uId + "as default");
+  //default recording code
+  var subDivisionLength = 15; // we have 15 possible courses
+  var envCourseArray = 
+  [
+  0,0,0,0,0,
+  0,0,0,0,0,
+  0,0,0,0,0
+  ]
+  log.debug("subrecording pool has " + recArray.length + " length. Must have: " + subDivisionLength + " length");
+
+  if(recArray.length < subDivisionLength) isIncompleteSubDivision = true;
+
   var validRecArray = new Array(recArray.length);
   var vrAidx = 0;
-  for(var i = 0; i < recArray.length; i++) // create valid rec pool
+  for(var i = 0; i < recArray.length; i++) // create valid rec pool OR check for missing env/course if subDivision has missing recordings
   {    
+      if(isIncompleteSubDivision == true)
+      {
+        envCourseArray[Number(recArray[i].e)*5 + Number(recArray[i].c)] = 1;
+      }
       if(recArray[i].uId == currentPlayerId) 
         {
           log.debug("found: " + recArray[i].uId + "... skipping");
@@ -366,6 +393,52 @@ handlers.startGame = function(args, context) {
         vrAidx++;
     
   }
+
+//let's give default recording if necessary
+if(isIncompleteSubDivision)
+{
+  var envToGet = 0;
+  var courseToGet = 0;
+  for(var i = 0; i < envCourseArray.length; i++)
+  {
+    if(envCourseArray[i] == 0)// we found a missing recording <- e = i/5; c = i%5;
+    {
+      envToGet = i/5;
+      courseToGet = i%5;
+      break;
+    }
+  }
+  //let's see who the master account is
+    var masterAccountRequest = server.GetTitleData(
+    {
+      Keys : "MasterUser"
+    }
+    ); 
+    if(masterAccountRequest.Data["MasterUser"] != undefined)
+    {
+      var defaultRecordingData = server.GetUserReadOnlyData(
+      {
+        PlayFabId: masterAccountRequest.Data["MasterUser"],
+        Keys: [(envToGet + "_" + courseToGet + "_RecPos") , (envToGet + "_" + courseToGet + "_RecRot"), (envToGet + "_" + courseToGet + "_RecHeader")]
+      }
+      );
+      if(defaultRecordingData.Data != undefined)
+      {
+        if((defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecPos"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecRot"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"] != undefined))
+        { // looks like we found a valid default recording
+          return {
+            Result :"OK",
+            RecType: "Default",
+            PosData: defaultRecordingData.Data[env + "_" + course + "_RecPos"].Value, //0_0_RecPos
+            RotData: defaultRecordingData.Data[env + "_" + course + "_RecRot"].Value,
+            HeaderData: defaultRecordingData.Data[env + "_" + course + "_RecHeader"].Value,
+            Opp: "Mniezo"
+                 };
+        }
+      }
+    }
+}
+
   if(vrAidx == 0) return generateErrObj("no valid recording found for this subdivision");
   var pivot = vrAidx - 1; //in case your WLRatio is the highest in the pool
   for(var i = 0; i < vrAidx; i++) // write winstreak/losestreak code
@@ -440,6 +513,7 @@ handlers.startGame = function(args, context) {
 
   return {
     Result :"OK",
+    RecType: "UserGenerated",
     PosData: recordingData.Data[env + "_" + course + "_RecPos"].Value, //0_0_RecPos
     RotData: recordingData.Data[env + "_" + course + "_RecRot"].Value,
     HeaderData: recordingData.Data[env + "_" + course + "_RecHeader"].Value,
