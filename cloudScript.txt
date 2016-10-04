@@ -1198,6 +1198,11 @@ handlers.retrieveBlackMarket = function(args, context)
     log.debug("regenerating market");
     return GenerateBlackMarket(currentPlayerId);
   }
+  if(args.reset == true)
+  {
+    log.debug("reseting market");
+    return GenerateBlackMarket(currentPlayerId);
+  }
   log.debug("get current market");
   return GetCurrentBlackMarket(currentPlayerId, getInternalDataResult);
 
