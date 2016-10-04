@@ -433,9 +433,9 @@ if(isIncompleteSubDivision == true)
           return {
             Result :"OK",
             RecType: "Default",
-            PosData: defaultRecordingData.Data[env + "_" + course + "_RecPos"].Value, //0_0_RecPos
-            RotData: defaultRecordingData.Data[env + "_" + course + "_RecRot"].Value,
-            HeaderData: defaultRecordingData.Data[env + "_" + course + "_RecHeader"].Value,
+            PosData: defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecPos"].Value, //0_0_RecPos
+            RotData: defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecRot"].Value,
+            HeaderData: defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"].Value,
             Opp: "Mniezo"
                  };
         }
