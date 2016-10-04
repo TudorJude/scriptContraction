@@ -473,7 +473,8 @@ log.debug("looking for user generated recording");
       finalRecArray[i] = validRecArray[vrAidx - 1 - i];
       continue;
     }
-    finalRecArray[i] = validRecArray[(pivot - finalRecArraySize/2) + i]; // get inner recordings
+    log.debug("valoarea pizdii: " + (pivot - Math.floor(finalRecArraySize/2) + i));
+    finalRecArray[i] = validRecArray[(pivot - Math.floor(finalRecArraySize/2) + i)]; // get inner recordings
   }
   log.debug("vrAidx: " + vrAidx);
   log.debug("validRecArray: " + validRecArray);
