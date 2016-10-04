@@ -2534,26 +2534,37 @@ handlers.buyChest = function(args, context)
   );
   var bO = checkBalance(args.curr, args.cost, userInventoryObject.VirtualCurrency.SC, userInventoryObject.VirtualCurrency.HC);
   if(bO != "OK") return generateFailObj("not enough money");
-  
-  var subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
+  if(args.cost > 0)
   {
-    PlayFabId: currentPlayerId,
-    VirtualCurrency : args.curr,
-    Amount: args.cost
+    var subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
+    {
+      PlayFabId: currentPlayerId,
+      VirtualCurrency : args.curr,
+      Amount: args.cost
+    }
+    ); 
+    var cU = {};
+    cU[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;   
+    var i = 
+             {
+               VirtualCurrency: cU
+             };
+    var r = {
+           Result: "OK",
+           Message: "ChestBought",
+           InventoryChange:i
+         };
+    return r;
   }
-  ); 
-  var cU = {};
-  cU[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;   
-  var i = 
-           {
-             VirtualCurrency: cU
-           };
-  var r = {
-         Result: "OK",
-         Message: "ChestBought",
-         InventoryChange:i
-       };
-  return r;
+  else
+  {
+        var q = {
+           Result: "OK",
+           Message: "ChestBought",
+           InventoryChange:{}
+         };
+    return q;
+  }
 }
 
 handlers.getServerTime = function(args, context)
