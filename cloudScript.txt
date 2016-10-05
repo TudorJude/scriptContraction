@@ -588,7 +588,7 @@ log.debug("looking for user generated recording");
             }
             else
             {
-              log.deubg("rMin: " + rMin + " userTrophies: " + userTrophies + " oppTrophies " + oppTrophies + " maxLeagueT " + maxLeagueT + " minLeagueT " + minLeagueT + " rMax: " + rMax);
+              log.debug("rMin: " + rMin + " userTrophies: " + userTrophies + " oppTrophies " + oppTrophies + " maxLeagueT " + maxLeagueT + " minLeagueT " + minLeagueT + " rMax: " + rMax);
               trophiesToTake = rMin + Math.floor((((userTrophies - oppTrophies)/(maxLeagueT - minLeagueT)) + 1) * ((rMax - rMin)/2));
               trophiesToGive = 3 * (rMax - rMin) - trophiesToTake;
             }
