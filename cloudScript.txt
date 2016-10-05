@@ -574,7 +574,6 @@ log.debug("looking for user generated recording");
   if(trophyCount <= 0) trophyCount = 0;
   wlStatInt = parseInt(wlStat, 2);
   log.debug("updating WL to:  " + wlStatInt);
-  var cLeague = calculateLeague(trophyCount);
   //update stats on server
   var suArray = [];
   var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
