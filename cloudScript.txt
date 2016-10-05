@@ -60,17 +60,25 @@ handlers.endGame = function(args, context) {
     log.debug("getting trophy count " + tc.Statistics[0].Value);
   }
   initTrophyCount = trophyCount;
+  var pDat = server.GetUserInternalData(
+  {
+    PlayFabId: currentPlayerId,
+    Keys: ["trophyLose","trophyWin"]
+  });
+  var refund;
+  if((pDat["trophyLose"] == undefined) || (pDat["trophyWin"] == undefined)) refund = 45;
+  refund = Number(pDat["trophyLose"]) + Number(pDat["trophyWin"]);
   if(args.outcome == "rWin") 
   {
   	if(trophyCount < 20) // first win jumps you to 50
   		trophyCount = 50;
   	else
-  		trophyCount += 60;
+  		trophyCount += refund;
   }
   log.debug("trophies change: " + initTrophyCount + " => " + trophyCount);
   var cLeague = calculateLeague(trophyCount);
   wlStatInt = 0;
-  for(var i = 0 ; i < wlStat.length; i++ )
+  for(var i = 0 ; i < wlStat.length; i++)
   {
     if(wlStat[i] == "1")
       wlStatInt += Math.pow(2,i);
@@ -610,7 +618,7 @@ log.debug("looking for user generated recording");
             PlayFabId: currentPlayerId,
             Data: dataToUpdate
           });
-          
+
   return {
     Result :"OK",
     RecType: "UserGenerated",
