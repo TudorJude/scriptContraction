@@ -527,7 +527,7 @@ log.debug("looking for user generated recording");
           var trophiesToGive = 30; // max
           var userTrophies = trophyCount;
           var oppTrophies;
-          var cLeague = calculateLeague(trophyCount);
+          var cLeague = Number(calculateLeague(trophyCount));
 
           log.debug("lsValParsed: " + lsValParsed);
           log.debug("lsValParsed.leagues: " + lsValParsed.leagues);
