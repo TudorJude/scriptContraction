@@ -456,6 +456,15 @@ if(isIncompleteSubDivision == true)
             Statistics: suArray
           }
           );
+          var dataToUpdate = {
+            "trophyWin" : rMax,
+            "trophyLose": rMin
+          }
+          server.UpdateUserInternalData(
+          {
+            PlayFabId: currentPlayerId,
+            Data: dataToUpdate
+          });
           log.debug("found valid default rec");
           return {
             Result :"OK",
@@ -592,7 +601,16 @@ log.debug("looking for user generated recording");
     Statistics: suArray
   }
   );
-
+          var dataToUpdate = {
+            "trophyWin" : trophiesToGive,
+            "trophyLose": trophiesToTake
+          }
+          server.UpdateUserInternalData(
+          {
+            PlayFabId: currentPlayerId,
+            Data: dataToUpdate
+          });
+          
   return {
     Result :"OK",
     RecType: "UserGenerated",
