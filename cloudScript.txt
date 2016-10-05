@@ -551,7 +551,7 @@ log.debug("looking for user generated recording");
           var userTrophies = trophyCount;
           var oppTrophies;
           var cLeague = Number(calculateLeague(trophyCount));
-
+log.debug("cLeague " + cLeague);
           log.debug("lsValParsed: " + lsValParsed);
           log.debug("sdvalParsed: " + sdvalParsed);
           log.debug("lsValParsed.leagues: " + lsValParsed.leagues);
@@ -584,7 +584,7 @@ log.debug("maxLT " + maxLeagueT + " minLeagueT " + minLeagueT);
           }
           else
           {
-            if(Math.abs(userTrophies - oppTrophies) <= maxLeagueT - minLeagueT)
+            if(Math.abs(userTrophies - oppTrophies) > maxLeagueT - minLeagueT)
             {
               trophiesToTake = rMin;
               trophiesToGive = rMax;
