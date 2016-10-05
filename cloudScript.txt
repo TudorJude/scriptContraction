@@ -332,6 +332,7 @@ handlers.startGame = function(args, context) {
   {
     trophyCount = tc.Statistics[0].Value;    
   }
+  trophyCount = Number(trophyCount);
   var sdval = leagueTitleDataRequest.Data["SubdivisionTrophyRanges"];
   var sdvalParsed = JSON.parse(sdval);
   var lsVal = leagueTitleDataRequest.Data["LeagueSubdivisions"];
@@ -345,7 +346,7 @@ handlers.startGame = function(args, context) {
           log.debug("rMax: " + rMax);    
   for(var i = 0; i < sdvalParsed.subdivisions.length; i++) 
   {
-    if(trophyCount<sdvalParsed.subdivisions[i])
+    if(trophyCount<Number(sdvalParsed.subdivisions[i]))
     {
       subDivision = i;
       break;
