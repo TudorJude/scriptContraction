@@ -592,8 +592,9 @@ log.debug("looking for user generated recording");
               trophiesToGive = 3 * (rMax - rMin) - trophiesToTake;
             }
           }
-
-          trophyCount -= trophiesToTake;
+log.debug("trophiesToTake:  " + trophiesToTake);
+ log.debug("trophiesToGive:  " + trophiesToGive);
+          trophyCount -= Number(trophiesToTake);
   if(trophyCount <= 1) trophyCount = 1;
   wlStatInt = parseInt(wlStat, 2);
   log.debug("updating WL to:  " + wlStatInt);
