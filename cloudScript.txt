@@ -328,6 +328,11 @@ handlers.startGame = function(args, context) {
   var lsValParsed = JSON.parse(lsVal);
   log.debug("SubdivisionTrophyRanges " + sdvalParsed);
   var subDivision = 43;
+          var rminmaxarr = leagueTitleDataRequest.Data["TrophyGainRange"].split("_"); // muie
+          var rMin = rminmaxarr[0];
+          log.debug("rMin: " + rMin);
+          var rMax = rminmaxarr[1];  
+          log.debug("rMax: " + rMax);    
   for(var i = 0; i < sdvalParsed.subdivisions.length; i++) 
   {
     if(trophyCount<sdvalParsed.subdivisions[i])
@@ -432,7 +437,7 @@ if(isIncompleteSubDivision == true)
         log.debug("defaultRecordingData: " + defaultRecordingData.Data);
         if((defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecPos"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecRot"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"] != undefined))
         { // looks like we found a valid default recording
-          trophyCount -= 15;
+          trophyCount -= rMin;
           if(trophyCount <= 0) trophyCount = 0;
           wlStatInt = parseInt(wlStat, 2);
           log.debug("updating WL to:  " + wlStatInt);          
@@ -458,6 +463,8 @@ if(isIncompleteSubDivision == true)
             PosData: defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecPos"].Value, //0_0_RecPos
             RotData: defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecRot"].Value,
             HeaderData: defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"].Value,
+            TrophyLose: rMin,
+            TrophyWin : rMax,
             Opp: "Mniezo"
                  };
         }
@@ -539,16 +546,7 @@ log.debug("looking for user generated recording");
           if(cLeague >= lsValParsed.leagues.length - 1)
             maxLeagueT = minLeagueT * 2;
           else
-            maxLeagueT = Number(sdvalParsed.subdivisions[lsValParsed.leagues[cLeague]]);
-          
-          log.debug("leagueTitleDataRequest: " + leagueTitleDataRequest);
-          log.debug("leagueTitleDataRequest.Data: " + leagueTitleDataRequest.Data);
-          log.debug("leagueTitleDataRequest.Data[TrophyGainRange]: " + leagueTitleDataRequest.Data["TrophyGainRange"]);
-          var rminmaxarr = leagueTitleDataRequest.Data["TrophyGainRange"].split("_"); // muie
-          var rMin = rminmaxarr[0];
-          log.debug("rMin: " + rMin);
-          var rMax = rminmaxarr[1];  
-          log.debug("rMax: " + rMax);        
+            maxLeagueT = Number(sdvalParsed.subdivisions[lsValParsed.leagues[cLeague]]);   
           
           var opponentHeader = JSON.parse(recordingData.Data[env + "_" + course + "_RecHeader"].Value);
           if(opponentHeader != undefined)
@@ -601,6 +599,8 @@ log.debug("looking for user generated recording");
     PosData: recordingData.Data[env + "_" + course + "_RecPos"].Value, //0_0_RecPos
     RotData: recordingData.Data[env + "_" + course + "_RecRot"].Value,
     HeaderData: recordingData.Data[env + "_" + course + "_RecHeader"].Value,
+    TrophyLose: trophiesToTake,
+    TrophyWin : trophiesToGive,
     Opp: oI.InfoResultPayload.AccountInfo.TitleInfo.DisplayName
          };
 }
