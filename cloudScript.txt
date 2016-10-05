@@ -309,7 +309,7 @@ handlers.startGame = function(args, context) {
   //trophy count and subleague distribution
   var leagueTitleDataRequest = server.GetTitleData(
     {
-      Key: ["LeagueSubdivisions","SubdivisionTrophyRanges"] 
+      Key: ["LeagueSubdivisions","SubdivisionTrophyRanges","TrophyGainRange"] 
     }
     );  
   var tc=server.GetPlayerStatistics(
@@ -324,6 +324,8 @@ handlers.startGame = function(args, context) {
   }
   var sdval = leagueTitleDataRequest.Data["SubdivisionTrophyRanges"];
   var sdvalParsed = JSON.parse(sdval);
+  var lsVal = leagueTitleDataRequest.Data["LeagueSubdivisions"];
+  var lsValParsed = JSON.parse(lsVal);
   log.debug("SubdivisionTrophyRanges " + sdvalParsed);
   var subDivision = 43;
   for(var i = 0; i < sdvalParsed.subdivisions.length; i++) 
@@ -430,12 +432,10 @@ if(isIncompleteSubDivision == true)
         log.debug("defaultRecordingData: " + defaultRecordingData.Data);
         if((defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecPos"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecRot"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"] != undefined))
         { // looks like we found a valid default recording
-            //found recording now let's reduce user's trophies
-          trophyCount -= 30;
+          trophyCount -= 15;
           if(trophyCount <= 0) trophyCount = 0;
           wlStatInt = parseInt(wlStat, 2);
-          log.debug("updating WL to:  " + wlStatInt);
-          var cLeague = calculateLeague(trophyCount);
+          log.debug("updating WL to:  " + wlStatInt);          
           //update stats on server
           var suArray = [];
           var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
@@ -522,7 +522,55 @@ log.debug("looking for user generated recording");
     }
     );
   //found recording now let's reduce user's trophies
-  trophyCount -= 30;
+          //let's extract opponent trophies so we know how muany trophies we give/takeaway from user
+          var trophiesToTake = 15; // min
+          var trophiesToGive = 30; // max
+          var userTrophies = trophyCount;
+          var oppTrophies;
+          var cLeague = calculateLeague(trophyCount);
+
+          var minLeagueT
+          if(cLeague > 0)
+            minLeagueT = Number(sdvalParsed.subDivisions[lsValParsed.leagues[cLeague - 1]]);
+          else
+            minLeagueT = 0;
+
+          var maxLeagueT;
+          if(cLeague >= lsValParsed.leagues.length - 1)
+            maxLeagueT = minLeagueT * 2;
+          else
+            maxLeagueT = Number(sdvalParsed.subDivisions[lsValParsed.leagues[cLeague]]);
+          
+          var rminmaxarr = leagueTitleDataRequest.Data["SubdivisionTrophyRanges"].split("_");
+          var rMin = rminmaxarr[0];
+          var rMax = rminmaxarr[1];          
+          
+          var opponentHeader = JSON.parse(defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"].Value);
+          if(opponentHeader != undefined)
+          {
+            oppTrophies = opponentHeader.Trophies;
+          }
+
+          if(maxLeagueT - minLeagueT <= 0) 
+          {
+              trophiesToTake = rMax;
+              trophiesToGive = rMin;
+          }
+          else
+          {
+            if(Math.abs(userTrophies - oppTrophies) <= maxLeagueT - minLeagueT)
+            {
+              trophiesToTake = rMin;
+              trophiesToGive = rMax;
+            }
+            else
+            {
+              trophiesToTake = rMin + Math.floor((((userTrophies - oppTrophies)/(maxLeagueT - minLeagueT)) + 1) * ((rMax - rMin)/2));
+              trophiesToGive = 3 * (rMax - rMin) - trophiesToTake;
+            }
+          }
+
+          trophyCount -= trophiesToTake;
   if(trophyCount <= 0) trophyCount = 0;
   wlStatInt = parseInt(wlStat, 2);
   log.debug("updating WL to:  " + wlStatInt);
