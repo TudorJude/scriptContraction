@@ -339,10 +339,10 @@ handlers.startGame = function(args, context) {
   var lsValParsed = JSON.parse(lsVal);
   log.debug("SubdivisionTrophyRanges " + sdvalParsed);
   var subDivision = 43;
-          var rminmaxarr = leagueTitleDataRequest.Data["TrophyGainRange"].split("_"); // muie
-          var rMin = rminmaxarr[0];
+          var rminmaxarr = leagueTitleDataRequest.Data["TrophyGainRange"].split("_"); 
+          var rMin = Number(rminmaxarr[0]);
           log.debug("rMin: " + rMin);
-          var rMax = rminmaxarr[1];  
+          var rMax = Number(rminmaxarr[1]);  
           log.debug("rMax: " + rMax);    
   for(var i = 0; i < sdvalParsed.subdivisions.length; i++) 
   {
@@ -573,7 +573,7 @@ log.debug("looking for user generated recording");
           {
             oppTrophies = opponentHeader.Trophies;
           }
-
+          oppTrophies = Number(oppTrophies);
           if(maxLeagueT - minLeagueT <= 0) 
           {
               trophiesToTake = rMax;
