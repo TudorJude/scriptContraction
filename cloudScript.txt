@@ -529,6 +529,8 @@ log.debug("looking for user generated recording");
           var oppTrophies;
           var cLeague = calculateLeague(trophyCount);
 
+          log.debug("lsValParsed: " + lsValParsed);
+          log.debug("lsValParsed.leagues: " + lsValParsed.leagues);
           var minLeagueT
           if(cLeague > 0)
             minLeagueT = Number(sdvalParsed.subDivisions[lsValParsed.leagues[cLeague - 1]]);
