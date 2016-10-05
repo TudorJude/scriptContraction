@@ -532,10 +532,10 @@ log.debug("looking for user generated recording");
           log.debug("lsValParsed: " + lsValParsed);
           log.debug("sdvalParsed: " + sdvalParsed);
           log.debug("lsValParsed.leagues: " + lsValParsed.leagues);
-          log.debug("sdvalParsed.subDivisions: " + sdvalParsed.subDivisions);
+          log.debug("sdvalParsed.subDivisions: " + sdvalParsed.subdivisions);
           var minLeagueT
           if(cLeague > 0)
-            minLeagueT = Number(sdvalParsed.subDivisions[lsValParsed.leagues[cLeague - 1]]);
+            minLeagueT = Number(sdvalParsed.subdivisions[lsValParsed.leagues[cLeague - 1]]);
           else
             minLeagueT = 0;
 
@@ -543,7 +543,7 @@ log.debug("looking for user generated recording");
           if(cLeague >= lsValParsed.leagues.length - 1)
             maxLeagueT = minLeagueT * 2;
           else
-            maxLeagueT = Number(sdvalParsed.subDivisions[lsValParsed.leagues[cLeague]]);
+            maxLeagueT = Number(sdvalParsed.subdivisions[lsValParsed.leagues[cLeague]]);
           
           var rminmaxarr = leagueTitleDataRequest.Data["SubdivisionTrophyRanges"].split("_");
           var rMin = rminmaxarr[0];
