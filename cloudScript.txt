@@ -744,6 +744,20 @@ server.UpdateUserInventoryItemCustomData(
 }
 );
 }
+handlers.requestCurrency = function(args)
+{
+  var userInventoryObject = server.GetUserInventory(
+  {
+    PlayFabId: currentPlayerId,
+  }
+  );
+  var r = 
+  {
+    VirtualCurrency: userInventoryObject.VirtualCurrency
+  }
+  return r;
+  
+}
 handlers.requestInventory = function(args)
 {
   var userInventoryObject = server.GetUserInventory(
@@ -1263,7 +1277,7 @@ handlers.purchaseBMItem = function(args, context)
       var i= 
           {
             Inventory: objectsUpdated,
-          VirtualCurrency: currencyUpdated
+            VirtualCurrency: currencyUpdated
           }
       var returnObj = {
         Result: "OK",
