@@ -550,7 +550,7 @@ log.debug("looking for user generated recording");
           var rMax = rminmaxarr[1];  
           log.debug("rMax: " + rMax);        
           
-          var opponentHeader = JSON.parse(recordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"].Value);
+          var opponentHeader = JSON.parse(recordingData.Data[env + "_" + course + "_RecHeader"].Value);
           if(opponentHeader != undefined)
           {
             oppTrophies = opponentHeader.Trophies;
