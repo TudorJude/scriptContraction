@@ -556,6 +556,7 @@ log.debug("looking for user generated recording");
           log.debug("sdvalParsed: " + sdvalParsed);
           log.debug("lsValParsed.leagues: " + lsValParsed.leagues);
           log.debug("sdvalParsed.subDivisions: " + sdvalParsed.subdivisions);
+
           var minLeagueT
           if(cLeague > 0)
             minLeagueT = Number(sdvalParsed.subdivisions[lsValParsed.leagues[cLeague - 1]]);
@@ -568,6 +569,8 @@ log.debug("looking for user generated recording");
           else
             maxLeagueT = Number(sdvalParsed.subdivisions[lsValParsed.leagues[cLeague]]);   
           
+log.debug("maxLT " + maxLeagueT + " minLeagueT " + minLeagueT);
+
           var opponentHeader = JSON.parse(recordingData.Data[env + "_" + course + "_RecHeader"].Value);
           if(opponentHeader != undefined)
           {
