@@ -546,9 +546,11 @@ log.debug("looking for user generated recording");
           log.debug("leagueTitleDataRequest.Data[TrophyGainRange]: " + leagueTitleDataRequest.Data["TrophyGainRange"]);
           var rminmaxarr = leagueTitleDataRequest.Data["TrophyGainRange"].split("_"); // muie
           var rMin = rminmaxarr[0];
-          var rMax = rminmaxarr[1];          
+          log.debug("rMin: " + rMin);
+          var rMax = rminmaxarr[1];  
+          log.debug("rMax: " + rMax);        
           
-          var opponentHeader = JSON.parse(defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"].Value);
+          var opponentHeader = JSON.parse(recordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"].Value);
           if(opponentHeader != undefined)
           {
             oppTrophies = opponentHeader.Trophies;
