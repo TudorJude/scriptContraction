@@ -59,6 +59,7 @@ handlers.endGame = function(args, context) {
     trophyCount = tc.Statistics[0].Value;
     log.debug("getting trophy count " + tc.Statistics[0].Value);
   }
+  trophyCount = Number(trophyCount);
   initTrophyCount = trophyCount;
   var pDat = server.GetUserInternalData(
   {
@@ -68,6 +69,7 @@ handlers.endGame = function(args, context) {
   var refund;
   if((pDat["trophyLose"] == undefined) || (pDat["trophyWin"] == undefined)) refund = 45;
   refund = Number(pDat["trophyLose"]) + Number(pDat["trophyWin"]);
+  log.debug("refund: " + refund);
   if(args.outcome == "rWin") 
   {
   	if(trophyCount < 20) // first win jumps you to 50
