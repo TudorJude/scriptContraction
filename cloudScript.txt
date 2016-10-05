@@ -494,12 +494,8 @@ log.debug("looking for user generated recording");
       finalRecArray[i] = validRecArray[vrAidx - 1 - i];
       continue;
     }
-    log.debug("valoarea pizdii: " + (pivot - Math.floor(finalRecArraySize/2) + i));
     finalRecArray[i] = validRecArray[(pivot - Math.floor(finalRecArraySize/2) + i)]; // get inner recordings
   }
-  log.debug("vrAidx: " + vrAidx);
-  log.debug("validRecArray: " + validRecArray);
-  log.debug("finalRecArray: " + finalRecArray);
   var randIdx = Math.floor(Math.random() * finalRecArraySize); // let's get a random one from this final pool
     opponentId = finalRecArray[randIdx].uId;
     env = finalRecArray[randIdx].e;
@@ -545,7 +541,10 @@ log.debug("looking for user generated recording");
           else
             maxLeagueT = Number(sdvalParsed.subdivisions[lsValParsed.leagues[cLeague]]);
           
-          var rminmaxarr = leagueTitleDataRequest.Data["SubdivisionTrophyRanges"].split("_");
+          log.debug("leagueTitleDataRequest: " + leagueTitleDataRequest);
+          log.debug("leagueTitleDataRequest.Data: " + leagueTitleDataRequest.Data);
+          log.debug("leagueTitleDataRequest.Data[TrophyGainRange]: " + leagueTitleDataRequest.Data["TrophyGainRange"]);
+          var rminmaxarr = leagueTitleDataRequest.Data["TrophyGainRange"].split("_"); // muie
           var rMin = rminmaxarr[0];
           var rMax = rminmaxarr[1];          
           
