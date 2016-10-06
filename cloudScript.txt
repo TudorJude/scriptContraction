@@ -67,6 +67,8 @@ handlers.endGame = function(args, context) {
     Keys: ["trophyLose","trophyWin"]
   });
   var refund;
+  log.debug("pDat.Data[trophyLose] " + pDat.Data["trophyLose"]);
+  log.debug("pDat.Data[trophyWin] " + pDat.Data["trophyWin"]);
   if((pDat.Data["trophyLose"] == undefined) || (pDat.Data["trophyWin"] == undefined)) refund = 45;
   else refund = Number(pDat.Data["trophyLose"]) + Number(pDat.Data["trophyWin"]);
   log.debug("refund: " + refund);
