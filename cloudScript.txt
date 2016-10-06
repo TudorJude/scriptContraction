@@ -702,7 +702,7 @@ var grantRequest = server.GrantItemsToUser(
   }
   );  
 
-var InvData = {0 : "Owned"};
+var InvData = {"0" : "Owned"};
 
 for(var i = 0; i < grantRequest.ItemGrantResults.length; i++)
 {
