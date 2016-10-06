@@ -993,7 +993,7 @@ function recalculateCarPr(CarData, carId, _carCardsCatalog, _partsCardCatalog)
       if(carCardsCatalog.Catalog[i].ItemId == carId)
       {
         var carCardInfo = JSON.parse(carCardsCatalog.Catalog[i].CustomData);
-        pr += parseInt(carCardInfo.basePr) + (parseInt(carCardInfo.prPerLvl) * (parseInt(CarData.CarLvl) - 1));
+        pr += parseInt(carCardInfo.basePr) + (parseInt(carCardInfo.prPerLvl) * (parseInt(CarData.CarLvl)));
         break;
       }
     }
