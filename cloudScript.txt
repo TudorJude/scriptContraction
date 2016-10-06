@@ -993,7 +993,7 @@ function recalculateCarPr(CarData, carId, _carCardsCatalog, _partsCardCatalog)
       if(carCardsCatalog.Catalog[i].ItemId == carId)
       {
         var carCardInfo = JSON.parse(carCardsCatalog.Catalog[i].CustomData);
-        pr += parseInt(carCardInfo.basePr) + (parseInt(carCardInfo.prPerLvl) * (parseInt(CarData.CarLvl)));
+        pr += parseInt(carCardInfo.basePr) + (parseInt(carCardInfo.prPerLvl) * (parseInt(CarData.CarLvl) - 1));
         break;
       }
     }
@@ -1568,6 +1568,7 @@ handlers.purchaseItems = function(args, context)
         log.debug("user has enough currency. Let's check for card balance");
         
         var cardCost = parseInt(cardInfo.baseCardCost) + (parseInt(car.CustomData.CarLvl) * parseInt(cardInfo.cardCostPerLvl));
+        car.CustomData.CarLvl = newLvl;
         log.debug("cardCost: " + cardCost);
         var cardFound = false;      
         var cardData;                                            
@@ -1634,7 +1635,6 @@ handlers.purchaseItems = function(args, context)
         }
         log.debug("user has enough cards to purchase upgrade!");
 
-        
         var newPr = recalculateCarPr(car.CustomData, car.ItemId, carCardsCatalog, undefined);
         log.debug("upgrading to car lvl: " +  newLvl + " and pr: " + newPr);
         var CarData = {
