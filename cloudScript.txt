@@ -747,6 +747,33 @@ server.UpdateUserInventoryItemCustomData(
   Data: CarData
 }
 );
+
+var partsToGive = [];
+partsToGive.push("Engine");    
+var partRequest = server.GrantItemsToUser(
+{
+  CatalogVersion : "PartCards",
+  PlayFabId: currentPlayerId,
+  ItemIds : partsToGive
+}
+); 
+var PartData = {"Amount" : "5"};
+server.UpdateUserInventoryItemCustomData(
+{
+  PlayFabId: currentPlayerId,
+  ItemInstanceId: partsToGive.ItemGrantResults[0].ItemInstanceId,
+  Data: PartData
+}
+);
+var CarData = {"CarLvl" : "1","EngineLvl" : "0","ExhaustLvl" : "0","GearboxLvl" : "0","SuspensionLvl" : "0"};
+server.UpdateUserInventoryItemCustomData(
+{
+  PlayFabId: currentPlayerId,
+  ItemInstanceId: carRequest.ItemGrantResults[0].ItemInstanceId,
+  Data: CarData
+}
+);
+
 }
 handlers.requestCurrency = function(args)
 {
