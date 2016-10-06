@@ -68,13 +68,14 @@ handlers.endGame = function(args, context) {
   });
   var refund;
   if((pDat["trophyLose"] == undefined) || (pDat["trophyWin"] == undefined)) refund = 45;
+  log.debug("pDatTL:"+pDat["trophyLose"]);
+  log.debug("pDatTW:"+pDat["trophyWin"]);
+  log.debug("pDatTLNumbered:"+Number(pDat["trophyLose"]));
+  log.debug("pDatTWNumbered:"+Number(pDat["trophyWin"]));
   refund = Number(pDat["trophyLose"]) + Number(pDat["trophyWin"]);
   log.debug("refund: " + refund);
   if(args.outcome == "rWin") 
   {
-  	if(trophyCount < 20) // first win jumps you to 50
-  		trophyCount = 50;
-  	else
   		trophyCount += refund;
   }
   log.debug("trophies change: " + initTrophyCount + " => " + trophyCount);
@@ -596,9 +597,10 @@ log.debug("maxLT " + maxLeagueT + " minLeagueT " + minLeagueT);
               trophiesToGive = 3 * (rMax - rMin) - trophiesToTake;
             }
           }
-log.debug("trophiesToTake:  " + trophiesToTake);
- log.debug("trophiesToGive:  " + trophiesToGive);
-          trophyCount -= Number(trophiesToTake);
+  log.debug("trophiesToTake:  " + trophiesToTake);
+  log.debug("trophiesToGive:  " + trophiesToGive);
+  if(trophyCount == 0) trophyCount = 0;
+    trophyCount -= Number(trophiesToTake);
   if(trophyCount <= 1) trophyCount = 1;
   wlStatInt = parseInt(wlStat, 2);
   log.debug("updating WL to:  " + wlStatInt);
