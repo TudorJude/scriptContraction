@@ -68,11 +68,7 @@ handlers.endGame = function(args, context) {
   });
   var refund;
   if((pDat["trophyLose"] == undefined) || (pDat["trophyWin"] == undefined)) refund = 45;
-  log.debug("pDatTL:"+pDat["trophyLose"]);
-  log.debug("pDatTW:"+pDat["trophyWin"]);
-  log.debug("pDatTLNumbered:"+Number(pDat["trophyLose"]));
-  log.debug("pDatTWNumbered:"+Number(pDat["trophyWin"]));
-  refund = Number(pDat["trophyLose"]) + Number(pDat["trophyWin"]);
+  else refund = Number(pDat["trophyLose"]) + Number(pDat["trophyWin"]);
   log.debug("refund: " + refund);
   if(args.outcome == "rWin") 
   {
