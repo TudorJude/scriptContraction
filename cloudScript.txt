@@ -761,7 +761,7 @@ var PartData = {"Amount" : "5"};
 server.UpdateUserInventoryItemCustomData(
 {
   PlayFabId: currentPlayerId,
-  ItemInstanceId: partsToGive.ItemGrantResults[0].ItemInstanceId,
+  ItemInstanceId: partRequest.ItemGrantResults[0].ItemInstanceId,
   Data: PartData
 }
 );
