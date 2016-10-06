@@ -595,9 +595,13 @@ log.debug("maxLT " + maxLeagueT + " minLeagueT " + minLeagueT);
           }
   log.debug("trophiesToTake:  " + trophiesToTake);
   log.debug("trophiesToGive:  " + trophiesToGive);
-  if(trophyCount == 0) trophyCount = 0;
+  if(trophyCount == 0) 
+    trophyCount = 0;
+  else 
+  {
     trophyCount -= Number(trophiesToTake);
-  if(trophyCount <= 1) trophyCount = 1;
+    if(trophyCount <= 1) trophyCount = 1;
+  }
   wlStatInt = parseInt(wlStat, 2);
   log.debug("updating WL to:  " + wlStatInt);
   //update stats on server
