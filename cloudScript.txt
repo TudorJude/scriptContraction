@@ -448,7 +448,7 @@ if(isIncompleteSubDivision == true)
         if((defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecPos"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecRot"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"] != undefined))
         { // looks like we found a valid default recording
           trophyCount -= rMin;
-          if(trophyCount <= 0) trophyCount = 0;
+          if(trophyCount <= 1) trophyCount = 1;
           wlStatInt = parseInt(wlStat, 2);
           log.debug("updating WL to:  " + wlStatInt);          
           //update stats on server
