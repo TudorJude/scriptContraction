@@ -595,15 +595,19 @@ log.debug("maxLT " + maxLeagueT + " minLeagueT " + minLeagueT);
               trophiesToGive = 3 * (rMax - rMin) - trophiesToTake;
             }
           }
-  log.debug("trophiesToTake:  " + trophiesToTake);
-  log.debug("trophiesToGive:  " + trophiesToGive);
+  var updateTrophiesToGiveTake = true;
   if(trophyCount == 0) 
-    trophyCount = 0;
+  {
+    updateTrophiesToGiveTake = false;
+    trophyCount = rMax;
+  }
   else 
   {
     trophyCount -= Number(trophiesToTake);
     if(trophyCount <= 1) trophyCount = 1;
   }
+  log.debug("trophiesToTake:  " + trophiesToTake);
+  log.debug("trophiesToGive:  " + trophiesToGive);
   wlStatInt = parseInt(wlStat, 2);
   log.debug("updating WL to:  " + wlStatInt);
   //update stats on server
@@ -621,15 +625,21 @@ log.debug("maxLT " + maxLeagueT + " minLeagueT " + minLeagueT);
     Statistics: suArray
   }
   );
-          var dataToUpdate = {
+            var dataToUpdate = {
             "trophyWin" : trophiesToGive,
             "trophyLose": trophiesToTake
           }
+  if(updateTrophiesToGiveTake == false)
+  {
+          dataToUpdate["trophyWin"] = 0;
+          dataToUpdate["trophyLose"] = 0;
+  }
           server.UpdateUserInternalData(
           {
             PlayFabId: currentPlayerId,
             Data: dataToUpdate
           });
+
 
   return {
     Result :"OK",
