@@ -447,7 +447,16 @@ if(isIncompleteSubDivision == true)
         log.debug("defaultRecordingData: " + defaultRecordingData.Data);
         if((defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecPos"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecRot"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"] != undefined))
         { // looks like we found a valid default recording
-          trophyCount -= rMin;
+          var updateTrophyInternal = true;
+          if(trophyCount == 0)
+          {
+            trophyCount = rMax;
+            updateTrophyInternal = false;
+          }
+          else
+          {
+            trophyCount -= rMin;
+          }          
           if(trophyCount <= 1) trophyCount = 1;
           wlStatInt = parseInt(wlStat, 2);
           log.debug("updating WL to:  " + wlStatInt);          
@@ -469,6 +478,11 @@ if(isIncompleteSubDivision == true)
           var dataToUpdate = {
             "trophyWin" : rMax,
             "trophyLose": rMin
+          }
+          if(updateTrophyInternal == false)
+          {
+            dataToUpdate["trophyWin"] = 0;
+            dataToUpdate["trophyLose"] = 0;
           }
           server.UpdateUserInternalData(
           {
