@@ -307,14 +307,14 @@ handlers.startGame = function(args, context) {
       winRatio = Math.round( 100* (wins/totalGames));
   }
   //start game so we assume it'sa lose until it's a win
-  log.debug("wlStatBeforeshiftandAdd " + wlStat);
+  //log.debug("wlStatBeforeshiftandAdd " + wlStat);
   wlStat += "0";
-  log.debug("wlStatBeforeshift " + wlStat);
+  //log.debug("wlStatBeforeshift " + wlStat);
    if(wlStat.length > 20)
    {
     wlStat = wlStat.slice(1);
    }
-   log.debug("wlStat " + wlStat);
+  // log.debug("wlStat " + wlStat);
   //trophy count and subleague distribution
   var leagueTitleDataRequest = server.GetTitleData(
     {
@@ -336,7 +336,7 @@ handlers.startGame = function(args, context) {
   var sdvalParsed = JSON.parse(sdval);
   var lsVal = leagueTitleDataRequest.Data["LeagueSubdivisions"];
   var lsValParsed = JSON.parse(lsVal);
-  log.debug("SubdivisionTrophyRanges " + sdvalParsed);
+  //log.debug("SubdivisionTrophyRanges " + sdvalParsed);
   var subDivision = 43;
           var rminmaxarr = leagueTitleDataRequest.Data["TrophyGainRange"].split("_"); 
           var rMin = Number(rminmaxarr[0]);
@@ -351,7 +351,7 @@ handlers.startGame = function(args, context) {
       break;
     }
   }
-  log.debug("user is in subdivision " + subDivision);
+  //log.debug("user is in subdivision " + subDivision);
 
   //matchmaking code
   //let's get subdivision and neighbouring subdivisions
@@ -389,13 +389,13 @@ handlers.startGame = function(args, context) {
   0,0,0,0,0,
   0,0,0,0,0
   ]
-  log.debug("subrecording pool has " + recArray.length + " length. Must have: " + subDivisionLength + " length");
+  //log.debug("subrecording pool has " + recArray.length + " length. Must have: " + subDivisionLength + " length");
 
   if(recArray.length < subDivisionLength) isIncompleteSubDivision = true;
 
   var validRecArray = new Array(recArray.length);
   var vrAidx = 0;
-  log.debug("iterating through recArray");
+  //log.debug("iterating through recArray");
   for(var i = 0; i < recArray.length; i++) // create valid rec pool OR check for missing env/course if subDivision has missing recordings
   {    
       if(isIncompleteSubDivision == true)
@@ -411,7 +411,7 @@ handlers.startGame = function(args, context) {
         vrAidx++;
     
   }
-log.debug("isIncompleteSubDivision: " + isIncompleteSubDivision);
+//log.debug("isIncompleteSubDivision: " + isIncompleteSubDivision);
 //let's give default recording if necessary
 if(isIncompleteSubDivision == true)
 {
@@ -426,7 +426,7 @@ if(isIncompleteSubDivision == true)
       break;
     }
   }
-   log.debug("gettingDefaultUser: env: " + envToGet + " course: " + courseToGet);
+   //log.debug("gettingDefaultUser: env: " + envToGet + " course: " + courseToGet);
   //let's see who the master account is
     var masterAccountRequest = server.GetTitleData(
     {
@@ -435,7 +435,7 @@ if(isIncompleteSubDivision == true)
     ); 
     if(masterAccountRequest.Data["MasterUser"] != undefined)
     {
-      log.debug("master user: " + masterAccountRequest.Data["MasterUser"]);
+     // log.debug("master user: " + masterAccountRequest.Data["MasterUser"]);
       var defaultRecordingData = server.GetUserReadOnlyData(
       {
         PlayFabId: masterAccountRequest.Data["MasterUser"],
@@ -444,7 +444,7 @@ if(isIncompleteSubDivision == true)
       );
       if(defaultRecordingData.Data != undefined)
       {
-        log.debug("defaultRecordingData: " + defaultRecordingData.Data);
+        //log.debug("defaultRecordingData: " + defaultRecordingData.Data);
         if((defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecPos"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecRot"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"] != undefined))
         { // looks like we found a valid default recording
           var updateTrophyInternal = true;
@@ -459,7 +459,7 @@ if(isIncompleteSubDivision == true)
           }          
           if(trophyCount <= 1) trophyCount = 1;
           wlStatInt = parseInt(wlStat, 2);
-          log.debug("updating WL to:  " + wlStatInt);          
+          //log.debug("updating WL to:  " + wlStatInt);          
           //update stats on server
           var suArray = [];
           var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
@@ -468,7 +468,7 @@ if(isIncompleteSubDivision == true)
           suArray.push(sut); 
           var sul = {StatisticName: "League", Version : "0", Value: cLeague};
           suArray.push(sul); 
-          log.debug("updatingStats: " + suArray);
+          //log.debug("updatingStats: " + suArray);
           var updateRequest = server.UpdatePlayerStatistics(
           {
             PlayFabId: currentPlayerId,
@@ -489,7 +489,7 @@ if(isIncompleteSubDivision == true)
             PlayFabId: currentPlayerId,
             Data: dataToUpdate
           });
-          log.debug("found valid default rec");
+          //log.debug("found valid default rec");
           return {
             Result :"OK",
             RecType: "Default",
@@ -504,7 +504,7 @@ if(isIncompleteSubDivision == true)
       }
     }
 }
-log.debug("looking for user generated recording");
+//log.debug("looking for user generated recording");
   if(vrAidx == 0) return generateErrObj("no valid recording found for this subdivision");
   var pivot = vrAidx - 1; //in case your WLRatio is the highest in the pool
   for(var i = 0; i < vrAidx; i++) // write winstreak/losestreak code
@@ -518,9 +518,9 @@ log.debug("looking for user generated recording");
       //course = recArray[i].c;
     }
   }
-  log.debug("pivot is: " + pivot);
+ // log.debug("pivot is: " + pivot);
   var finalRecArraySize = Math.min(vrAidx, 3); // for now 3 is the max number of recordings in the random final pool
-  log.debug("finalRecArraySize: " + finalRecArraySize);
+ // log.debug("finalRecArraySize: " + finalRecArraySize);
   var finalRecArray = new Array(finalRecArraySize); // this array will be populated with the recordings around the pivot
   for(var i = 0; i < finalRecArraySize; i++)
   {
@@ -541,7 +541,7 @@ log.debug("looking for user generated recording");
     env = finalRecArray[randIdx].e;
     course = finalRecArray[randIdx].c;
   var urodkr = [(env + "_" + course + "_RecPos") , (env + "_" + course + "_RecRot"), (env + "_" + course + "_RecHeader")]; 
-  log.debug("requesting " + urodkr);
+ // log.debug("requesting " + urodkr);
   var recordingData = server.GetUserReadOnlyData(
     {
       PlayFabId: opponentId,
@@ -564,11 +564,11 @@ log.debug("looking for user generated recording");
           var userTrophies = trophyCount;
           var oppTrophies;
           var cLeague = Number(calculateLeague(trophyCount));
-log.debug("cLeague " + cLeague);
-          log.debug("lsValParsed: " + lsValParsed);
-          log.debug("sdvalParsed: " + sdvalParsed);
-          log.debug("lsValParsed.leagues: " + lsValParsed.leagues);
-          log.debug("sdvalParsed.subDivisions: " + sdvalParsed.subdivisions);
+//log.debug("cLeague " + cLeague);
+  //        log.debug("lsValParsed: " + lsValParsed);
+  //        log.debug("sdvalParsed: " + sdvalParsed);
+  //        log.debug("lsValParsed.leagues: " + lsValParsed.leagues);
+  //        log.debug("sdvalParsed.subDivisions: " + sdvalParsed.subdivisions);
 
           var minLeagueT
           if(cLeague > 0)
@@ -582,7 +582,7 @@ log.debug("cLeague " + cLeague);
           else
             maxLeagueT = Number(sdvalParsed.subdivisions[lsValParsed.leagues[cLeague]]);   
           
-log.debug("maxLT " + maxLeagueT + " minLeagueT " + minLeagueT);
+//log.debug("maxLT " + maxLeagueT + " minLeagueT " + minLeagueT);
 
           var opponentHeader = JSON.parse(recordingData.Data[env + "_" + course + "_RecHeader"].Value);
           if(opponentHeader != undefined)
@@ -604,7 +604,7 @@ log.debug("maxLT " + maxLeagueT + " minLeagueT " + minLeagueT);
             }
             else
             {
-              log.debug("rMin: " + rMin + " userTrophies: " + userTrophies + " oppTrophies " + oppTrophies + " maxLeagueT " + maxLeagueT + " minLeagueT " + minLeagueT + " rMax: " + rMax);
+            //  log.debug("rMin: " + rMin + " userTrophies: " + userTrophies + " oppTrophies " + oppTrophies + " maxLeagueT " + maxLeagueT + " minLeagueT " + minLeagueT + " rMax: " + rMax);
               trophiesToTake = rMin + Math.floor((((userTrophies - oppTrophies)/(maxLeagueT - minLeagueT)) + 1) * ((rMax - rMin)/2));
               trophiesToGive = (rMax + rMin) - trophiesToTake;
             }
@@ -620,10 +620,10 @@ log.debug("maxLT " + maxLeagueT + " minLeagueT " + minLeagueT);
     trophyCount -= Number(trophiesToTake);
     if(trophyCount <= 1) trophyCount = 1;
   }
-  log.debug("trophiesToTake:  " + trophiesToTake);
-  log.debug("trophiesToGive:  " + trophiesToGive);
+  //log.debug("trophiesToTake:  " + trophiesToTake);
+ // log.debug("trophiesToGive:  " + trophiesToGive);
   wlStatInt = parseInt(wlStat, 2);
-  log.debug("updating WL to:  " + wlStatInt);
+ // log.debug("updating WL to:  " + wlStatInt);
   //update stats on server
   var suArray = [];
   var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
@@ -632,7 +632,7 @@ log.debug("maxLT " + maxLeagueT + " minLeagueT " + minLeagueT);
   suArray.push(sut); 
   var sul = {StatisticName: "League", Version : "0", Value: cLeague};
   suArray.push(sul); 
-  log.debug("updatingStats: " + suArray);
+ // log.debug("updatingStats: " + suArray);
   var updateRequest = server.UpdatePlayerStatistics(
   {
     PlayFabId: currentPlayerId,
@@ -1570,8 +1570,8 @@ handlers.purchaseItems = function(args, context)
       //CarUpgrade
     case "carUpgrade":
       
-      log.debug("== carUpgrade request: " + "carId: " + args.carId);
-      log.debug("RETRIEVING CARDS CATALOGUE");
+      //log.debug("== carUpgrade request: " + "carId: " + args.carId);
+      //log.debug("RETRIEVING CARDS CATALOGUE");
         var carCardsCatalog = server.GetCatalogItems(
           {
             CatalogVersion : "CarCards"
