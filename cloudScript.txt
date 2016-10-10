@@ -1617,7 +1617,7 @@ handlers.purchaseItems = function(args, context)
         
         //let's check that the user has enough money + cards
         var newLvl = (parseInt(car.CustomData.CarLvl) + 1);
-        var currCost = parseInt(cardInfo.baseCurrCost) + (newLvl * parseInt(cardInfo.currCostPerLvl));
+        var currCost = parseInt(cardInfo.baseCurrCost) + (parseInt(car.CustomData.CarLvl) * parseInt(cardInfo.currCostPerLvl));
         var costCheckObj = checkBalance(cardInfo.currType, currCost, playerSC, playerHC);
         if(costCheckObj != "OK") return costCheckObj;
 
