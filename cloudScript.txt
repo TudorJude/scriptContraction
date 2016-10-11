@@ -443,14 +443,14 @@ else
           log.debug("found: " + recArray[i].uId + "... skipping prev opp");
           continue;
         }
-        likelyRecArray[vrAidx] = recArray[i];
+        likelyRecArray[lrAidx] = recArray[i];
         lrAidx++;
       if(recArray[i].uId == oppPrevPrev)
         {
           log.debug("found: " + recArray[i].uId + "... skipping prev prev opp");
           continue;
         }
-        moreLikelyRecArray[vrAidx] = recArray[i];
+        moreLikelyRecArray[mlrAidx] = recArray[i];
         mlrAidx++;
   }
 //log.debug("isIncompleteSubDivision: " + isIncompleteSubDivision);
