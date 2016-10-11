@@ -285,7 +285,7 @@ log.debug("user is in subdivision " + subDivision);
 handlers.startGame = function(args, context) {
   //let's see what subleague we are in and what win/loss ration we have
   //wlratio
-  var wlStat = "01"; // 50/50 for newtimers
+  var wlStat = "10"; // 50/50 for newtimers
   var wlStatInt = 0; // 50/50 for newtimers
   var winRatio = 50;
   var totalGames = 2;
@@ -369,6 +369,31 @@ handlers.startGame = function(args, context) {
   var opponentId;
   var env;
   var course;
+
+//previous opponents
+var oppPrev = "noop"; // ultimu
+var oppPrevPrev = "noop";// penultimu
+var oppArray;
+var oppDat = server.GetUserInternalData(
+{
+    PlayFabId: currentPlayerId,
+    Keys: ["lastOpp"]
+});
+
+if((oppDat.Data == undefined) || (oppDat.Data.lastOpp == undefined))
+{
+  oppPrev = "noop";
+  oppPrevPrev = "noop";
+}
+else
+{
+  oppArray = oppDat.Data.lastOpp.Value.split(",");
+  for(var i = 0; i < oppArray; i++)
+  {
+    if(i == 0) oppPrev = oppArray[i];
+    if(i == 1) oppPrevPrev = oppArray[i];
+  }
+}
   if(isIncompleteSubDivision == false)
   {
     recArray = JSON.parse(recPool);
@@ -393,8 +418,12 @@ handlers.startGame = function(args, context) {
 
   if(recArray.length < subDivisionLength) isIncompleteSubDivision = true;
 
-  var validRecArray = new Array(recArray.length);
+  var validRecArray = new Array(recArray.length); // all recordings except yours
   var vrAidx = 0;
+  var likelyRecArray = new Array(recArray.length); // all recordings minus yours AND minus oppPrev
+  var lrAidx = 0;
+  var moreLikelyRecArray = new Array(recArray.length); // all recordings minus yours AND minus oppPrev AND minus oppPrevPrev
+  var mlrAidx = 0;
   //log.debug("iterating through recArray");
   for(var i = 0; i < recArray.length; i++) // create valid rec pool OR check for missing env/course if subDivision has missing recordings
   {    
@@ -409,7 +438,20 @@ handlers.startGame = function(args, context) {
         }
         validRecArray[vrAidx] = recArray[i];
         vrAidx++;
-    
+      if(recArray[i].uId == oppPrev)
+        {
+          log.debug("found: " + recArray[i].uId + "... skipping prev opp");
+          continue;
+        }
+        likelyRecArray[vrAidx] = recArray[i];
+        lrAidx++;
+      if(recArray[i].uId == oppPrevPrev)
+        {
+          log.debug("found: " + recArray[i].uId + "... skipping prev prev opp");
+          continue;
+        }
+        moreLikelyRecArray[vrAidx] = recArray[i];
+        mlrAidx++;
   }
 //log.debug("isIncompleteSubDivision: " + isIncompleteSubDivision);
 //let's give default recording if necessary
@@ -426,7 +468,7 @@ if(isIncompleteSubDivision == true)
       break;
     }
   }
-   //log.debug("gettingDefaultUser: env: " + envToGet + " course: " + courseToGet);
+  //log.debug("gettingDefaultUser: env: " + envToGet + " course: " + courseToGet);
   //let's see who the master account is
     var masterAccountRequest = server.GetTitleData(
     {
@@ -506,10 +548,19 @@ if(isIncompleteSubDivision == true)
 }
 //log.debug("looking for user generated recording");
   if(vrAidx == 0) return generateErrObj("no valid recording found for this subdivision");
-  var pivot = vrAidx - 1; //in case your WLRatio is the highest in the pool
-  for(var i = 0; i < vrAidx; i++) // write winstreak/losestreak code
+
+//we have 3 arrays. We want the likelyhood that you get the same previous opponents to be as low as possible
+//so we will see if moreLikelyRecArray is empty. If yes we check if likelyRecArray is empty. 
+//if they are both empty we remain with the current validRecArray array
+var searchArray = validRecArray;
+var sAlen = vrAidx;
+  if(lrAidx > 0){sAlen = lrAidx; searchArray = likelyRecArray}
+  if(mlrAidx > 0){sAlen = mlrAidx; searchArray = moreLikelyRecArray}
+
+  var pivot = sAlen - 1; //in case your WLRatio is the highest in the pool
+  for(var i = 0; i < sAlen; i++) // write winstreak/losestreak code
   {    
-    if(validRecArray[i].wl > winRatio) //let's find the pivot; we'll move it later based on WL ratio
+    if(searchArray[i].wl > winRatio) //let's find the pivot; we'll move it later based on WL ratio
     {
       pivot = i;
       break;
@@ -519,22 +570,22 @@ if(isIncompleteSubDivision == true)
     }
   }
  // log.debug("pivot is: " + pivot);
-  var finalRecArraySize = Math.min(vrAidx, 3); // for now 3 is the max number of recordings in the random final pool
+  var finalRecArraySize = Math.min(sAlen, 3); // for now 3 is the max number of recordings in the random final pool
  // log.debug("finalRecArraySize: " + finalRecArraySize);
   var finalRecArray = new Array(finalRecArraySize); // this array will be populated with the recordings around the pivot
   for(var i = 0; i < finalRecArraySize; i++)
   {
     if(pivot <= 0) // get rightmost recordings
     {
-      finalRecArray[i] = validRecArray[i];
+      finalRecArray[i] = searchArray[i];
       continue;
     }
-    if(pivot >= vrAidx - 1) // get leftmost recordings
+    if(pivot >= sAlen - 1) // get leftmost recordings
     {
-      finalRecArray[i] = validRecArray[vrAidx - 1 - i];
+      finalRecArray[i] = searchArray[sAlen - 1 - i];
       continue;
     }
-    finalRecArray[i] = validRecArray[(pivot - Math.floor(finalRecArraySize/2) + i)]; // get inner recordings
+    finalRecArray[i] = searchArray[(pivot - Math.floor(finalRecArraySize/2) + i)]; // get inner recordings
   }
   var randIdx = Math.floor(Math.random() * finalRecArraySize); // let's get a random one from this final pool
     opponentId = finalRecArray[randIdx].uId;
@@ -639,9 +690,11 @@ if(isIncompleteSubDivision == true)
     Statistics: suArray
   }
   );
+  var lastOppVal = opponentId + "," + oppPrev;
             var dataToUpdate = {
             "trophyWin" : trophiesToGive,
-            "trophyLose": trophiesToTake
+            "trophyLose": trophiesToTake,
+            "lastOpp" : opponentId
           }
   if(updateTrophiesToGiveTake == false)
   {
