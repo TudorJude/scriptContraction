@@ -390,7 +390,7 @@ else
 {
   oppArray = oppDat.Data.lastOpp.Value.split(",");
   log.debug("oppArray is " + oppArray);
-  for(var i = 0; i < oppArray; i++)
+  for(var i = 0; i < oppArray.length; i++)
   {
     if(i == 0) oppPrev = oppArray[i];
     if(i == 1) oppPrevPrev = oppArray[i];
