@@ -382,17 +382,21 @@ var oppDat = server.GetUserInternalData(
 
 if((oppDat.Data == undefined) || (oppDat.Data.lastOpp == undefined))
 {
+  log.debug("opp data is undefined");
   oppPrev = "noop";
   oppPrevPrev = "noop";
 }
 else
 {
   oppArray = oppDat.Data.lastOpp.Value.split(",");
+  log.debug("oppArray is " + oppArray);
   for(var i = 0; i < oppArray; i++)
   {
     if(i == 0) oppPrev = oppArray[i];
     if(i == 1) oppPrevPrev = oppArray[i];
   }
+  log.debug("oppPrev is " + oppPrev);
+  log.debug("oppPrevPrev is " + oppPrevPrev);
 }
   if(isIncompleteSubDivision == false)
   {
@@ -694,7 +698,7 @@ var sAlen = vrAidx;
             var dataToUpdate = {
             "trophyWin" : trophiesToGive,
             "trophyLose": trophiesToTake,
-            "lastOpp" : opponentId
+            "lastOpp" : lastOppVal
           }
   if(updateTrophiesToGiveTake == false)
   {
