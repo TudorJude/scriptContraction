@@ -619,6 +619,7 @@ var sAlen = vrAidx;
           var userTrophies = trophyCount;
           var oppTrophies;
           var cLeague = Number(calculateLeague(trophyCount));
+          var recTypeSent = "UserGenerated";
 //log.debug("cLeague " + cLeague);
   //        log.debug("lsValParsed: " + lsValParsed);
   //        log.debug("sdvalParsed: " + sdvalParsed);
@@ -656,6 +657,7 @@ var sAlen = vrAidx;
             {
               trophiesToTake = rMin;
               trophiesToGive = rMax;
+              recTypeSent = "Default";
             }
             else
             {
@@ -714,7 +716,7 @@ var sAlen = vrAidx;
 
   return {
     Result :"OK",
-    RecType: "UserGenerated",
+    RecType: recTypeSent,
     PosData: recordingData.Data[env + "_" + course + "_RecPos"].Value, //0_0_RecPos
     RotData: recordingData.Data[env + "_" + course + "_RecRot"].Value,
     HeaderData: recordingData.Data[env + "_" + course + "_RecHeader"].Value,
