@@ -338,6 +338,8 @@ handlers.startGame = function(args, context) {
   var lsValParsed = JSON.parse(lsVal);
   //log.debug("SubdivisionTrophyRanges " + sdvalParsed);
   var subDivision = 43;
+  var nextSubDivision = 43;
+  var subDivisionRange = 200;
           var rminmaxarr = leagueTitleDataRequest.Data["TrophyGainRange"].split("_"); 
           var rMin = Number(rminmaxarr[0]);
           log.debug("rMin: " + rMin);
@@ -348,9 +350,12 @@ handlers.startGame = function(args, context) {
     if(trophyCount<Number(sdvalParsed.subdivisions[i]))
     {
       subDivision = i;
+      if(i < sdvalParsed.subdivisions.length - 1) nextSubDivision = i + 1;
       break;
     }
   }
+  subDivisionRange = Number(sdvalParsed.subdivisions[nextSubDivision]) - Number(sdvalParsed.subdivisions[subDivision]);
+  if(subDivisionRange <= 0) subDivisionRange = 400; // random 400
   //log.debug("user is in subdivision " + subDivision);
 
   //matchmaking code
@@ -657,7 +662,8 @@ var sAlen = vrAidx;
             {
               trophiesToTake = rMin;
               trophiesToGive = rMax;
-              recTypeSent = "Default";
+              if(Math.abs(userTrophies - oppTrophies) > subDivisionRange)
+                recTypeSent = "Default";
             }
             else
             {
