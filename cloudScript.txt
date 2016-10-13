@@ -318,7 +318,7 @@ handlers.startGame = function(args, context) {
   //trophy count and subleague distribution
   var leagueTitleDataRequest = server.GetTitleData(
     {
-      Key: ["LeagueSubdivisions","SubdivisionTrophyRanges","TrophyGainRange"] 
+      Key: ["LeagueSubdivisions","SubdivisionTrophyRanges","TrophyGainRange","TrophyLoseRange"] 
     }
     );  
   var tc=server.GetPlayerStatistics(
@@ -341,10 +341,11 @@ handlers.startGame = function(args, context) {
   var nextSubDivision = 43;
   var subDivisionRange = 200;
           var rminmaxarr = leagueTitleDataRequest.Data["TrophyGainRange"].split("_"); 
+          var lminmaxarr = leagueTitleDataRequest.Data["TrophyLoseRange"].split("_"); 
           var rMin = Number(rminmaxarr[0]);
-          log.debug("rMin: " + rMin);
           var rMax = Number(rminmaxarr[1]);  
-          log.debug("rMax: " + rMax);    
+          var lMin = Number(lminmaxarr[0]);
+          var lMax = Number(lminmaxarr[1]);
   for(var i = 0; i < sdvalParsed.subdivisions.length; i++) 
   {
     if(trophyCount<Number(sdvalParsed.subdivisions[i]))
@@ -506,7 +507,7 @@ if(isIncompleteSubDivision == true)
           }
           else
           {
-            trophyCount -= rMin;
+            trophyCount -= lMin;
           }          
           if(trophyCount <= 1) trophyCount = 1;
           wlStatInt = parseInt(wlStat, 2);
@@ -528,7 +529,7 @@ if(isIncompleteSubDivision == true)
           );
           var dataToUpdate = {
             "trophyWin" : rMax,
-            "trophyLose": rMin
+            "trophyLose": lMin
           }
           if(updateTrophyInternal == false)
           {
@@ -547,7 +548,7 @@ if(isIncompleteSubDivision == true)
             PosData: defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecPos"].Value, //0_0_RecPos
             RotData: defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecRot"].Value,
             HeaderData: defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"].Value,
-            TrophyLose: rMin,
+            TrophyLose: lMin,
             TrophyWin : rMax,
             Opp: "Mniezo"
                  };
@@ -654,13 +655,13 @@ var sAlen = vrAidx;
           if(maxLeagueT - minLeagueT <= 0) 
           {
               trophiesToTake = rMax;
-              trophiesToGive = rMin;
+              trophiesToGive = lMin;
           }
           else
           {
             if(Math.abs(userTrophies - oppTrophies) > maxLeagueT - minLeagueT)
             {
-              trophiesToTake = rMin;
+              trophiesToTake = lMin;
               trophiesToGive = rMax;
               if(Math.abs(userTrophies - oppTrophies) > subDivisionRange)
                 recTypeSent = "Default";
@@ -668,8 +669,8 @@ var sAlen = vrAidx;
             else
             {
             //  log.debug("rMin: " + rMin + " userTrophies: " + userTrophies + " oppTrophies " + oppTrophies + " maxLeagueT " + maxLeagueT + " minLeagueT " + minLeagueT + " rMax: " + rMax);
-              trophiesToTake = rMin + Math.floor((((userTrophies - oppTrophies)/(maxLeagueT - minLeagueT)) + 1) * ((rMax - rMin)/2));
-              trophiesToGive = (rMax + rMin) - trophiesToTake;
+              trophiesToTake = lMin + Math.floor((((userTrophies - oppTrophies)/(maxLeagueT - minLeagueT)) + 1) * ((lMax - lMin)/2));
+              trophiesToGive = rMin + Math.floor((((oppTrophies - userTrophies)/(maxLeagueT - minLeagueT)) + 1) * ((rMax - rMin)/2));
             }
           }
   var updateTrophiesToGiveTake = true;
