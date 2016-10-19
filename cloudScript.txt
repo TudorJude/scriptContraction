@@ -666,7 +666,7 @@ var sAlen = vrAidx;
             {
               trophiesToTake = lMin;
               trophiesToGive = rMax;
-              if(Math.abs(userTrophies - oppTrophies) > subDivisionRange)
+              if(Number(Math.abs(userTrophies - oppTrophies)) > Number(subDivisionRange))
               {                
                 recTypeSent = "Default";
               }
