@@ -662,14 +662,10 @@ var sAlen = vrAidx;
           }
           else
           {
-            if(Math.abs(userTrophies - oppTrophies) > (maxLeagueT - minLeagueT))
+            if(Number(Math.abs(userTrophies - oppTrophies)) > Number(subDivisionRange))
             {
-              trophiesToTake = lMin;
-              trophiesToGive = rMax;
-              if(Number(Math.abs(userTrophies - oppTrophies)) > Number(subDivisionRange))
-              {                
-                recTypeSent = "Default";
-              }
+              trophiesToTake = (lMin + lMax)/2;
+              trophiesToGive = (rMax + rMin)/2;
             }
             else
             {
