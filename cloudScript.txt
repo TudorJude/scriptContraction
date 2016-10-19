@@ -666,6 +666,7 @@ var sAlen = vrAidx;
             {
               trophiesToTake = (lMin + lMax)/2;
               trophiesToGive = (rMax + rMin)/2;
+              recTypeSent = "Default";
             }
             else
             {
