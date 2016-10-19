@@ -13,33 +13,33 @@ handlers.endGame = function(args, context) {
   if(ps.Statistics.length != 0)
   {
       wlStatInt = ps.Statistics[0].Value.toString();
-      log.debug("wlStatInt " + wlStatInt);
+      //log.debug("wlStatInt " + wlStatInt);
       wlStat = Number(wlStatInt).toString(2);
-      log.debug("wlStat " + wlStat);
+      //log.debug("wlStat " + wlStat);
   }
   var wins = 0;
   var totalGames = 2;
   var winRatio = 0;
-  log.debug("wlStat.length " + wlStat.length);
+  //log.debug("wlStat.length " + wlStat.length);
   var tempString = new Array(wlStat.length);
-  log.debug("tempString.length " + tempString.length);
+  //log.debug("tempString.length " + tempString.length);
   for(var i = 0 ; i < tempString.length - 1; i++)
   {
     tempString[i] = wlStat[i];
   }
 	tempString[tempString.length-1] = curWL; 
-  log.debug("tempString " + tempString);
+  //log.debug("tempString " + tempString);
   wlStat = tempString;
-  log.debug("wlStat " + wlStat);
+  //log.debug("wlStat " + wlStat);
 	totalGames = wlStat.length;
 	for(var i = 0; i < wlStat.length; i++)
 	{
 		if(wlStat[i] == "1") wins++;
 	}
-	log.debug("wlStatNew " + wlStat);
+	//log.debug("wlStatNew " + wlStat);
 
   winRatio = Math.round( 100* (wins/totalGames));
-  log.debug("winRatio " + winRatio);
+  //log.debug("winRatio " + winRatio);
   //let's get some relevant title wide data
     var titleDataRequest = server.GetTitleData(
     {
@@ -57,7 +57,7 @@ handlers.endGame = function(args, context) {
   if(tc.Statistics.length != 0)
   {
     trophyCount = tc.Statistics[0].Value;
-    log.debug("getting trophy count " + tc.Statistics[0].Value);
+    //log.debug("getting trophy count " + tc.Statistics[0].Value);
   }
   trophyCount = Number(trophyCount);
   initTrophyCount = trophyCount;
@@ -67,16 +67,16 @@ handlers.endGame = function(args, context) {
     Keys: ["trophyLose","trophyWin"]
   });
   var refund;
-  log.debug("pDat.Data[trophyLose] " + pDat.Data["trophyLose"].Value);
-  log.debug("pDat.Data[trophyWin] " + pDat.Data["trophyWin"].Value);
+  //log.debug("pDat.Data[trophyLose] " + pDat.Data["trophyLose"].Value);
+  //log.debug("pDat.Data[trophyWin] " + pDat.Data["trophyWin"].Value);
   if((pDat.Data["trophyLose"] == undefined) || (pDat.Data["trophyWin"] == undefined)) refund = 45;
   else refund = Number(pDat.Data["trophyLose"].Value) + Number(pDat.Data["trophyWin"].Value);
-  log.debug("refund: " + refund);
+  //log.debug("refund: " + refund);
   if(args.outcome == "rWin") 
   {
   		trophyCount += refund;
   }
-  log.debug("trophies change: " + initTrophyCount + " => " + trophyCount);
+  //log.debug("trophies change: " + initTrophyCount + " => " + trophyCount);
   var cLeague = calculateLeague(trophyCount);
   wlStatInt = 0;
   for(var i = 0 ; i < wlStat.length; i++)
@@ -112,7 +112,7 @@ handlers.endGame = function(args, context) {
   //let's see which Subdivision this player is in
   var sdval = titleDataRequest.Data["SubdivisionTrophyRanges"];
   var sdvalParsed = JSON.parse(sdval);
-  log.debug("SubdivisionTrophyRanges " + sdvalParsed);
+  //log.debug("SubdivisionTrophyRanges " + sdvalParsed);
   var subDivision;
   for(var i = 0; i < sdvalParsed.subdivisions.length; i++) 
   {
@@ -122,7 +122,7 @@ handlers.endGame = function(args, context) {
 		break;
   	}
   }
-log.debug("user is in subdivision " + subDivision);
+//log.debug("user is in subdivision " + subDivision);
 	//let's save the player's recording
  var dict = [];
     dict.push({
@@ -137,21 +137,21 @@ log.debug("user is in subdivision " + subDivision);
             Key:  args.envIndex+"_"+args.courseIndex+"_RecHeader", 
         Value: args.recordingHeader
     });  
-       log.debug("updating user read only data ");
+       //log.debug("updating user read only data ");
   var playerData = server.UpdateUserReadOnlyData( 
     {
       PlayFabId: currentPlayerId,
       Data:dict
     }
   );  
-  log.debug("updated user read only data for " + currentPlayerId + " " + playerData);
+  //log.debug("updated user read only data for " + currentPlayerId + " " + playerData);
   var titleDataVal = server.GetTitleInternalData(
     {
       Key: "RecSubDivision"+subDivision, //i.e RecSubDivision0,
     }
     );  
   var recPool = titleDataVal.Data["RecSubDivision"+subDivision];
-  log.debug("recPool: " + recPool);
+  //log.debug("recPool: " + recPool);
   var recArray;
   var titleKeyVal;
   if(recPool == undefined)
@@ -166,12 +166,12 @@ log.debug("user is in subdivision " + subDivision);
   	}
   	recArray.push(recObj);
   	titleKeyVal = JSON.stringify(recArray); 
-  	log.debug("recArray: " + titleKeyVal);
+  	//log.debug("recArray: " + titleKeyVal);
   }
   else
   {
   	recArray = JSON.parse(recPool);  
-  	log.debug("recArray: " + recArray);
+  	//log.debug("recArray: " + recArray);
   	var recObj =
   	{
   		"wl": winRatio,
@@ -260,12 +260,12 @@ log.debug("user is in subdivision " + subDivision);
   	}
   	if(uniqueKeyExists == false)
   	{
-  	  log.debug("recArrayLNbefore: " + recArray.length);
+  	 // log.debug("recArrayLNbefore: " + recArray.length);
   	  recArray.push(recObj);
-  	  log.debug("recArrayLNafter: " + recArray.length);
+  	  //log.debug("recArrayLNafter: " + recArray.length);
     }
   	titleKeyVal = JSON.stringify(recArray);  
-  	log.debug("titleKeyVal: " + titleKeyVal);
+  //	log.debug("titleKeyVal: " + titleKeyVal);
   }
   
   var titleData = server.SetTitleInternalData(
@@ -391,21 +391,21 @@ var oppDat = server.GetUserInternalData(
 
 if((oppDat.Data == undefined) || (oppDat.Data.lastOpp == undefined))
 {
-  log.debug("opp data is undefined");
+  //log.debug("opp data is undefined");
   oppPrev = "noop";
   oppPrevPrev = "noop";
 }
 else
 {
   oppArray = oppDat.Data.lastOpp.Value.split(",");
-  log.debug("oppArray is " + oppArray);
+ // log.debug("oppArray is " + oppArray);
   for(var i = 0; i < oppArray.length; i++)
   {
     if(i == 0) oppPrev = oppArray[i];
     if(i == 1) oppPrevPrev = oppArray[i];
   }
-  log.debug("oppPrev is " + oppPrev);
-  log.debug("oppPrevPrev is " + oppPrevPrev);
+ // log.debug("oppPrev is " + oppPrev);
+ // log.debug("oppPrevPrev is " + oppPrevPrev);
 }
   if(isIncompleteSubDivision == false)
   {
@@ -446,21 +446,21 @@ else
       }
       if(recArray[i].uId == currentPlayerId) 
         {
-          log.debug("found: " + recArray[i].uId + "... skipping");
+         // log.debug("found: " + recArray[i].uId + "... skipping");
           continue;
         }
         validRecArray[vrAidx] = recArray[i];
         vrAidx++;
       if(recArray[i].uId == oppPrev)
         {
-          log.debug("found: " + recArray[i].uId + "... skipping prev opp");
+         // log.debug("found: " + recArray[i].uId + "... skipping prev opp");
           continue;
         }
         likelyRecArray[lrAidx] = recArray[i];
         lrAidx++;
       if(recArray[i].uId == oppPrevPrev)
         {
-          log.debug("found: " + recArray[i].uId + "... skipping prev prev opp");
+         // log.debug("found: " + recArray[i].uId + "... skipping prev prev opp");
           continue;
         }
         moreLikelyRecArray[mlrAidx] = recArray[i];
@@ -674,9 +674,8 @@ var sAlen = vrAidx;
               trophiesToTake = lMin + Math.floor((((userTrophies - oppTrophies)/(maxLeagueT - minLeagueT)) + 1) * ((lMax - lMin)/2));
               trophiesToGive = rMin + Math.floor((((oppTrophies - userTrophies)/(maxLeagueT - minLeagueT)) + 1) * ((rMax - rMin)/2));
             }
-          }
-          log.debug("(maxLeagueT - minLeagueT): " + (maxLeagueT - minLeagueT) + " maxLeagueT: " + maxLeagueT + " minLeagueT " + minLeagueT);
-          log.debug("recType will be: " + recTypeSent + " because oppTrophies: " + oppTrophies + " is larger than userTrophies " + userTrophies + " by" + Math.abs(userTrophies - oppTrophies) + " which is larger than " + subDivisionRange);
+          }         
+          
   var updateTrophiesToGiveTake = true;
   if(trophyCount == 0) 
   {
@@ -908,7 +907,7 @@ handlers.requestInventory = function(args)
     {
       hasCars = true;
       var check = checkCarDataValidity(userInventoryObject.Inventory[i], carCardsCatalog);
-      log.debug("check " + check);
+      //log.debug("check " + check);
       if((check == "PlayFabError") || (check == undefined)) return generateErrObj("PlayfabError");
       else if(check == "OK") log.debug("Data for " + userInventoryObject.Inventory[i].ItemId + " OK");
            else userInventoryObject.Inventory[i].CustomData = check;
@@ -1268,7 +1267,7 @@ function GetCurrentBlackMarket(currentPlayerId, getInternalDataResult)
 
 handlers.purchaseBMItem = function(args, context)
 {
-  log.debug("purchasing item " + args.itemId + " from black market");
+  //log.debug("purchasing item " + args.itemId + " from black market");
   if((args.itemId < 0) || (args.itemId > 3)) return generateFailObj("invalid item index");
   var keysToGet = [];
   keysToGet.push("BMItem" + args.itemId);
@@ -1287,7 +1286,7 @@ handlers.purchaseBMItem = function(args, context)
   );
   
   var userArray = getInternalDataResult.Data["BMItem" + args.itemId].Value.split("_");//name, curr, baseCost, uses, costUse
-  log.debug("userArray: " + userArray);
+  //log.debug("userArray: " + userArray);
   var playerMoney = userInventoryObject.VirtualCurrency[userArray[1]];
   
   if(userArray.length != 5)
@@ -1309,16 +1308,16 @@ handlers.purchaseBMItem = function(args, context)
     var cardInstance;
     var cardAmount = 0;
     var cardData;
-    log.debug("searching for: " + userArray[0] + " in " + catalogName);
+   // log.debug("searching for: " + userArray[0] + " in " + catalogName);
     for(var i = 0; i < userInventoryObject.Inventory.length; i++) // if we find it in the inventory we just give him the amount of cards we owe the player
     {
       if((userInventoryObject.Inventory[i].ItemId == userArray[0]) && (userInventoryObject.Inventory[i].CatalogVersion == catalogName))
       {
-        log.debug("found it!");
+       // log.debug("found it!");
         cardInstance = userInventoryObject.Inventory[i].ItemInstanceId;     
         if(userInventoryObject.Inventory[i].CustomData == undefined)
         {
-          log.debug("no custom data. creating ...");
+         // log.debug("no custom data. creating ...");
           cardData = {"Amount" : 1};
         }
         else
@@ -1346,7 +1345,7 @@ handlers.purchaseBMItem = function(args, context)
     }
     if(cardInstance == undefined)
     {
-      log.debug("cardInstance is undefined");
+      //log.debug("cardInstance is undefined");
       var itemsToGive = [];
       itemsToGive.push(userArray[0]);
       var grantRequest = server.GrantItemsToUser(
@@ -1379,7 +1378,7 @@ handlers.purchaseBMItem = function(args, context)
       }
       );
     var itemVal = userArray[0] + "_" + userArray[1] + "_" + userArray[2] + "_"  + (parseInt(userArray[3]) + 1) + "_" +  userArray[4];
-    log.debug("generatedArray: " + itemVal);
+    //log.debug("generatedArray: " + itemVal);
     var dataToUpdate = {};
     dataToUpdate["BMItem" + args.itemId] = itemVal;
     server.UpdateUserInternalData(
@@ -1438,13 +1437,13 @@ handlers.retrieveBlackMarket = function(args, context)
   
   if(getInternalDataResult.Data.BMTime == undefined)
   {
-    log.debug("No user BM data detected; generating ...");
+    //log.debug("No user BM data detected; generating ...");
     return GenerateBlackMarket(currentPlayerId);
   }
   
   var d = new Date();
-  log.debug("milliseconds passed: " +  d.getTime());
-  log.debug("BMTime: " +  getInternalDataResult.Data.BMTime.Value);
+  //log.debug("milliseconds passed: " +  d.getTime());
+  //log.debug("BMTime: " +  getInternalDataResult.Data.BMTime.Value);
   
   var tK = [];
   tK.push("BlackMarketResetMinutes");
@@ -1456,7 +1455,7 @@ handlers.retrieveBlackMarket = function(args, context)
     );
   if(args.reset == true)
   {
-    log.debug("reseting market");
+    //log.debug("reseting market");
     var curr = "HC";
     var cost = 200;
     var td = server.GetTitleData(
@@ -1505,10 +1504,10 @@ handlers.retrieveBlackMarket = function(args, context)
 
   if(d.getTime() - parseInt(getInternalDataResult.Data.BMTime.Value) > parseInt(tData.Data.BlackMarketResetMinutes) *60*1000) // minutes *60*1000
   {
-    log.debug("regenerating market");
+    //log.debug("regenerating market");
     return GenerateBlackMarket(currentPlayerId);
   }
-  log.debug("get current market");
+  //log.debug("get current market");
   return GetCurrentBlackMarket(currentPlayerId, getInternalDataResult);
 
 }
@@ -1623,7 +1622,7 @@ handlers.updateCarCust = function(args, context)
 handlers.purchaseItems = function(args, context)
 {
   //retrieve user inventory
-  log.debug("RETRIEVING USER INVENTORY");
+  //log.debug("RETRIEVING USER INVENTORY");
   var userInventoryObject = server.GetUserInventory(
   {
     PlayFabId: currentPlayerId
@@ -1633,7 +1632,7 @@ handlers.purchaseItems = function(args, context)
   var playerSC = userInventoryObject.VirtualCurrency.SC;
   var playerHC = userInventoryObject.VirtualCurrency.HC;
 
-  log.debug("user currency: SC: " + playerSC + " HC: " + playerHC);
+  //log.debug("user currency: SC: " + playerSC + " HC: " + playerHC);
   
   switch(args.purchaseType) 
   {
@@ -1655,7 +1654,7 @@ handlers.purchaseItems = function(args, context)
         if((userInventoryObject.Inventory[i].ItemId == args.carId) && (userInventoryObject.Inventory[i].CatalogVersion == "CarsProgress"))
         {
           carFound = true;
-          log.debug("car is in user's inventory!");
+          //log.debug("car is in user's inventory!");
           car = userInventoryObject.Inventory[i];
           break;
         }
@@ -1666,7 +1665,7 @@ handlers.purchaseItems = function(args, context)
           if(carCardsCatalog.Catalog[i].ItemId == args.carId)
           {
             cardInfo = JSON.parse(carCardsCatalog.Catalog[i].CustomData);
-            log.debug("cardInfo found!");
+            //log.debug("cardInfo found!");
             break;
           }
         }
@@ -1683,7 +1682,7 @@ handlers.purchaseItems = function(args, context)
       
       if(carFound == true)
       {
-        log.debug("user has car: " +  args.carId + "... upgrading");
+        //log.debug("user has car: " +  args.carId + "... upgrading");
         
         //let's check that the user has enough money + cards
         var newLvl = (parseInt(car.CustomData.CarLvl) + 1);
@@ -1692,18 +1691,18 @@ handlers.purchaseItems = function(args, context)
         if(costCheckObj != "OK") return costCheckObj;
 
         
-        log.debug("user has enough currency. Let's check for card balance");
+        //log.debug("user has enough currency. Let's check for card balance");
         
         var cardCost = parseInt(cardInfo.baseCardCost) + (parseInt(car.CustomData.CarLvl) * parseInt(cardInfo.cardCostPerLvl));
         car.CustomData.CarLvl = newLvl;
-        log.debug("cardCost: " + cardCost);
+       // log.debug("cardCost: " + cardCost);
         var cardFound = false;      
         var cardData;                                            
         for(var i = 0; i < userInventoryObject.Inventory.length; i++)
         {
           if((userInventoryObject.Inventory[i].ItemId == args.carId) && (userInventoryObject.Inventory[i].CatalogVersion == "CarCards"))
           {
-            log.debug("consuming: " + userInventoryObject.Inventory[i].ItemInstanceId);
+           // log.debug("consuming: " + userInventoryObject.Inventory[i].ItemInstanceId);
             cardFound = true;
             try
             {
@@ -1749,7 +1748,7 @@ handlers.purchaseItems = function(args, context)
             }
             catch(err)
             {
-              log.debug("itemConsumptionResult.errorCode " + err);
+              //log.debug("itemConsumptionResult.errorCode " + err);
               return generateFailObj("Insufficient cards");
             }
             break;
@@ -1760,10 +1759,10 @@ handlers.purchaseItems = function(args, context)
         {
             return generateFailObj("No cards found");
         }
-        log.debug("user has enough cards to purchase upgrade!");
+       // log.debug("user has enough cards to purchase upgrade!");
 
         var newPr = recalculateCarPr(car.CustomData, car.ItemId, carCardsCatalog, undefined);
-        log.debug("upgrading to car lvl: " +  newLvl + " and pr: " + newPr);
+       // log.debug("upgrading to car lvl: " +  newLvl + " and pr: " + newPr);
         var CarData = {
           "CarLvl" : newLvl,
           "Pr" : newPr        
@@ -1785,7 +1784,7 @@ handlers.purchaseItems = function(args, context)
           }
           );
         }
-        log.debug("Upgrade Complete!");        
+       // log.debug("Upgrade Complete!");        
 
         var objectsUpdated = 
           [
@@ -1820,7 +1819,7 @@ handlers.purchaseItems = function(args, context)
       }
       else
       {
-          log.debug("user doesn't have car: " +  args.carId + "... looking for card");
+         // log.debug("user doesn't have car: " +  args.carId + "... looking for card");
           var cardFound = false; 
           var cardData;
           var carCardInstance;
@@ -1828,7 +1827,7 @@ handlers.purchaseItems = function(args, context)
           {
             if((userInventoryObject.Inventory[i].ItemId == args.carId) && (userInventoryObject.Inventory[i].CatalogVersion == "CarCards"))
             {
-              log.debug("consuming: " + userInventoryObject.Inventory[i].ItemInstanceId);
+              //log.debug("consuming: " + userInventoryObject.Inventory[i].ItemInstanceId);
               cardFound = true;
               try
               {
@@ -1879,7 +1878,7 @@ handlers.purchaseItems = function(args, context)
               return generateFailObj("No cards found");
             }
         
-          log.debug("user has enough cards to purchase car. Checking if enough currency is availabe");
+          //log.debug("user has enough cards to purchase car. Checking if enough currency is availabe");
         
           var costCheckObj = checkBalance(cardInfo.currType, cardInfo.baseCurrCost, playerSC, playerHC);
           if(costCheckObj != "OK") return costCheckObj;
@@ -1972,18 +1971,18 @@ handlers.purchaseItems = function(args, context)
                if(userInventoryObject.Inventory[i].ItemId == "PaintJobs")
                  {
                    hasPaintJobItem = true;
-                   log.debug("user has paintjobs");
+                   //log.debug("user has paintjobs");
                    if(userInventoryObject.Inventory[i].CustomData != undefined)
                    {
-                      log.debug("user has paintjobs customData");
+                     // log.debug("user has paintjobs customData");
                       if (cardInfo.defaultPaintID in userInventoryObject.Inventory[i].CustomData)
                       {
-                        log.debug("user has paintjob already");
+                        //log.debug("user has paintjob already");
                         hasPaintJob = true;
                       }
                       else
                       {
-                        log.debug("user doesn't have paintjob");
+                       // log.debug("user doesn't have paintjob");
                         paintData = {}
                         paintData[cardInfo.defaultPaintID] = "Owned";
                       }
@@ -2095,9 +2094,9 @@ handlers.purchaseItems = function(args, context)
         break;
     //PartUpgrade
     case "partUpgrade":
-        log.debug("Upgrading Part: " + args.partId + " on Car: " + args.carId);
+       // log.debug("Upgrading Part: " + args.partId + " on Car: " + args.carId);
         
-        log.debug("Checking to see if car exists in catalog");
+        //log.debug("Checking to see if car exists in catalog");
         var carCatalog = server.GetCatalogItems(
           {
             CatalogVersion : "CarsProgress"
@@ -2124,7 +2123,7 @@ handlers.purchaseItems = function(args, context)
               return r; 
         }
 
-        log.debug("Checking to see if part exists in catalog");
+       // log.debug("Checking to see if part exists in catalog");
         var partsCatalog = server.GetCatalogItems(
           {
             CatalogVersion : "PartCards"
@@ -2153,7 +2152,7 @@ handlers.purchaseItems = function(args, context)
               return returnObj; 
         }
        
-        log.debug("Checking to see if user has car: " + args.carId);
+        //log.debug("Checking to see if user has car: " + args.carId);
         var carFound = false;
         var car;
         for(var i = 0; i < userInventoryObject.Inventory.length; i++)
@@ -2161,7 +2160,7 @@ handlers.purchaseItems = function(args, context)
           if((userInventoryObject.Inventory[i].ItemId == args.carId) && (userInventoryObject.Inventory[i].CatalogVersion == "CarsProgress"))
           {
             carFound = true;
-            log.debug("car is in user's inventory!");
+            //log.debug("car is in user's inventory!");
             car = userInventoryObject.Inventory[i];
             break;
           }
@@ -2171,7 +2170,7 @@ handlers.purchaseItems = function(args, context)
         {
               return generateFailObj("car with ID: " + args.carId + " not found in user inventory.");
         }      
-        log.debug("Checking to see if user has part and or has enough parts");
+       // log.debug("Checking to see if user has part and or has enough parts");
         var partFound = false;
         var part;
         for(var i = 0; i < userInventoryObject.Inventory.length; i++)
@@ -2179,7 +2178,7 @@ handlers.purchaseItems = function(args, context)
           if((userInventoryObject.Inventory[i].ItemId == args.partId) && (userInventoryObject.Inventory[i].CatalogVersion == "PartCards"))
           {
             partFound = true;
-            log.debug("part is in user's inventory!");
+            //log.debug("part is in user's inventory!");
             part = userInventoryObject.Inventory[i]; 
             var CarDataToBeUpdated = {};
             var tempDict = 
@@ -2192,17 +2191,17 @@ handlers.purchaseItems = function(args, context)
             Turbo: "TurboLvl"
           };
             //refactored code
-            log.debug("calculating " + args.partId + " cost and modifying " + tempDict[args.partId]);
+           // log.debug("calculating " + args.partId + " cost and modifying " + tempDict[args.partId]);
             var partsRequired = parseInt(cardInfo.baseCardCost, 10) + (parseInt(car.CustomData[tempDict[args.partId]], 10) * parseInt(cardInfo.cardCostPerLvl, 10));
             var newlvl = parseInt(car.CustomData[tempDict[args.partId]]) + 1;
             var currCost = Number(cardInfo.baseCurrCost) + (parseInt(car.CustomData[tempDict[args.partId]]) * Number(cardInfo.currCostPerLvl));         
             CarDataToBeUpdated[tempDict[args.partId]] = newlvl;
             car.CustomData[tempDict[args.partId]] = newlvl;
-            log.debug("we need: " + partsRequired + " cards and " + currCost + " money => base: " + parseInt(cardInfo.baseCurrCost) + " lvls: " + parseInt(car.CustomData[tempDict[args.partId]]) + " perLvlCost: " + parseInt(cardInfo.currCostPerLvl) + " equalling: "  + ((parseInt(car.CustomData[tempDict[args.partId]], 10) * parseInt(cardInfo.currCostPerLvl, 10))));
+           // log.debug("we need: " + partsRequired + " cards and " + currCost + " money => base: " + parseInt(cardInfo.baseCurrCost) + " lvls: " + parseInt(car.CustomData[tempDict[args.partId]]) + " perLvlCost: " + parseInt(cardInfo.currCostPerLvl) + " equalling: "  + ((parseInt(car.CustomData[tempDict[args.partId]], 10) * parseInt(cardInfo.currCostPerLvl, 10))));
             var updateCardData;
             var costCheckObj = checkBalance(cardInfo.currType, currCost, playerSC, playerHC);
             if(costCheckObj != "OK") return costCheckObj;
-            log.debug("consuming part instance: " + userInventoryObject.Inventory[i].ItemInstanceId);
+           // log.debug("consuming part instance: " + userInventoryObject.Inventory[i].ItemInstanceId);
               try
               {
               if(userInventoryObject.Inventory[i].CustomData == undefined)//let's check if item has custom data
@@ -2238,7 +2237,7 @@ handlers.purchaseItems = function(args, context)
               }
               catch(err)
               {
-                log.debug("itemConsumptionResult.errorCode " + err);
+               // log.debug("itemConsumptionResult.errorCode " + err);
                 return generateFailObj("Insufficient cards");
               } 
                break; //for search
@@ -2282,7 +2281,7 @@ handlers.purchaseItems = function(args, context)
                  CustomData : CarDataToBeUpdated
                }
                ];        
-             log.debug("succesfully upgraded part!");
+            // log.debug("succesfully upgraded part!");
              var currencyUpdated = {};
              var i = 
                  {
@@ -2301,7 +2300,7 @@ handlers.purchaseItems = function(args, context)
              return r;
         break; // big switch
     case "custPurchase":
-        log.debug("Purchasing Customization: " + args.custId + " with val: " + args.custVal);
+       // log.debug("Purchasing Customization: " + args.custId + " with val: " + args.custVal);
         
         log.debug("Checking to see if customization exists in catalog");
         var custCatalog = server.GetCatalogItems(
@@ -2328,8 +2327,8 @@ handlers.purchaseItems = function(args, context)
             var costCheckObj = checkBalance(custCurr, custPrice, playerSC, playerHC);
             if(costCheckObj != "OK") return costCheckObj;
             
-      log.debug("custCurr: " + custCurr);
-            log.debug("custPrice: " + custPrice);
+     // log.debug("custCurr: " + custCurr);
+         //   log.debug("custPrice: " + custPrice);
             
             break;
           }
@@ -2345,14 +2344,14 @@ handlers.purchaseItems = function(args, context)
           return returnObj;
         }
         
-         log.debug("Checking to see if user has said customization");
+       //  log.debug("Checking to see if user has said customization");
          var customizationItem;
          var customizationItemInstance;
          for(var i = 0; i < userInventoryObject.Inventory.length; i++)
          {
            if(userInventoryObject.Inventory[i].ItemId == args.custId)
            {
-             log.debug("user has customization category!");
+      //       log.debug("user has customization category!");
              customizationItem = userInventoryObject.Inventory[i];
              customizationItemInstance = userInventoryObject.Inventory[i].ItemInstanceId;
               if (customizationItem.CustomData != undefined)
@@ -2445,9 +2444,9 @@ handlers.purchaseItems = function(args, context)
       
       break; // big switch
     case "softCurrencyPurchase":
-        log.debug("Purchasing pack: " + args.packId);
+     //   log.debug("Purchasing pack: " + args.packId);
         
-        log.debug("Checking to see if pack exists in catalog");
+     //   log.debug("Checking to see if pack exists in catalog");
         var packCatalog = server.GetCatalogItems(
           {
             CatalogVersion : "SoftCurrencyStore"
@@ -2582,7 +2581,7 @@ handlers.grantItems = function(args)
         {
           if((userInventoryObject.Inventory[i].ItemId == args.itemId) && (userInventoryObject.Inventory[i].CatalogVersion == args.catalogId))
           {
-            log.debug("adding amount to: " + userInventoryObject.Inventory[i].ItemInstanceId);
+           // log.debug("adding amount to: " + userInventoryObject.Inventory[i].ItemInstanceId);
             if(userInventoryObject.Inventory[i].CustomData == undefined)
             {
               newAmount = args.amount;
@@ -2697,17 +2696,17 @@ handlers.openChest = function(args, context)
   //car cards
   for(var p in args.carCardsRequest)
     {
-      log.debug(p + " : " + args.carCardsRequest[p]);
+      //log.debug(p + " : " + args.carCardsRequest[p]);
       if (args.carCardsRequest.hasOwnProperty(p)) 
       { 
         itemFound = false;
         newAmount = 0;
-        log.debug("looking for: " +p);
+        //log.debug("looking for: " +p);
         for(var i = 0; i < userInventoryObject.Inventory.length; i++)
               {
                 if((userInventoryObject.Inventory[i].ItemId == p) && (userInventoryObject.Inventory[i].CatalogVersion == "CarCards"))
                 {
-                  log.debug("adding amount to: " + userInventoryObject.Inventory[i].ItemInstanceId);
+                 // log.debug("adding amount to: " + userInventoryObject.Inventory[i].ItemInstanceId);
                   if(userInventoryObject.Inventory[i].CustomData == undefined)
                   {
                     newAmount = Number(args.carCardsRequest[p]);
@@ -2761,17 +2760,17 @@ handlers.openChest = function(args, context)
   //part cards
   for(var p in args.partCardsRequest)
     {
-      log.debug(p + " : " + args.partCardsRequest[p]);
+      //log.debug(p + " : " + args.partCardsRequest[p]);
       if (args.partCardsRequest.hasOwnProperty(p)) 
       { 
         itemFound = false;
         newAmount = 0;
-        log.debug("looking for: " +p);
+       // log.debug("looking for: " +p);
         for(var i = 0; i < userInventoryObject.Inventory.length; i++)
               {
                 if((userInventoryObject.Inventory[i].ItemId == p) && (userInventoryObject.Inventory[i].CatalogVersion == "PartCards"))
                 {
-                  log.debug("adding amount to: " + userInventoryObject.Inventory[i].ItemInstanceId);
+                 // log.debug("adding amount to: " + userInventoryObject.Inventory[i].ItemInstanceId);
                   if(userInventoryObject.Inventory[i].CustomData == undefined)
                   {
                     newAmount = Number(args.partCardsRequest[p]);
