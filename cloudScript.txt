@@ -667,8 +667,7 @@ var sAlen = vrAidx;
               trophiesToTake = lMin;
               trophiesToGive = rMax;
               if(Math.abs(userTrophies - oppTrophies) > subDivisionRange)
-              {
-                log.debug("recType will be: " + recTypeSent + " because oppTrophies: " + oppTrophies + " is larger than userTrophies " + userTrophies + " by" + Math.abs(userTrophies - oppTrophies) + " which is larger than " + subDivisionRange);
+              {                
                 recTypeSent = "Default";
               }
             }
@@ -679,6 +678,7 @@ var sAlen = vrAidx;
               trophiesToGive = rMin + Math.floor((((oppTrophies - userTrophies)/(maxLeagueT - minLeagueT)) + 1) * ((rMax - rMin)/2));
             }
           }
+          log.debug("recType will be: " + recTypeSent + " because oppTrophies: " + oppTrophies + " is larger than userTrophies " + userTrophies + " by" + Math.abs(userTrophies - oppTrophies) + " which is larger than " + subDivisionRange);
   var updateTrophiesToGiveTake = true;
   if(trophyCount == 0) 
   {
