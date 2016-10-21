@@ -1833,15 +1833,15 @@ handlers.purchaseItems = function(args, context)
                 Keys: "LevelingData"
              });
              var tdParsed = JSON.parse(td.Data.LevelingData);
-             exp += Number(tdParsed.expOnUpgrade);
+             exp = Number(exp) + Number(tdParsed.expOnUpgrade);
              log.debug("exp is: " + exp);
-             var updateObject = {StatisticName : "League", Version : "0", Value: exp};
+             var updateObject = {StatisticName : "Experience", Version : "0", Value: exp};
              var usr = server.UpdatePlayerStatistics(
              {
               PlayFabId:currentPlayerId,
               Statistics:updateObject
              });
-        
+
         return r;
       }
       else
@@ -2133,9 +2133,9 @@ handlers.purchaseItems = function(args, context)
                 Keys: "LevelingData"
              });
              var tdParsed = JSON.parse(td.Data.LevelingData);
-             exp += Number(tdParsed.expOnUpgrade);
+             exp = Number(exp) + Number(tdParsed.expOnUpgrade);
              log.debug("exp is: " + exp);
-             var updateObject = {StatisticName : "League", Version : "0", Value: exp};
+             var updateObject = {StatisticName : "Experience", Version : "0", Value: exp};
              var usr = server.UpdatePlayerStatistics(
              {
               PlayFabId:currentPlayerId,
