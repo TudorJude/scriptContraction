@@ -67,8 +67,8 @@ handlers.endGame = function(args, context) {
     Keys: ["trophyLose","trophyWin"]
   });
   var refund;
-  //log.debug("pDat.Data[trophyLose] " + pDat.Data["trophyLose"].Value);
-  //log.debug("pDat.Data[trophyWin] " + pDat.Data["trophyWin"].Value);
+  log.debug("pDat.Data[trophyLose] " + pDat.Data["trophyLose"].Value);
+  log.debug("pDat.Data[trophyWin] " + pDat.Data["trophyWin"].Value);
   if((pDat.Data["trophyLose"] == undefined) || (pDat.Data["trophyWin"] == undefined)) refund = 45;
   else refund = Number(pDat.Data["trophyLose"].Value) + Number(pDat.Data["trophyWin"].Value);
   //log.debug("refund: " + refund);
@@ -76,7 +76,7 @@ handlers.endGame = function(args, context) {
   {
   		trophyCount += refund;
   }
-  //log.debug("trophies change: " + initTrophyCount + " => " + trophyCount);
+  log.debug("trophies change: " + initTrophyCount + " => " + trophyCount);
   var cLeague = calculateLeague(trophyCount);
   wlStatInt = 0;
   for(var i = 0 ; i < wlStat.length; i++)
