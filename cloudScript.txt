@@ -1815,6 +1815,33 @@ handlers.purchaseItems = function(args, context)
           Message: "InventoryUpdate",
           InventoryChange:i
         };
+
+             //let's give user some experience
+             var sr = server.GetPlayerStatistics(
+             {
+               PlayFabId: currentPlayerId,
+               StatisticNames: "Experience"
+             });
+             var exp = 0;
+             if(sr.Statistics.length > 0)
+             {
+                exp = Number(sr.Statistics[0].Value);
+             }
+
+             var td = server.GetTitleData(
+             {
+                Keys: "LevelingData"
+             });
+             var tdParsed = JSON.parse(td.Data.LevelingData);
+             exp += Number(tdParsed.expOnUpgrade);
+             log.debug("exp is: " + exp);
+             var updateObject = {StatisticName : "League", Version : "0", Value: exp};
+             var usr = server.UpdatePlayerStatistics(
+             {
+              PlayFabId:currentPlayerId,
+              Statistics:updateObject
+             });
+        
         return r;
       }
       else
@@ -2107,10 +2134,8 @@ handlers.purchaseItems = function(args, context)
              });
              var tdParsed = JSON.parse(td.Data.LevelingData);
              exp += Number(tdParsed.expOnUpgrade);
-             var updateObject = {
-              StatisticName: "Experience",
-              Value:exp
-             };
+             log.debug("exp is: " + exp);
+             var updateObject = {StatisticName : "League", Version : "0", Value: exp};
              var usr = server.UpdatePlayerStatistics(
              {
               PlayFabId:currentPlayerId,
