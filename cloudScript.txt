@@ -2088,6 +2088,34 @@ handlers.purchaseItems = function(args, context)
                Message: "InventoryUpdateNewCar",
                InventoryChange:i
              };
+
+             //let's give user some experience
+             var sr = server.GetPlayerStatistics(
+             {
+               PlayFabId: currentPlayerId,
+               StatisticNames: "Experience"
+             });
+             var exp = 0;
+             if(sr.Statistics.length > 0)
+             {
+                exp = Number(sr.Statistics[0].Value);
+             }
+
+             var td = server.GetTitleData(
+             {
+                Keys: "LevelingData"
+             });
+             var tdParsed = JSON.parse(td.Data.LevelingData);
+             exp += Number(tdParsed.expOnUpgrade);
+             var updateObject = {
+              StatisticName: "Experience",
+              Value:exp
+             };
+             var usr = server.UpdatePlayerStatistics(
+             {
+              PlayFabId:currentPlayerId,
+              Statistics:updateObject
+             });
              return r;
         }  
       
