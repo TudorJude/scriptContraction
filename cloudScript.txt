@@ -57,7 +57,7 @@ handlers.endGame = function(args, context) {
   if(tc.Statistics.length != 0)
   {
     trophyCount = tc.Statistics[0].Value;
-    //log.debug("getting trophy count " + tc.Statistics[0].Value);
+    log.debug("getting trophy count " + tc.Statistics[0].Value);
   }
   trophyCount = Number(trophyCount);
   initTrophyCount = trophyCount;
