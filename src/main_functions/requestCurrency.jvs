@@ -1,0 +1,13 @@
+handlers.requestCurrency = function(args)
+{
+  var userInventoryObject = server.GetUserInventory(
+  {
+    PlayFabId: currentPlayerId,
+  }
+  );
+  var r =
+  {
+    VirtualCurrency: userInventoryObject.VirtualCurrency
+  };
+  return r;
+};

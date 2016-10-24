@@ -1,5 +1,346 @@
-//github
-//hey
+function checkCarDataValidity(inventoryCarData, carCardsCatalog)
+{
+  if(inventoryCarData.CustomData == undefined)
+  {
+    try
+    {
+          var CarData = {
+              "CarLvl" : "1",
+              "EngineLvl" : "0",
+              "ExhaustLvl" : "0",
+              "GearboxLvl" : "0",
+              "SuspensionLvl" : "0"
+            };
+
+          server.UpdateUserInventoryItemCustomData(
+              {
+                PlayFabId: currentPlayerId,
+                ItemInstanceId: inventoryCarData.ItemInstanceId,
+                Data: CarData
+              }
+              );
+              CarData = {
+                    "TiresLvl" : "0",
+                    "TurboLvl" : "0",
+                    "PaintId" : "0",
+                    "DecalId" : "0",
+                    "RimsId" : "0"
+                  };
+              server.UpdateUserInventoryItemCustomData(
+              {
+                PlayFabId: currentPlayerId,
+                ItemInstanceId: inventoryCarData.ItemInstanceId,
+                Data: CarData
+              }
+              );
+              var pr = 0;
+              for(var i =0; i < carCardsCatalog.Catalog.length; i++)
+              {
+                  if(carCardsCatalog.Catalog[i].ItemId == inventoryCarData.ItemId)
+                  {
+                    var carCardInfo = JSON.parse(carCardsCatalog.Catalog[i].CustomData);
+                    pr = parseInt(carCardInfo.basePr);
+                    break;
+                  }
+              }
+              CarData = {
+                    "PlatesId" : "0",
+                    "WindshieldId" : "0",
+                    "Pr" : pr
+                  };
+              server.UpdateUserInventoryItemCustomData(
+              {
+                PlayFabId: currentPlayerId,
+                ItemInstanceId: inventoryCarData.ItemInstanceId,
+                Data: CarData
+              }
+              );
+       }
+       catch(err)
+       {
+        return "PlayFabError";
+       }
+       var newData = {
+              "CarLvl" : "1",
+              "EngineLvl" : "0",
+              "ExhaustLvl" : "0",
+              "GearboxLvl" : "0",
+              "SuspensionLvl" : "0",
+              "TiresLvl" : "0",
+              "TurboLvl" : "0",
+              "PaintId" : "0",
+              "DecalId" : "0",
+              "RimsId" : "0" ,
+              "PlatesId" : "0",
+              "WindshieldId" : "0",
+              "Pr" : pr
+       };
+       return newData;
+  }
+  return "OK";
+}
+function generateFailObj(mess)
+{
+  var retObj = {
+    Result: "Failed",
+    Message: mess
+  };
+  return retObj;
+}
+
+function generateErrObj(mess)
+{
+  var retObj = {
+    Result: "Error",
+    Message: mess
+  };
+  return retObj;
+}
+
+function checkBalance(currType, cost, userSCBalance, userHCBalance)
+{
+  if(currType == "SC")
+  {
+    if(userSCBalance < cost)
+      return generateFailObj("NotEnoughSC");
+  }
+  else
+  {
+    if(userHCBalance < cost)
+      return generateFailObj("NotEnoughHC");
+  }
+  return "OK";
+}
+
+function calculateLeague(currentTrophies)
+{
+  var league = 1;
+  var td = server.GetTitleData(
+  {
+    Keys : ["LeagueSubdivisions", "SubdivisionTrophyRanges"]
+  });
+  if(td.Data["LeagueSubdivisions"] == undefined) return league;
+  if(td.Data["SubdivisionTrophyRanges"] == undefined) return league;
+  var leaguesSubdivisions = JSON.parse(td.Data.LeagueSubdivisions);
+  var leaguesSubdivisionsParsed = leaguesSubdivisions.leagues;
+  var sdvtr = JSON.parse(td.Data.SubdivisionTrophyRanges);
+  var sdvtrParsed = sdvtr.subdivisions;
+
+  for(var i = 0; i < leaguesSubdivisionsParsed.length; i++)
+  {
+    if(Number(currentTrophies) > Number(sdvtrParsed[leaguesSubdivisionsParsed[i]]))
+      continue;
+      return i;
+  }
+}
+
+function recalculateCarPr(CarData, carId, _carCardsCatalog, _partsCardCatalog)
+{
+    var pr = 0;
+    var carCardsCatalog;
+    if(_carCardsCatalog == undefined)
+    {
+      carCardsCatalog = server.GetCatalogItems(
+         {
+           CatalogVersion : "CarCards"
+         }
+         );
+    }
+    else
+    {
+      carCardsCatalog = _carCardsCatalog;
+    }
+    for(var i = 0; i < carCardsCatalog.Catalog.length; i++)
+    {
+      if(carCardsCatalog.Catalog[i].ItemId == carId)
+      {
+        var carCardInfo = JSON.parse(carCardsCatalog.Catalog[i].CustomData);
+        pr += parseInt(carCardInfo.basePr) + (parseInt(carCardInfo.prPerLvl) * (parseInt(CarData.CarLvl) - 1));
+        break;
+      }
+    }
+
+    //calcualte pr based on each part level
+    var partCardsCatalog;
+    if(_partsCardCatalog == undefined)
+    {
+      partCardsCatalog = server.GetCatalogItems(
+       {
+         CatalogVersion : "PartCards"
+       }
+       );
+    }
+    else
+    {
+      partCardsCatalog = _partsCardCatalog;
+    }
+
+    var tempDict =
+        {
+          Exhaust: CarData.ExhaustLvl,
+          Engine: CarData.EngineLvl,
+          Gearbox: CarData.GearboxLvl,
+          Suspension: CarData.SuspensionLvl,
+          Tires: CarData.TiresLvl,
+          Turbo: CarData.TurboLvl
+        };
+    var partCardInfo;
+    for(var i = 0; i < partCardsCatalog.Catalog.length; i++) //refactored
+    {
+      partCardInfo = JSON.parse(partCardsCatalog.Catalog[i].CustomData);
+      pr += parseInt(partCardInfo.basePr) + (parseInt(partCardInfo.prPerLvl) * tempDict[partCardsCatalog.Catalog[i].ItemId]);
+    }
+  return pr;
+}
+
+function GenerateBlackMarket(currentPlayerId)
+{
+  //getting user league
+  var league = 1;
+  var ps=server.GetPlayerStatistics(
+  {
+     PlayFabId: currentPlayerId,
+     StatisticNames: ["League"]
+  });
+  if(ps.Statistics.length != 0)
+  {
+    league = ps.Statistics[0].Value.toString();
+  }
+  //getting parts
+  var partsCatalog = server.GetCatalogItems(
+     {
+       CatalogVersion : "PartCards"
+     }
+     );
+  var dataToUpdate = {};
+  var d = new Date();
+  dataToUpdate["BMTime"] = d.getTime();
+  //get first part
+  var part0Index = Math.floor(Math.random() * partsCatalog.Catalog.length);
+  var cardParsed = JSON.parse(partsCatalog.Catalog[part0Index].CustomData);
+  if(cardParsed == undefined) return generateErrObj("Part card " + partsCatalog.Catalog[i].ItemId + " has no custom data.");
+  dataToUpdate["BMItem0"] = partsCatalog.Catalog[part0Index].ItemId + "_" + cardParsed.BMCurrType + "_" + cardParsed.BMbasePrice + "_" + 0 + "_" + cardParsed.BMpriceIncrPerBuy;
+  //generate second part card
+  var part1Index = Math.floor(Math.random() * partsCatalog.Catalog.length);
+  if(part1Index == part0Index) part1Index = partsCatalog.Catalog.length - part0Index - 1;
+  cardParsed = JSON.parse(partsCatalog.Catalog[part1Index].CustomData);
+  if(cardParsed == undefined) return generateErrObj("Part card " + partsCatalog.Catalog[i].ItemId + " has no custom data.");
+  dataToUpdate["BMItem1"] = partsCatalog.Catalog[part1Index].ItemId + "_" + cardParsed.BMCurrType + "_" + cardParsed.BMbasePrice + "_" + 0 + "_" + cardParsed.BMpriceIncrPerBuy;
+  //getting car cards
+  var carsCatalog = server.GetCatalogItems(
+   {
+     CatalogVersion : "CarCards"
+   }
+   );
+  var carCardParsed;
+  var nonRareIndexes = [];
+  var rareIndexes = [];
+  for(var i = 0; i < carsCatalog.Catalog.length; i++)
+  {
+    carCardParsed = JSON.parse(carsCatalog.Catalog[i].CustomData)
+    if(carCardParsed == undefined) return generateErrObj("Car card " + carsCatalog.Catalog[i].ItemId + " has no custom data.");
+    if(carCardParsed.unlockedAtRank > league + 1) continue;
+    if(carCardParsed.rareCar == "false")
+      nonRareIndexes.push(carsCatalog.Catalog[i].ItemId + "_" + carCardParsed.BMCurrType + "_" + carCardParsed.BMbasePrice + "_" + 0 + "_" + carCardParsed.BMpriceIncrPerBuy);
+    else
+      rareIndexes.push(carsCatalog.Catalog[i].ItemId + "_" + carCardParsed.BMCurrType + "_" + carCardParsed.BMbasePrice + "_" + 0 + "_" + carCardParsed.BMpriceIncrPerBuy);
+  }
+  if(nonRareIndexes.length <= 0)
+  {
+    dataToUpdate["BMItem2"] = rareIndexes[Math.floor(Math.random() * rareIndexes.length)];
+    dataToUpdate["BMItem3"] = rareIndexes[Math.floor(Math.random() * rareIndexes.length)];
+  }
+  else
+    if(rareIndexes.length <= 0)
+    {
+      dataToUpdate["BMItem2"] = nonRareIndexes[Math.floor(Math.random() * nonRareIndexes.length)];
+      dataToUpdate["BMItem3"] = nonRareIndexes[Math.floor(Math.random() * nonRareIndexes.length)];
+    }
+    else
+    {
+        dataToUpdate["BMItem2"] = nonRareIndexes[Math.floor(Math.random() * nonRareIndexes.length)];
+        dataToUpdate["BMItem3"] = rareIndexes[Math.floor(Math.random() * rareIndexes.length)];
+    }
+  server.UpdateUserInternalData(
+    {
+      PlayFabId : currentPlayerId,
+      Data : dataToUpdate
+    }
+  );
+  var tK = [];
+  tK.push("BlackMarketResetMinutes");
+  var tData = server.GetTitleData(
+    {
+      PlayFabId : currentPlayerId,
+      Keys : tK
+    }
+    );
+  dataToUpdate["BMTime"] = parseInt(tData.Data.BlackMarketResetMinutes) * 60;
+  return dataToUpdate;
+}
+
+function GetCurrentBlackMarket(currentPlayerId, getInternalDataResult)
+{
+  var bmObj = {};
+  var d = new Date();
+
+  var tK = [];
+  tK.push("BlackMarketResetMinutes");
+  var tData = server.GetTitleData(
+    {
+      PlayFabId : currentPlayerId,
+      Keys : tK
+    }
+    );
+
+  bmObj["BMTime"] = parseInt(tData.Data.BlackMarketResetMinutes) * 60 - Math.floor((d.getTime() - getInternalDataResult.Data.BMTime.Value) / 1000);
+  for(var i = 0; i < 4; i++)
+  {
+    bmObj["BMItem" + i] = getInternalDataResult.Data["BMItem" + i].Value;
+  }
+  return bmObj;
+}
+handlers.buyChest = function(args, context)
+{
+  var userInventoryObject=server.GetUserInventory(
+  {
+    PlayFabId:currentPlayerId
+  }
+  );
+  var bO = checkBalance(args.curr, args.cost, userInventoryObject.VirtualCurrency.SC, userInventoryObject.VirtualCurrency.HC);
+  if(bO != "OK") return generateFailObj("not enough money");
+  if(args.cost > 0)
+  {
+    var subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
+    {
+      PlayFabId: currentPlayerId,
+      VirtualCurrency : args.curr,
+      Amount: args.cost
+    }
+    );
+    var cU = {};
+    cU[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
+    var i =
+             {
+               VirtualCurrency: cU
+             };
+    var r = {
+           Result: "OK",
+           Message: "ChestBought",
+           InventoryChange:i
+         };
+    return r;
+  }
+  else
+  {
+        var q = {
+           Result: "OK",
+           Message: "ChestBought",
+           InventoryChange:{}
+         };
+    return q;
+  }
+};
 handlers.endGame = function(args, context) {
   //let's recalculate the player's win/loss ratio
   var wlStat = "01";
@@ -279,492 +620,143 @@ handlers.endGame = function(args, context) {
      {
           "TrophyCount" : trophyCount,
           "League" : cLeague
-      }
+      };
   return {Result : newPlayerStats};
 }
-
-handlers.startGame = function(args, context) {
-  //let's see what subleague we are in and what win/loss ration we have
-  //wlratio
-  var wlStat = "10"; // 50/50 for newtimers
-  var wlStatInt = 0; // we change the bitwise representation to int32 and store it like that
-  var winRatio = 50;
-  var totalGames = 2;
-  var wins = 0;
-  var ps=server.GetPlayerStatistics(
-  {
-     PlayFabId: currentPlayerId,
-     StatisticNames: ["WinLoss"]
-  });
-  if(ps.Statistics.length != 0)
-  {
-      wlStatInt = ps.Statistics[0].Value.toString();
-      wlStat = Number(wlStatInt).toString(2);
-      totalGames = wlStat.length;
-      for(var i = 0; i < wlStat.length; i++)
-      {
-        if(wlStat[i] == "1") wins++;
-      }
-      winRatio = Math.round( 100* (wins/totalGames));
-  }
-  //start game so we assume it'sa lose until it's a win
-  //log.debug("wlStatBeforeshiftandAdd " + wlStat);
-  wlStat += "0";
-  //log.debug("wlStatBeforeshift " + wlStat);
-   if(wlStat.length > 20)
-   {
-    wlStat = wlStat.slice(1);
-   }
-  // log.debug("wlStat " + wlStat);
-  //trophy count and subleague distribution
-  var leagueTitleDataRequest = server.GetTitleData(
-    {
-      Key: ["LeagueSubdivisions","SubdivisionTrophyRanges","TrophyGainRange","TrophyLoseRange"]
-    }
-    );
-  var tc=server.GetPlayerStatistics(
-  {
-     PlayFabId: currentPlayerId,
-     StatisticNames: ["TrophyCount"]
-  });
-  var trophyCount = 0;
-  if(tc.Statistics.length != 0)
-  {
-    trophyCount = tc.Statistics[0].Value;
-  }
-  trophyCount = Number(trophyCount);
-  var sdval = leagueTitleDataRequest.Data["SubdivisionTrophyRanges"];
-  var sdvalParsed = JSON.parse(sdval);
-  var lsVal = leagueTitleDataRequest.Data["LeagueSubdivisions"];
-  var lsValParsed = JSON.parse(lsVal);
-  //log.debug("SubdivisionTrophyRanges " + sdvalParsed);
-  var subDivision = 43;
-  var nextSubDivision = 43;
-  var subDivisionRange = 200;
-          var rminmaxarr = leagueTitleDataRequest.Data["TrophyGainRange"].split("_");
-          var lminmaxarr = leagueTitleDataRequest.Data["TrophyLoseRange"].split("_");
-          var rMin = Number(rminmaxarr[0]);
-          var rMax = Number(rminmaxarr[1]);
-          var lMin = Number(lminmaxarr[0]);
-          var lMax = Number(lminmaxarr[1]);
-  for(var i = 0; i < sdvalParsed.subdivisions.length; i++)
-  {
-    if(trophyCount<Number(sdvalParsed.subdivisions[i]))
-    {
-      subDivision = i;
-      if(i < sdvalParsed.subdivisions.length - 1) nextSubDivision = i + 1;
-      break;
-    }
-  }
-  subDivisionRange = Number(sdvalParsed.subdivisions[nextSubDivision]) - Number(sdvalParsed.subdivisions[subDivision]);
-  log.debug("nextSubDivision " + nextSubDivision + " subDivision " + subDivision);
-  log.debug(" sdvalParsed.subdivisions[nextSubDivision] " + sdvalParsed.subdivisions[nextSubDivision] + " sdvalParsed.subdivisions[subDivision] " + sdvalParsed.subdivisions[subDivision]);
-  if(subDivisionRange <= 0) subDivisionRange = 400; // random 400
-  log.debug("subDivisionRange " + subDivisionRange);
-  //log.debug("user is in subdivision " + subDivision);
-
-  //matchmaking code
-  //let's get subdivision and neighbouring subdivisions
-  var subDivKeys = ["RecSubDivision"+subDivision];
-  var titleData = server.GetTitleInternalData(
-    {
-      Keys : "RecSubDivision"+subDivision
-    }
-    );
-  var recPool = titleData.Data["RecSubDivision"+subDivision];
-  var isIncompleteSubDivision = false;
-  //log.debug("recPool " + recPool);
-  if(recPool == undefined) isIncompleteSubDivision = true;
-  var recArray;
-  var opponentId;
-  var env;
-  var course;
-
-//previous opponents
-var oppPrev = "noop"; // ultimu
-var oppPrevPrev = "noop";// penultimu
-var oppArray;
-var oppDat = server.GetUserInternalData(
+handlers.getServerTime = function(args, context)
 {
+	var t = new Date();
+	return { time: t};
+}
+//cheat scripts
+handlers.giveMoney = function(args)
+{
+  //args.curr, args.amount
+  var addUserCurrencyResult = server.AddUserVirtualCurrency(
+  {
     PlayFabId: currentPlayerId,
-    Keys: ["lastOpp"]
-});
+    VirtualCurrency : args.curr,
+    Amount: args.amount
+  }
+  );
 
-if((oppDat.Data == undefined) || (oppDat.Data.lastOpp == undefined))
+  var currencyUpdated = {};
+  currencyUpdated[addUserCurrencyResult.VirtualCurrency] = addUserCurrencyResult.Balance;
+  var invChangeObj =
+           {
+             VirtualCurrency: currencyUpdated
+           };
+  var r = {
+         Result: "OK",
+         Message: "CurrencyChanged",
+         InventoryChange:invChangeObj
+       };
+  return r;
+};
+handlers.grantItems = function(args)
 {
-  //log.debug("opp data is undefined");
-  oppPrev = "noop";
-  oppPrevPrev = "noop";
-}
-else
-{
-  oppArray = oppDat.Data.lastOpp.Value.split(",");
- // log.debug("oppArray is " + oppArray);
-  for(var i = 0; i < oppArray.length; i++)
+  //retrieve user inventory
+  var userInventoryObject = server.GetUserInventory(
   {
-    if(i == 0) oppPrev = oppArray[i];
-    if(i == 1) oppPrevPrev = oppArray[i];
+    PlayFabId: currentPlayerId
   }
- // log.debug("oppPrev is " + oppPrev);
- // log.debug("oppPrevPrev is " + oppPrevPrev);
-}
-  if(isIncompleteSubDivision == false)
-  {
-    recArray = JSON.parse(recPool);
-    opponentId = recArray[recArray.length - 1].uId;
-    env = recArray[recArray.length - 1].e;
-    course = recArray[recArray.length - 1].c;
-  }
-  else
-  {
-    recArray = [];
-  }
+  );
+  //args.itemId, args.catalogId, args.amount
 
-  //default recording code
-  var subDivisionLength = 15; // we have 15 possible courses
-  var envCourseArray =
-  [
-  0,0,0,0,0,
-  0,0,0,0,0,
-  0,0,0,0,0
-  ]
-  //log.debug("subrecording pool has " + recArray.length + " length. Must have: " + subDivisionLength + " length");
-
-  if(recArray.length < subDivisionLength) isIncompleteSubDivision = true;
-
-  var validRecArray = new Array(recArray.length); // all recordings except yours
-  var vrAidx = 0;
-  var likelyRecArray = new Array(recArray.length); // all recordings minus yours AND minus oppPrev
-  var lrAidx = 0;
-  var moreLikelyRecArray = new Array(recArray.length); // all recordings minus yours AND minus oppPrev AND minus oppPrevPrev
-  var mlrAidx = 0;
-  //log.debug("iterating through recArray");
-  for(var i = 0; i < recArray.length; i++) // create valid rec pool OR check for missing env/course if subDivision has missing recordings
-  {
-      if(isIncompleteSubDivision == true)
-      {
-        envCourseArray[Number(recArray[i].e)*5 + Number(recArray[i].c)] = 1;
-      }
-      if(recArray[i].uId == currentPlayerId)
+  //old grant item code
+  //var itemsToGrant = [];
+  //for(var i = 0; i < args.amount; i++)
+  //{
+  //  itemsToGrant.push(args.itemId);
+  //}
+  //try
+  //{
+  // var grantVar = server.GrantItemsToUser(
+  // {
+  //  CatalogVersion : args.catalogId,
+  //   PlayFabId: currentPlayerId,
+  //   ItemIds : itemsToGrant
+  // }
+  // );
+  //new grant item code
+  var itemData;
+  var itemFound = false;
+  var newAmount;
+  for(var i = 0; i < userInventoryObject.Inventory.length; i++)
         {
-         // log.debug("found: " + recArray[i].uId + "... skipping");
-          continue;
-        }
-        validRecArray[vrAidx] = recArray[i];
-        vrAidx++;
-      if(recArray[i].uId == oppPrev)
-        {
-         // log.debug("found: " + recArray[i].uId + "... skipping prev opp");
-          continue;
-        }
-        likelyRecArray[lrAidx] = recArray[i];
-        lrAidx++;
-      if(recArray[i].uId == oppPrevPrev)
-        {
-         // log.debug("found: " + recArray[i].uId + "... skipping prev prev opp");
-          continue;
-        }
-        moreLikelyRecArray[mlrAidx] = recArray[i];
-        mlrAidx++;
-  }
-//log.debug("isIncompleteSubDivision: " + isIncompleteSubDivision);
-//let's give default recording if necessary
-if(isIncompleteSubDivision == true)
-{
-  var envToGet = 0;
-  var courseToGet = 0;
-  for(var i = 0; i < envCourseArray.length; i++)
-  {
-    if(envCourseArray[i] == 0)// we found a missing recording <- e = i/5; c = i%5;
-    {
-      envToGet = Math.floor(i/5);
-      courseToGet = i%5;
-      break;
-    }
-  }
-  //log.debug("gettingDefaultUser: env: " + envToGet + " course: " + courseToGet);
-  //let's see who the master account is
-    var masterAccountRequest = server.GetTitleData(
-    {
-      Keys : "MasterUser"
-    }
-    );
-    if(masterAccountRequest.Data["MasterUser"] != undefined)
-    {
-     // log.debug("master user: " + masterAccountRequest.Data["MasterUser"]);
-      var defaultRecordingData = server.GetUserReadOnlyData(
-      {
-        PlayFabId: masterAccountRequest.Data["MasterUser"],
-        Keys: [(envToGet + "_" + courseToGet + "_RecPos") , (envToGet + "_" + courseToGet + "_RecRot"), (envToGet + "_" + courseToGet + "_RecHeader")]
-      }
-      );
-      if(defaultRecordingData.Data != undefined)
-      {
-        //log.debug("defaultRecordingData: " + defaultRecordingData.Data);
-        if((defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecPos"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecRot"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"] != undefined))
-        { // looks like we found a valid default recording
-          var updateTrophyInternal = true;
-          if(trophyCount == 0)
+          if((userInventoryObject.Inventory[i].ItemId == args.itemId) && (userInventoryObject.Inventory[i].CatalogVersion == args.catalogId))
           {
-            trophyCount = rMax;
-            updateTrophyInternal = false;
-          }
-          else
-          {
-            trophyCount -= lMin;
-          }
-          if(trophyCount <= 1) trophyCount = 1;
-          wlStatInt = parseInt(wlStat, 2);
-          //log.debug("updating WL to:  " + wlStatInt);
-          //update stats on server
-          var suArray = [];
-          var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
-          suArray.push(su);
-          var sut = {StatisticName: "TrophyCount", Version : "0", Value: trophyCount};
-          suArray.push(sut);
-          var sul = {StatisticName: "League", Version : "0", Value: cLeague};
-          suArray.push(sul);
-          //log.debug("updatingStats: " + suArray);
-          var updateRequest = server.UpdatePlayerStatistics(
-          {
-            PlayFabId: currentPlayerId,
-            Statistics: suArray
-          }
-          );
-          var dataToUpdate = {
-            "trophyWin" : rMax,
-            "trophyLose": lMin
-          }
-          if(updateTrophyInternal == false)
-          {
-            dataToUpdate["trophyWin"] = 0;
-            dataToUpdate["trophyLose"] = 0;
-          }
-          server.UpdateUserInternalData(
-          {
-            PlayFabId: currentPlayerId,
-            Data: dataToUpdate
-          });
-          //log.debug("found valid default rec");
-          return {
-            Result :"OK",
-            RecType: "Default",
-            PosData: defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecPos"].Value, //0_0_RecPos
-            RotData: defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecRot"].Value,
-            HeaderData: defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"].Value,
-            TrophyLose: lMin,
-            TrophyWin : rMax,
-            Opp: "Mniezo"
-                 };
-        }
-      }
-    }
-}
-//log.debug("looking for user generated recording");
-if(vrAidx == 0) return generateErrObj("no valid recording found for this subdivision");
-
-//we have 3 arrays. We want the likelyhood that you get the same previous opponents to be as low as possible
-//so we will see if moreLikelyRecArray is empty. If yes we check if likelyRecArray is empty.
-//if they are both empty we remain with the current validRecArray array
-var searchArray = validRecArray;
-var sAlen = vrAidx;
-  if(lrAidx > 0){sAlen = lrAidx; searchArray = likelyRecArray}
-  if(mlrAidx > 0){sAlen = mlrAidx; searchArray = moreLikelyRecArray}
-
-  var pivot = sAlen - 1; //in case your WLRatio is the highest in the pool
-  for(var i = 0; i < sAlen; i++) // write winstreak/losestreak code
-  {
-    if(searchArray[i].wl > winRatio) //let's find the pivot; we'll move it later based on WL ratio
-    {
-      pivot = i;
-      break;
-      //opponentId = recArray[i].uId;
-      //env = recArray[i].e;
-      //course = recArray[i].c;
-    }
-  }
- // log.debug("pivot is: " + pivot);
-  var finalRecArraySize = Math.min(sAlen, 3); // for now 3 is the max number of recordings in the random final pool
- // log.debug("finalRecArraySize: " + finalRecArraySize);
-  var finalRecArray = new Array(finalRecArraySize); // this array will be populated with the recordings around the pivot
-  for(var i = 0; i < finalRecArraySize; i++)
-  {
-    if(pivot <= 0) // get rightmost recordings
-    {
-      finalRecArray[i] = searchArray[i];
-      continue;
-    }
-    if(pivot >= sAlen - 1) // get leftmost recordings
-    {
-      finalRecArray[i] = searchArray[sAlen - 1 - i];
-      continue;
-    }
-    finalRecArray[i] = searchArray[(pivot - Math.floor(finalRecArraySize/2) + i)]; // get inner recordings
-  }
-  var randIdx = Math.floor(Math.random() * finalRecArraySize); // let's get a random one from this final pool
-    opponentId = finalRecArray[randIdx].uId;
-    env = finalRecArray[randIdx].e;
-    course = finalRecArray[randIdx].c;
-  var urodkr = [(env + "_" + course + "_RecPos") , (env + "_" + course + "_RecRot"), (env + "_" + course + "_RecHeader")];
- // log.debug("requesting " + urodkr);
-  var recordingData = server.GetUserReadOnlyData(
-    {
-      PlayFabId: opponentId,
-      Keys: urodkr
-    }
-    );
-  if(recordingData == undefined) return generateErrObj("Did not find recording for this user: " + opponentId); // handle this later
-  //end matchmaking
-
-  var oI = server.GetPlayerCombinedInfo(
-    {
-      PlayFabId:opponentId,
-      InfoRequestParameters: {"GetUserAccountInfo": true,"GetUserInventory": false,"GetUserVirtualCurrency": false,"GetUserData": false,"GetUserReadOnlyData": false,"GetCharacterInventories": false,"GetCharacterList": false, "GetTitleData": false,"GetPlayerStatistics": false}
-    }
-    );
-  //found recording now let's reduce user's trophies
-          //let's extract opponent trophies so we know how muany trophies we give/takeaway from user
-          var trophiesToTake = 15; // min
-          var trophiesToGive = 30; // max
-          var userTrophies = trophyCount;
-          var oppTrophies;
-          var cLeague = Number(calculateLeague(trophyCount));
-          var recTypeSent = "UserGenerated";
-//log.debug("cLeague " + cLeague);
-  //        log.debug("lsValParsed: " + lsValParsed);
-  //        log.debug("sdvalParsed: " + sdvalParsed);
-  //        log.debug("lsValParsed.leagues: " + lsValParsed.leagues);
-  //        log.debug("sdvalParsed.subDivisions: " + sdvalParsed.subdivisions);
-
-          var minLeagueT
-          if(cLeague > 0)
-            minLeagueT = Number(sdvalParsed.subdivisions[lsValParsed.leagues[cLeague - 1]]);
-          else
-            minLeagueT = 0;
-
-          var maxLeagueT;
-          if(cLeague >= lsValParsed.leagues.length - 1)
-            maxLeagueT = minLeagueT * 2;
-          else
-            maxLeagueT = Number(sdvalParsed.subdivisions[lsValParsed.leagues[cLeague]]);
-
-//log.debug("maxLT " + maxLeagueT + " minLeagueT " + minLeagueT);
-
-          var opponentHeader = JSON.parse(recordingData.Data[env + "_" + course + "_RecHeader"].Value);
-          if(opponentHeader != undefined)
-          {
-            oppTrophies = opponentHeader.Trophies;
-          }
-          oppTrophies = Number(oppTrophies);
-          if(maxLeagueT - minLeagueT <= 0)
-          {
-              trophiesToTake = rMax;
-              trophiesToGive = lMin;
-          }
-          else
-          {
-            if(Number(Math.abs(userTrophies - oppTrophies)) > Number(subDivisionRange))
+           // log.debug("adding amount to: " + userInventoryObject.Inventory[i].ItemInstanceId);
+            if(userInventoryObject.Inventory[i].CustomData == undefined)
             {
-              trophiesToTake = Math.floor((lMin + lMax)/2);
-              trophiesToGive = Math.floor((rMax + rMin)/2);
-              recTypeSent = "Default";
+              newAmount = args.amount;
             }
             else
             {
-            //  log.debug("rMin: " + rMin + " userTrophies: " + userTrophies + " oppTrophies " + oppTrophies + " maxLeagueT " + maxLeagueT + " minLeagueT " + minLeagueT + " rMax: " + rMax);
-              trophiesToTake = lMin + Math.floor((((userTrophies - oppTrophies)/(maxLeagueT - minLeagueT)) + 1) * ((lMax - lMin)/2));
-              trophiesToGive = rMin + Math.floor((((oppTrophies - userTrophies)/(maxLeagueT - minLeagueT)) + 1) * ((rMax - rMin)/2));
+              if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)
+                newAmount = args.amount;
+              else
+              {
+                if(isNaN(Number(userInventoryObject.Inventory[i].CustomData.Amount)))
+                  newAmount = args.amount;
+                else
+                  newAmount = Number(userInventoryObject.Inventory[i].CustomData.Amount) + args.amount;
+              }
             }
+            itemData = {"Amount" : newAmount};
+            server.UpdateUserInventoryItemCustomData(
+                    {
+                      PlayFabId: currentPlayerId,
+                      ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
+                      Data: itemData
+                    }
+                    );
+            itemFound = true;
+            break;
           }
+        }
 
-  var updateTrophiesToGiveTake = true;
-  if(trophyCount == 0)
-  {
-    updateTrophiesToGiveTake = false;
-    trophyCount = rMax;
-  }
-  else
-  {
-    trophyCount -= Number(trophiesToTake);
-    if(trophyCount <= 1) trophyCount = 1;
-  }
-  //log.debug("trophiesToTake:  " + trophiesToTake);
- // log.debug("trophiesToGive:  " + trophiesToGive);
-  wlStatInt = parseInt(wlStat, 2);
- // log.debug("updating WL to:  " + wlStatInt);
-  //update stats on server
-  var suArray = [];
-  var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
-  suArray.push(su);
-  var sut = {StatisticName: "TrophyCount", Version : "0", Value: trophyCount};
-  suArray.push(sut);
-  var sul = {StatisticName: "League", Version : "0", Value: cLeague};
-  suArray.push(sul);
- // log.debug("updatingStats: " + suArray);
-  var updateRequest = server.UpdatePlayerStatistics(
-  {
-    PlayFabId: currentPlayerId,
-    Statistics: suArray
-  }
-  );
-  var lastOppVal = opponentId + "," + oppPrev;
-            var dataToUpdate = {
-            "trophyWin" : trophiesToGive,
-            "trophyLose": trophiesToTake,
-            "lastOpp" : lastOppVal
-          }
-  if(updateTrophiesToGiveTake == false)
-  {
-          dataToUpdate["trophyWin"] = 0;
-          dataToUpdate["trophyLose"] = 0;
-  }
-          server.UpdateUserInternalData(
-          {
-            PlayFabId: currentPlayerId,
-            Data: dataToUpdate
-          });
+    if(itemFound == false)
+    {
+      var itemsToGrant = [];
+      itemsToGrant.push(args.itemId);
+      var grantVar = server.GrantItemsToUser(
+      {
+        CatalogVersion : args.catalogId,
+        PlayFabId: currentPlayerId,
+        ItemIds : itemsToGrant
+      }
+      );
 
-
-  return {
-    Result :"OK",
-    RecType: recTypeSent,
-    PosData: recordingData.Data[env + "_" + course + "_RecPos"].Value, //0_0_RecPos
-    RotData: recordingData.Data[env + "_" + course + "_RecRot"].Value,
-    HeaderData: recordingData.Data[env + "_" + course + "_RecHeader"].Value,
-    TrophyLose: trophiesToTake,
-    TrophyWin : trophiesToGive,
-    Opp: oI.InfoResultPayload.AccountInfo.TitleInfo.DisplayName
-         };
+      itemData = {"Amount" : args.amount};
+      server.UpdateUserInventoryItemCustomData(
+           {
+              PlayFabId: currentPlayerId,
+              ItemInstanceId: grantVar.ItemGrantResults[0].ItemInstanceId,
+              Data: itemData
+           }
+           );
+    }
+   //for return
+   var objectsUpdated =
+   [
+   {
+     ItemId : args.itemId,
+     CatalogVersion: args.catalogId,
+     CustomData: itemData
+   }
+   ] ;
+    var invChangeObj =
+        {
+            Inventory: objectsUpdated
+        }
+    var returnObj = {
+      Result: "OK",
+      Message: "InventoryUpdated",
+      InventoryChange:invChangeObj
+    };
+   return returnObj;
 }
-
-// matchmaking code
-handlers.updateTrophyCount = function(args, context) {
-  var t = 0;
-  var ps=server.GetPlayerStatistics(
-  {
-     PlayFabId: currentPlayerId,
-     StatisticNames: ["TrophyCount"]
-  });
-  if(ps.Statistics.length != 0)
-  {
-    t = ps.Statistics[0].Value;
-  }
-  if(args.val == "rStart") t-=30;
-  if(t < 0) t=0;
-  if(args.val == "rWin") t+=60;
-  if(args.val == "rLose") return {val:t};
-  var suArray = [];
-  var su = {StatisticName : "TrophyCount", Version : "0", Value: t};
-  suArray.push(su);
-  var updateRequest = server.UpdatePlayerStatistics(
-  {
-    PlayFabId: currentPlayerId,
-    Statistics: suArray
-  }
-  );
-  if(args.val == "rWin") return {val:t};
-}
-
 handlers.initServerData = function(args)
 {
 //create trophy statistic
@@ -859,413 +851,195 @@ server.UpdateUserInventoryItemCustomData(
   Data: PartData
 }
 );
-var CarData = {"CarLvl" : "1","EngineLvl" : "0","ExhaustLvl" : "0","GearboxLvl" : "0","SuspensionLvl" : "0"};
+CarData = {"CarLvl" : "1","EngineLvl" : "0","ExhaustLvl" : "0","GearboxLvl" : "0","SuspensionLvl" : "0"};
 server.UpdateUserInventoryItemCustomData(
 {
   PlayFabId: currentPlayerId,
   ItemInstanceId: carRequest.ItemGrantResults[0].ItemInstanceId,
   Data: CarData
-}
-);
-
-}
-handlers.requestCurrency = function(args)
+});
+};
+handlers.openChest = function(args, context)
 {
+  var objectsUpdated = [];
+  var currencyUpdated = [];
+  var invChangeObj;
   var userInventoryObject = server.GetUserInventory(
   {
-    PlayFabId: currentPlayerId,
+    PlayFabId: currentPlayerId
   }
   );
-  var r =
+  //let's check if this is a chest from the store
+  if(args.currCost > 0)
   {
-    VirtualCurrency: userInventoryObject.VirtualCurrency
-  }
-  return r;
+    var bO = checkBalance(args.currType, args.currCost, userInventoryObject.VirtualCurrency["SC"], userInventoryObject.VirtualCurrency["HC"])
+    if(bO != "OK") return generateFailObj("not enough money");
 
-}
-handlers.requestInventory = function(args)
-{
-  var userInventoryObject = server.GetUserInventory(
-  {
-    PlayFabId: currentPlayerId,
-  }
-  );
-  //get catalog data for pr calculation
-    var carCardsCatalog = server.GetCatalogItems(
-         {
-           CatalogVersion : "CarCards"
-         }
-         );
-    var partCardsCatalog = server.GetCatalogItems(
-       {
-         CatalogVersion : "PartCards"
-       }
-       );
-  var hasCars = false;
-  for(var i = 0; i < userInventoryObject.Inventory.length; i++)
-  {
-    if(userInventoryObject.Inventory[i].CatalogVersion == "CarsProgress")
+    var subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
     {
-      hasCars = true;
-      var check = checkCarDataValidity(userInventoryObject.Inventory[i], carCardsCatalog);
-      //log.debug("check " + check);
-      if((check == "PlayFabError") || (check == undefined)) return generateErrObj("PlayfabError");
-      else if(check == "OK") log.debug("Data for " + userInventoryObject.Inventory[i].ItemId + " OK");
-           else userInventoryObject.Inventory[i].CustomData = check;
-      userInventoryObject.Inventory[i].CustomData.Pr = recalculateCarPr(userInventoryObject.Inventory[i].CustomData, userInventoryObject.Inventory[i].ItemId, carCardsCatalog, partCardsCatalog);
-      var d = {};
-      d["Pr"] = userInventoryObject.Inventory[i].CustomData.Pr;
-      server.UpdateUserInventoryItemCustomData( // if this doesn't happen it's still fine; we might actually be able to skip this entirely
-      {
-        PlayFabId: currentPlayerId,
-        ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
-        Data: d
-      }
-      );
+      PlayFabId: currentPlayerId,
+      VirtualCurrency : args.currType,
+      Amount: args.currCost
     }
+    );
   }
-  if(hasCars == false)
-    {
-      var carsToGive = [];
-      carsToGive.push("FordFocus");
-      var carRequest = server.GrantItemsToUser(
-      {
-        CatalogVersion : "CarsProgress",
-        PlayFabId: currentPlayerId,
-        ItemIds : carsToGive
-      }
-      );
-      var CarData = {"CarLvl" : "1","EngineLvl" : "0","ExhaustLvl" : "0","GearboxLvl" : "0","SuspensionLvl" : "0"};
-      server.UpdateUserInventoryItemCustomData(
-      {
-        PlayFabId: currentPlayerId,
-        ItemInstanceId: carRequest.ItemGrantResults[0].ItemInstanceId,
-        Data: CarData
-      }
-      );
-      CarData = {"TiresLvl" : "0","TurboLvl" : "0","PaintId" : "0","DecalId" : "0","RimsId" : "0"};
-      server.UpdateUserInventoryItemCustomData(
-      {
-        PlayFabId: currentPlayerId,
-        ItemInstanceId: carRequest.ItemGrantResults[0].ItemInstanceId,
-        Data: CarData
-      }
-      );
-      CarData = {"PlatesId" : "0","WindshieldId" : "0","Pr" : "10"};
-      server.UpdateUserInventoryItemCustomData(
-      {
-        PlayFabId: currentPlayerId,
-        ItemInstanceId: carRequest.ItemGrantResults[0].ItemInstanceId,
-        Data: CarData
-      }
-      );
-      return generateErrObj("UserHasNoCars ... reiniting");
-    }
-  return userInventoryObject;
-}
-function checkCarDataValidity(inventoryCarData, carCardsCatalog)
-{
-  if(inventoryCarData.CustomData == undefined)
-  {
-    try
-    {
-          var CarData = {
-              "CarLvl" : "1",
-              "EngineLvl" : "0",
-              "ExhaustLvl" : "0",
-              "GearboxLvl" : "0",
-              "SuspensionLvl" : "0"
-            };
+  //currency
+	var addUserCurrencyResult;
+	for(var p in args.currencyReq)
+	{
+		if(args.currencyReq[p] > 0)
+		  addUserCurrencyResult = server.AddUserVirtualCurrency(
+		  {
+		    PlayFabId: currentPlayerId,
+		    VirtualCurrency : p,
+		    Amount: args.currencyReq[p]
+		  }
+		  );
 
-          server.UpdateUserInventoryItemCustomData(
+	}
+  var itemData;
+  var itemFound = false;
+  var newAmount = 0;
+  //car cards
+  for(var p in args.carCardsRequest)
+    {
+      //log.debug(p + " : " + args.carCardsRequest[p]);
+      if (args.carCardsRequest.hasOwnProperty(p))
+      {
+        itemFound = false;
+        newAmount = 0;
+        //log.debug("looking for: " +p);
+        for(var i = 0; i < userInventoryObject.Inventory.length; i++)
               {
-                PlayFabId: currentPlayerId,
-                ItemInstanceId: inventoryCarData.ItemInstanceId,
-                Data: CarData
-              }
-              );
-              CarData = {
-                    "TiresLvl" : "0",
-                    "TurboLvl" : "0",
-                    "PaintId" : "0",
-                    "DecalId" : "0",
-                    "RimsId" : "0"
-                  };
-              server.UpdateUserInventoryItemCustomData(
-              {
-                PlayFabId: currentPlayerId,
-                ItemInstanceId: inventoryCarData.ItemInstanceId,
-                Data: CarData
-              }
-              );
-              var pr = 0;
-              for(var i =0; i < carCardsCatalog.Catalog.length; i++)
-              {
-                  if(carCardsCatalog.Catalog[i].ItemId == inventoryCarData.ItemId)
+                if((userInventoryObject.Inventory[i].ItemId == p) && (userInventoryObject.Inventory[i].CatalogVersion == "CarCards"))
+                {
+                 // log.debug("adding amount to: " + userInventoryObject.Inventory[i].ItemInstanceId);
+                  if(userInventoryObject.Inventory[i].CustomData == undefined)
                   {
-                    var carCardInfo = JSON.parse(carCardsCatalog.Catalog[i].CustomData);
-                    pr = parseInt(carCardInfo.basePr);
-                    break;
+                    newAmount = Number(args.carCardsRequest[p]);
                   }
+                  else
+                  {
+                    if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)
+                      newAmount = Number(args.carCardsRequest[p]);
+                    else
+                    {
+                      if(isNaN(Number(userInventoryObject.Inventory[i].CustomData.Amount)))
+                        newAmount = Number(args.carCardsRequest[p]);
+                      else
+                        newAmount = Number(userInventoryObject.Inventory[i].CustomData.Amount) + Number(args.carCardsRequest[p]);
+                    }
+                  }
+                  itemData = {"Amount" : newAmount};
+                  server.UpdateUserInventoryItemCustomData(
+                          {
+                            PlayFabId: currentPlayerId,
+                            ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
+                            Data: itemData
+                          }
+                          );
+                  itemFound = true;
+                  break;
+                }
               }
-              CarData = {
-                    "PlatesId" : "0",
-                    "WindshieldId" : "0",
-                    "Pr" : pr
-                  };
-              server.UpdateUserInventoryItemCustomData(
-              {
-                PlayFabId: currentPlayerId,
-                ItemInstanceId: inventoryCarData.ItemInstanceId,
-                Data: CarData
-              }
-              );
-       }
-       catch(err)
-       {
-        return "PlayFabError";
-       }
-       var newData = {
-              "CarLvl" : "1",
-              "EngineLvl" : "0",
-              "ExhaustLvl" : "0",
-              "GearboxLvl" : "0",
-              "SuspensionLvl" : "0",
-              "TiresLvl" : "0",
-              "TurboLvl" : "0",
-              "PaintId" : "0",
-              "DecalId" : "0",
-              "RimsId" : "0" ,
-              "PlatesId" : "0",
-              "WindshieldId" : "0",
-              "Pr" : pr
-       }
-       return newData;
-  }
-  return "OK";
-}
-function generateFailObj(mess)
-{
-  var retObj = {
-    Result: "Failed",
-    Message: mess
-  };
-  return retObj;
-}
+        if(itemFound == false)
+        {
+            var itemsToGrant = [p];
+            var grantVar = server.GrantItemsToUser(
+            {
+              CatalogVersion : "CarCards",
+              PlayFabId: currentPlayerId,
+              ItemIds : itemsToGrant
+            }
+            );
 
-function generateErrObj(mess)
-{
-  var retObj = {
-    Result: "Error",
-    Message: mess
-  };
-  return retObj;
-}
-
-function checkBalance(currType, cost, userSCBalance, userHCBalance)
-{
-  if(currType == "SC")
-  {
-    if(userSCBalance < cost)
-      return generateFailObj("NotEnoughSC");
-  }
-  else
-  {
-    if(userHCBalance < cost)
-      return generateFailObj("NotEnoughHC");
-  }
-  return "OK";
-}
-
-function calculateLeague(currentTrophies)
-{
-  var league = 1;
-  var td = server.GetTitleData(
-  {
-    Keys : ["LeagueSubdivisions", "SubdivisionTrophyRanges"]
-  });
-  if(td.Data["LeagueSubdivisions"] == undefined) return league;
-  if(td.Data["SubdivisionTrophyRanges"] == undefined) return league;
-  var leaguesSubdivisions = JSON.parse(td.Data.LeagueSubdivisions);
-  var leaguesSubdivisionsParsed = leaguesSubdivisions.leagues;
-  var sdvtr = JSON.parse(td.Data.SubdivisionTrophyRanges);
-  var sdvtrParsed = sdvtr.subdivisions;
-
-  for(var i = 0; i < leaguesSubdivisionsParsed.length; i++)
-  {
-    if(Number(currentTrophies) > Number(sdvtrParsed[leaguesSubdivisionsParsed[i]]))
-      continue;
-      return i;
-  }
-}
-
-function recalculateCarPr(CarData, carId, _carCardsCatalog, _partsCardCatalog)
-{
-    var pr = 0;
-    var carCardsCatalog;
-    if(_carCardsCatalog == undefined)
-    {
-      carCardsCatalog = server.GetCatalogItems(
-         {
-           CatalogVersion : "CarCards"
-         }
-         );
-    }
-    else
-    {
-      carCardsCatalog = _carCardsCatalog;
-    }
-    for(var i = 0; i < carCardsCatalog.Catalog.length; i++)
-    {
-      if(carCardsCatalog.Catalog[i].ItemId == carId)
-      {
-        var carCardInfo = JSON.parse(carCardsCatalog.Catalog[i].CustomData);
-        pr += parseInt(carCardInfo.basePr) + (parseInt(carCardInfo.prPerLvl) * (parseInt(CarData.CarLvl) - 1));
-        break;
+            itemData = {"Amount" : args.carCardsRequest[p]};
+            server.UpdateUserInventoryItemCustomData(
+                 {
+                    PlayFabId: currentPlayerId,
+                    ItemInstanceId: grantVar.ItemGrantResults[0].ItemInstanceId,
+                    Data: itemData
+                 }
+                 );
+        }
       }
     }
-
-    //calcualte pr based on each part level
-    var partCardsCatalog;
-    if(_partsCardCatalog == undefined)
+  //part cards
+  for(var p in args.partCardsRequest)
     {
-      partCardsCatalog = server.GetCatalogItems(
-       {
-         CatalogVersion : "PartCards"
-       }
-       );
-    }
-    else
-    {
-      partCardsCatalog = _partsCardCatalog;
-    }
-
-    var tempDict =
+      //log.debug(p + " : " + args.partCardsRequest[p]);
+      if (args.partCardsRequest.hasOwnProperty(p))
+      {
+        itemFound = false;
+        newAmount = 0;
+       // log.debug("looking for: " +p);
+        for(var i = 0; i < userInventoryObject.Inventory.length; i++)
+              {
+                if((userInventoryObject.Inventory[i].ItemId == p) && (userInventoryObject.Inventory[i].CatalogVersion == "PartCards"))
+                {
+                 // log.debug("adding amount to: " + userInventoryObject.Inventory[i].ItemInstanceId);
+                  if(userInventoryObject.Inventory[i].CustomData == undefined)
+                  {
+                    newAmount = Number(args.partCardsRequest[p]);
+                  }
+                  else
+                  {
+                    if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)
+                      newAmount = Number(args.partCardsRequest[p]);
+                    else
+                    {
+                      if(isNaN(Number(userInventoryObject.Inventory[i].CustomData.Amount)))
+                        newAmount = Number(args.partCardsRequest[p]);
+                      else
+                        newAmount = Number(userInventoryObject.Inventory[i].CustomData.Amount) + Number(args.partCardsRequest[p]);
+                    }
+                  }
+                  itemData = {"Amount" : newAmount};
+                  server.UpdateUserInventoryItemCustomData(
+                          {
+                            PlayFabId: currentPlayerId,
+                            ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
+                            Data: itemData
+                          }
+                          );
+                  itemFound = true;
+                  break;
+                }
+              }
+        if(itemFound == false)
         {
-          Exhaust: CarData.ExhaustLvl,
-          Engine: CarData.EngineLvl,
-          Gearbox: CarData.GearboxLvl,
-          Suspension: CarData.SuspensionLvl,
-          Tires: CarData.TiresLvl,
-          Turbo: CarData.TurboLvl
-        };
-    var partCardInfo;
-    for(var i = 0; i < partCardsCatalog.Catalog.length; i++) //refactored
-    {
-      partCardInfo = JSON.parse(partCardsCatalog.Catalog[i].CustomData);
-      pr += parseInt(partCardInfo.basePr) + (parseInt(partCardInfo.prPerLvl) * tempDict[partCardsCatalog.Catalog[i].ItemId]);
-    }
-  return pr;
-}
+            var itemsToGrant = [p];
+            var grantVar = server.GrantItemsToUser(
+            {
+              CatalogVersion : "PartCards",
+              PlayFabId: currentPlayerId,
+              ItemIds : itemsToGrant
+            }
+            );
 
-function GenerateBlackMarket(currentPlayerId)
-{
-  //getting user league
-  var league = 1;
-  var ps=server.GetPlayerStatistics(
-  {
-     PlayFabId: currentPlayerId,
-     StatisticNames: ["League"]
-  });
-  if(ps.Statistics.length != 0)
-  {
-    league = ps.Statistics[0].Value.toString();
-  }
-  //getting parts
-  var partsCatalog = server.GetCatalogItems(
-     {
-       CatalogVersion : "PartCards"
-     }
-     );
-  var dataToUpdate = {};
-  var d = new Date();
-  dataToUpdate["BMTime"] = d.getTime();
-  //get first part
-  var part0Index = Math.floor(Math.random() * partsCatalog.Catalog.length);
-  var cardParsed = JSON.parse(partsCatalog.Catalog[part0Index].CustomData);
-  if(cardParsed == undefined) return generateErrObj("Part card " + partsCatalog.Catalog[i].ItemId + " has no custom data.");
-  dataToUpdate["BMItem0"] = partsCatalog.Catalog[part0Index].ItemId + "_" + cardParsed.BMCurrType + "_" + cardParsed.BMbasePrice + "_" + 0 + "_" + cardParsed.BMpriceIncrPerBuy;
-  //generate second part card
-  var part1Index = Math.floor(Math.random() * partsCatalog.Catalog.length);
-  if(part1Index == part0Index) part1Index = partsCatalog.Catalog.length - part0Index - 1;
-  cardParsed = JSON.parse(partsCatalog.Catalog[part1Index].CustomData);
-  if(cardParsed == undefined) return generateErrObj("Part card " + partsCatalog.Catalog[i].ItemId + " has no custom data.");
-  dataToUpdate["BMItem1"] = partsCatalog.Catalog[part1Index].ItemId + "_" + cardParsed.BMCurrType + "_" + cardParsed.BMbasePrice + "_" + 0 + "_" + cardParsed.BMpriceIncrPerBuy;
-  //getting car cards
-  var carsCatalog = server.GetCatalogItems(
-   {
-     CatalogVersion : "CarCards"
-   }
-   );
-  var carCardParsed;
-  var nonRareIndexes = [];
-  var rareIndexes = [];
-  for(var i = 0; i < carsCatalog.Catalog.length; i++)
-  {
-    carCardParsed = JSON.parse(carsCatalog.Catalog[i].CustomData)
-    if(carCardParsed == undefined) return generateErrObj("Car card " + carsCatalog.Catalog[i].ItemId + " has no custom data.");
-    if(carCardParsed.unlockedAtRank > league + 1) continue;
-    if(carCardParsed.rareCar == "false")
-      nonRareIndexes.push(carsCatalog.Catalog[i].ItemId + "_" + carCardParsed.BMCurrType + "_" + carCardParsed.BMbasePrice + "_" + 0 + "_" + carCardParsed.BMpriceIncrPerBuy);
-    else
-      rareIndexes.push(carsCatalog.Catalog[i].ItemId + "_" + carCardParsed.BMCurrType + "_" + carCardParsed.BMbasePrice + "_" + 0 + "_" + carCardParsed.BMpriceIncrPerBuy);
-  }
-  if(nonRareIndexes.length <= 0)
-  {
-    dataToUpdate["BMItem2"] = rareIndexes[Math.floor(Math.random() * rareIndexes.length)];
-    dataToUpdate["BMItem3"] = rareIndexes[Math.floor(Math.random() * rareIndexes.length)];
-  }
-  else
-    if(rareIndexes.length <= 0)
-    {
-      dataToUpdate["BMItem2"] = nonRareIndexes[Math.floor(Math.random() * nonRareIndexes.length)];
-      dataToUpdate["BMItem3"] = nonRareIndexes[Math.floor(Math.random() * nonRareIndexes.length)];
+            itemData = {"Amount" : args.partCardsRequest[p]};
+            server.UpdateUserInventoryItemCustomData(
+                 {
+                    PlayFabId: currentPlayerId,
+                    ItemInstanceId: grantVar.ItemGrantResults[0].ItemInstanceId,
+                    Data: itemData
+                 }
+                 );
+        }
+      }
     }
-    else
+   var invObj = server.GetUserInventory(
     {
-        dataToUpdate["BMItem2"] = nonRareIndexes[Math.floor(Math.random() * nonRareIndexes.length)];
-        dataToUpdate["BMItem3"] = rareIndexes[Math.floor(Math.random() * rareIndexes.length)];
-    }
-  server.UpdateUserInternalData(
-    {
-      PlayFabId : currentPlayerId,
-      Data : dataToUpdate
-    }
-  );
-  var tK = [];
-  tK.push("BlackMarketResetMinutes");
-  var tData = server.GetTitleData(
-    {
-      PlayFabId : currentPlayerId,
-      Keys : tK
+      PlayFabId: currentPlayerId
     }
     );
-  dataToUpdate["BMTime"] = parseInt(tData.Data.BlackMarketResetMinutes) * 60;
-  return dataToUpdate;
-}
-
-function GetCurrentBlackMarket(currentPlayerId, getInternalDataResult)
-{
-  var bmObj = {};
-  var d = new Date();
-
-  var tK = [];
-  tK.push("BlackMarketResetMinutes");
-  var tData = server.GetTitleData(
-    {
-      PlayFabId : currentPlayerId,
-      Keys : tK
-    }
-    );
-
-  bmObj["BMTime"] = parseInt(tData.Data.BlackMarketResetMinutes) * 60 - Math.floor((d.getTime() - getInternalDataResult.Data.BMTime.Value) / 1000);
-  for(var i = 0; i < 4; i++)
-  {
-    bmObj["BMItem" + i] = getInternalDataResult.Data["BMItem" + i].Value;
-  }
-  return bmObj;
-}
-
+   var returnObj = {
+      Result: "OK",
+      Message: "InventoryUpdated",
+      InventoryChange:invObj
+    };
+   return returnObj;
+};
 handlers.purchaseBMItem = function(args, context)
 {
   //log.debug("purchasing item " + args.itemId + " from black market");
@@ -1316,14 +1090,14 @@ handlers.purchaseBMItem = function(args, context)
       {
        // log.debug("found it!");
         cardInstance = userInventoryObject.Inventory[i].ItemInstanceId;
-        if(userInventoryObject.Inventory[i].CustomData == undefined)
+        if(userInventoryObject.Inventory[i].CustomData === undefined)
         {
          // log.debug("no custom data. creating ...");
           cardData = {"Amount" : 1};
         }
         else
         {
-          if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)
+          if(userInventoryObject.Inventory[i].CustomData.Amount === undefined)
             cardData = {"Amount" : 1};
           else
           {
@@ -1344,7 +1118,7 @@ handlers.purchaseBMItem = function(args, context)
         break;
       }
     }
-    if(cardInstance == undefined)
+    if(cardInstance === undefined)
     {
       //log.debug("cardInstance is undefined");
       var itemsToGive = [];
@@ -1357,7 +1131,7 @@ handlers.purchaseBMItem = function(args, context)
         }
         );
       cardInstance = grantRequest.ItemGrantResults[0].ItemInstanceId;
-      if(cardInstance == undefined)
+      if(cardInstance === undefined)
         generateErrObj("grantRequest denied");
       else
       {
@@ -1399,11 +1173,10 @@ handlers.purchaseBMItem = function(args, context)
       var currencyUpdated = {};
       currencyUpdated[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
       var b=args.itemId+"_"+userArray[2]+"_"+(parseInt(userArray[3]) + 1)+"_"+userArray[4];
-      var i=
-          {
+      i={
             Inventory: objectsUpdated,
             VirtualCurrency: currencyUpdated
-          }
+        };
       var returnObj = {
         Result: "OK",
         Message: "InventoryUpdate",
@@ -1411,215 +1184,7 @@ handlers.purchaseBMItem = function(args, context)
         BMItemChange: b
       };
       return returnObj;
-  //}
-  //catch(err)
-  //{
-  //  generateErrObj("Something went horribly wrong somewhere: " + err);
- // }
-
-}
-
-handlers.retrieveBlackMarket = function(args, context)
-{
-  //let's get last BM Time Call
-  var keysToGet = [];
-  keysToGet.push("BMTime");
-  for(var i = 0; i < 4; i++)
-  {
-    keysToGet.push("BMItem" + i);
-  }
-
-  var getInternalDataResult = server.GetUserInternalData(
-    {
-      PlayFabId: currentPlayerId,
-      Keys: keysToGet
-    }
-    );
-
-  if(getInternalDataResult.Data.BMTime == undefined)
-  {
-    //log.debug("No user BM data detected; generating ...");
-    return GenerateBlackMarket(currentPlayerId);
-  }
-
-  var d = new Date();
-  //log.debug("milliseconds passed: " +  d.getTime());
-  //log.debug("BMTime: " +  getInternalDataResult.Data.BMTime.Value);
-
-  var tK = [];
-  tK.push("BlackMarketResetMinutes");
-  var tData = server.GetTitleData(
-    {
-      PlayFabId : currentPlayerId,
-      Keys : tK
-    }
-    );
-  if(args.reset == true)
-  {
-    //log.debug("reseting market");
-    var curr = "HC";
-    var cost = 200;
-    var td = server.GetTitleData(
-    {
-      Keys : ["BlackMarketResetCost"]
-    });
-    if(td.Data["BlackMarketResetCost"] != undefined)
-    {
-      var tDatArr = td.Data["BlackMarketResetCost"].split("_");
-      curr = tDatArr[0];
-      cost = Number(tDatArr[1]);
-    }
-
-    if(cost > 0)
-    {
-      var userInventoryObject = server.GetUserInventory(
-      {
-        PlayFabId: currentPlayerId
-      }
-      );
-
-      var bO = checkBalance(curr, cost, userInventoryObject.VirtualCurrency.SC, userInventoryObject.VirtualCurrency.HC);
-      if(bO != "OK") return generateFailObj("not enough money");
-
-      var subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
-        {
-          PlayFabId: currentPlayerId,
-          VirtualCurrency : curr,
-          Amount: cost
-        }
-        );
-      var marketObject = GenerateBlackMarket(currentPlayerId);
-      ////////////////
-      var currencyUpdated = {};
-      currencyUpdated[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
-      var i =
-           {
-             VirtualCurrency: currencyUpdated
-           }
-      marketObject["InventoryChange"] = i;
-      return marketObject;
-      ////////////////
-    }
-    return GenerateBlackMarket(currentPlayerId);
-  }
-
-  if(d.getTime() - parseInt(getInternalDataResult.Data.BMTime.Value) > parseInt(tData.Data.BlackMarketResetMinutes) *60*1000) // minutes *60*1000
-  {
-    //log.debug("regenerating market");
-    return GenerateBlackMarket(currentPlayerId);
-  }
-  //log.debug("get current market");
-  return GetCurrentBlackMarket(currentPlayerId, getInternalDataResult);
-
-}
-
-handlers.updateCarCust = function(args, context)
-{
-  var userInv = server.GetUserInventory(
-  {
-    PlayFabId : currentPlayerId,
-  }
-  );
-  var itemsToGive = [];
-  var carFound = "-1";
-  var DataToUpdate = {};
-  var customizations = {
-    PaintJobs : { itemOwned : "no", itemCustData: args.paintId, carItemId : "PaintId" },
-    Decals : { itemOwned : "no", itemCustData: args.decalId, carItemId : "DecalId" },
-    Plates : { itemOwned : "no", itemCustData: args.platesId, carItemId : "PlatesId" },
-    Rims : { itemOwned : "no", itemCustData: args.rimsId, carItemId : "RimsId" },
-    WindshieldText : { itemOwned : "no", itemCustData: args.wsId, carItemId : "WindshieldId" }
-  };
-
-  for(var i = 0; i < userInv.Inventory.length; i++)
-  {
-    if((userInv.Inventory[i].ItemId == args.carId) && (userInv.Inventory[i].CatalogVersion == "CarsProgress"))
-    {
-      carFound = userInv.Inventory[i].ItemInstanceId;
-    }
-    if(userInv.Inventory[i].ItemId in customizations)
-    {
-      customizations[userInv.Inventory[i].ItemId].itemOwned = "yes";
-      if(customizations[userInv.Inventory[i].ItemId].itemCustData in userInv.Inventory[i].CustomData)
-      {
-        DataToUpdate[customizations[userInv.Inventory[i].ItemId].carItemId] = customizations[userInv.Inventory[i].ItemId].itemCustData;
-      }
-      else
-      {
-        log.debug("user doesn't own: " + userInv.Inventory[i].ItemId + " " + customizations[userInv.Inventory[i].ItemId].itemCustData);
-      }
-    }
-  }
-  if(carFound == "-1")
-  {
-    return generateFailObj("User does not own car with id: " + args.carId);
-  }
-    //give inventory
-  for (var prop in customizations)
-  {
-    if (customizations.hasOwnProperty(prop))
-    {
-        if(customizations[prop].itemOwned == "no")
-        {
-           itemsToGive.push(prop);
-        }
-    }
-  }
-
-  if(DataToUpdate == {}) return generateFailObj("User doesn't own any of those customizations");
-  server.UpdateUserInventoryItemCustomData(
-     {
-       PlayFabId: currentPlayerId,
-       ItemInstanceId: carFound,
-       Data: DataToUpdate
-     }
-     );
-  var objectsUpdated =
-  [
-  {
-    ItemId : args.carId,
-    CatalogVersion: "CarsProgress",
-    CustomData : DataToUpdate
-  }
-  ];
-  if(itemsToGive.length > 0)
-  {
-    var grantRequest = server.GrantItemsToUser(
-    {
-      CatalogVersion : "Customization",
-      PlayFabId: currentPlayerId,
-      ItemIds : itemsToGive
-    }
-    );
-
-    var InvData = {
-      0 : "Owned"
-    };
-
-   for(var i = 0; i < grantRequest.ItemGrantResults.length; i++)
-  {
-    server.UpdateUserInventoryItemCustomData(
-         {
-           PlayFabId: currentPlayerId,
-           ItemInstanceId: grantRequest.ItemGrantResults[i].ItemInstanceId,
-           Data: InvData
-         }
-         );
-  }
-  }
-  var invChangeObj =
-      {
-          Inventory: objectsUpdated
-      }
-  var returnObj = {
-    Result: "OK",
-    Message: "InventoryUpdate",
-    InventoryChange:invChangeObj
-  };
-  return returnObj;
-
-}
-
+};
 handlers.purchaseItems = function(args, context)
 {
   //retrieve user inventory
@@ -2575,363 +2140,775 @@ handlers.purchaseItems = function(args, context)
     default:
         log.debug("invalid purchase parameter");
    }
-}
-//cheat scripts
-handlers.giveMoney = function(args)
+};
+handlers.requestCurrency = function(args)
 {
-  //args.curr, args.amount
-  var addUserCurrencyResult = server.AddUserVirtualCurrency(
-  {
-    PlayFabId: currentPlayerId,
-    VirtualCurrency : args.curr,
-    Amount: args.amount
-  }
-  );
-
-  var currencyUpdated = {};
-  currencyUpdated[addUserCurrencyResult.VirtualCurrency] = addUserCurrencyResult.Balance;
-  var invChangeObj =
-           {
-             VirtualCurrency: currencyUpdated
-           };
-  var r = {
-         Result: "OK",
-         Message: "CurrencyChanged",
-         InventoryChange:invChangeObj
-       };
-  return r;
-}
-
-handlers.grantItems = function(args)
-{
-  //retrieve user inventory
   var userInventoryObject = server.GetUserInventory(
   {
-    PlayFabId: currentPlayerId
+    PlayFabId: currentPlayerId,
   }
   );
-  //args.itemId, args.catalogId, args.amount
-
-  //old grant item code
-  //var itemsToGrant = [];
-  //for(var i = 0; i < args.amount; i++)
-  //{
-  //  itemsToGrant.push(args.itemId);
-  //}
-  //try
-  //{
-  // var grantVar = server.GrantItemsToUser(
-  // {
-  //  CatalogVersion : args.catalogId,
-  //   PlayFabId: currentPlayerId,
-  //   ItemIds : itemsToGrant
-  // }
-  // );
-  //new grant item code
-  var itemData;
-  var itemFound = false;
-  var newAmount;
+  var r =
+  {
+    VirtualCurrency: userInventoryObject.VirtualCurrency
+  };
+  return r;
+};
+handlers.requestInventory = function(args)
+{
+  var userInventoryObject = server.GetUserInventory(
+  {
+    PlayFabId: currentPlayerId,
+  }
+  );
+  //get catalog data for pr calculation
+    var carCardsCatalog = server.GetCatalogItems(
+         {
+           CatalogVersion : "CarCards"
+         }
+         );
+    var partCardsCatalog = server.GetCatalogItems(
+       {
+         CatalogVersion : "PartCards"
+       }
+       );
+  var hasCars = false;
   for(var i = 0; i < userInventoryObject.Inventory.length; i++)
-        {
-          if((userInventoryObject.Inventory[i].ItemId == args.itemId) && (userInventoryObject.Inventory[i].CatalogVersion == args.catalogId))
-          {
-           // log.debug("adding amount to: " + userInventoryObject.Inventory[i].ItemInstanceId);
-            if(userInventoryObject.Inventory[i].CustomData == undefined)
-            {
-              newAmount = args.amount;
-            }
-            else
-            {
-              if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)
-                newAmount = args.amount;
-              else
-              {
-                if(isNaN(Number(userInventoryObject.Inventory[i].CustomData.Amount)))
-                  newAmount = args.amount;
-                else
-                  newAmount = Number(userInventoryObject.Inventory[i].CustomData.Amount) + args.amount;
-              }
-            }
-            itemData = {"Amount" : newAmount};
-            server.UpdateUserInventoryItemCustomData(
-                    {
-                      PlayFabId: currentPlayerId,
-                      ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
-                      Data: itemData
-                    }
-                    );
-            itemFound = true;
-            break;
-          }
-        }
-
-    if(itemFound == false)
+  {
+    if(userInventoryObject.Inventory[i].CatalogVersion == "CarsProgress")
     {
-      var itemsToGrant = [];
-      itemsToGrant.push(args.itemId);
-      var grantVar = server.GrantItemsToUser(
+      hasCars = true;
+      var check = checkCarDataValidity(userInventoryObject.Inventory[i], carCardsCatalog);
+      //log.debug("check " + check);
+      if((check == "PlayFabError") || (check === undefined)) return generateErrObj("PlayfabError");
+      else if(check == "OK") log.debug("Data for " + userInventoryObject.Inventory[i].ItemId + " OK");
+           else userInventoryObject.Inventory[i].CustomData = check;
+      userInventoryObject.Inventory[i].CustomData.Pr = recalculateCarPr(userInventoryObject.Inventory[i].CustomData, userInventoryObject.Inventory[i].ItemId, carCardsCatalog, partCardsCatalog);
+      var d = {};
+      d["Pr"] = userInventoryObject.Inventory[i].CustomData.Pr;
+      server.UpdateUserInventoryItemCustomData( // if this doesn't happen it's still fine; we might actually be able to skip this entirely
       {
-        CatalogVersion : args.catalogId,
         PlayFabId: currentPlayerId,
-        ItemIds : itemsToGrant
+        ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
+        Data: d
+      }
+      );
+    }
+  }
+  if(hasCars === false)
+    {
+      var carsToGive = [];
+      carsToGive.push("FordFocus");
+      var carRequest = server.GrantItemsToUser(
+      {
+        CatalogVersion : "CarsProgress",
+        PlayFabId: currentPlayerId,
+        ItemIds : carsToGive
+      }
+      );
+      var CarData = {"CarLvl" : "1","EngineLvl" : "0","ExhaustLvl" : "0","GearboxLvl" : "0","SuspensionLvl" : "0"};
+      server.UpdateUserInventoryItemCustomData(
+      {
+        PlayFabId: currentPlayerId,
+        ItemInstanceId: carRequest.ItemGrantResults[0].ItemInstanceId,
+        Data: CarData
+      }
+      );
+      CarData = {"TiresLvl" : "0","TurboLvl" : "0","PaintId" : "0","DecalId" : "0","RimsId" : "0"};
+      server.UpdateUserInventoryItemCustomData(
+      {
+        PlayFabId: currentPlayerId,
+        ItemInstanceId: carRequest.ItemGrantResults[0].ItemInstanceId,
+        Data: CarData
+      }
+      );
+      CarData = {"PlatesId" : "0","WindshieldId" : "0","Pr" : "10"};
+      server.UpdateUserInventoryItemCustomData(
+      {
+        PlayFabId: currentPlayerId,
+        ItemInstanceId: carRequest.ItemGrantResults[0].ItemInstanceId,
+        Data: CarData
+      }
+      );
+      return generateErrObj("UserHasNoCars ... reiniting");
+    }
+  return userInventoryObject;
+};
+handlers.retrieveBlackMarket = function(args, context)
+{
+  //let's get last BM Time Call
+  var keysToGet = [];
+  keysToGet.push("BMTime");
+  for(var i = 0; i < 4; i++)
+  {
+    keysToGet.push("BMItem" + i);
+  }
+
+  var getInternalDataResult = server.GetUserInternalData(
+    {
+      PlayFabId: currentPlayerId,
+      Keys: keysToGet
+    }
+    );
+
+  if(getInternalDataResult.Data.BMTime === undefined)
+  {
+    //log.debug("No user BM data detected; generating ...");
+    return GenerateBlackMarket(currentPlayerId);
+  }
+
+  var d = new Date();
+  //log.debug("milliseconds passed: " +  d.getTime());
+  //log.debug("BMTime: " +  getInternalDataResult.Data.BMTime.Value);
+
+  var tK = [];
+  tK.push("BlackMarketResetMinutes");
+  var tData = server.GetTitleData(
+    {
+      PlayFabId : currentPlayerId,
+      Keys : tK
+    }
+    );
+  if(args.reset === true)
+  {
+    //log.debug("reseting market");
+    var curr = "HC";
+    var cost = 200;
+    var td = server.GetTitleData(
+    {
+      Keys : ["BlackMarketResetCost"]
+    });
+    if(td.Data["BlackMarketResetCost"] !== undefined)
+    {
+      var tDatArr = td.Data["BlackMarketResetCost"].split("_");
+      curr = tDatArr[0];
+      cost = Number(tDatArr[1]);
+    }
+
+    if(cost > 0)
+    {
+      var userInventoryObject = server.GetUserInventory(
+      {
+        PlayFabId: currentPlayerId
       }
       );
 
-      itemData = {"Amount" : args.amount};
-      server.UpdateUserInventoryItemCustomData(
-           {
-              PlayFabId: currentPlayerId,
-              ItemInstanceId: grantVar.ItemGrantResults[0].ItemInstanceId,
-              Data: itemData
-           }
-           );
-    }
-   //for return
-   var objectsUpdated =
-   [
-   {
-     ItemId : args.itemId,
-     CatalogVersion: args.catalogId,
-     CustomData: itemData
-   }
-   ] ;
-    var invChangeObj =
+      var bO = checkBalance(curr, cost, userInventoryObject.VirtualCurrency.SC, userInventoryObject.VirtualCurrency.HC);
+      if(bO != "OK") return generateFailObj("not enough money");
+
+      var subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
         {
-            Inventory: objectsUpdated
+          PlayFabId: currentPlayerId,
+          VirtualCurrency : curr,
+          Amount: cost
         }
-    var returnObj = {
-      Result: "OK",
-      Message: "InventoryUpdated",
-      InventoryChange:invChangeObj
-    };
-   return returnObj;
-}
-handlers.openChest = function(args, context)
-{
-  var objectsUpdated = [];
-  var currencyUpdated = [];
-  var invChangeObj;
-  var userInventoryObject = server.GetUserInventory(
-  {
-    PlayFabId: currentPlayerId
-  }
-  );
-  //let's check if this is a chest from the store
-  if(args.currCost > 0)
-  {
-    var bO = checkBalance(args.currType, args.currCost, userInventoryObject.VirtualCurrency["SC"], userInventoryObject.VirtualCurrency["HC"])
-    if(bO != "OK") return generateFailObj("not enough money");
-
-    var subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
-    {
-      PlayFabId: currentPlayerId,
-      VirtualCurrency : args.currType,
-      Amount: args.currCost
-    }
-    );
-  }
-  //currency
-	var addUserCurrencyResult;
-	for(var p in args.currencyReq)
-	{
-		if(args.currencyReq[p] > 0)
-		  addUserCurrencyResult = server.AddUserVirtualCurrency(
-		  {
-		    PlayFabId: currentPlayerId,
-		    VirtualCurrency : p,
-		    Amount: args.currencyReq[p]
-		  }
-		  );
-
-	}
-  var itemData;
-  var itemFound = false;
-  var newAmount = 0;
-  //car cards
-  for(var p in args.carCardsRequest)
-    {
-      //log.debug(p + " : " + args.carCardsRequest[p]);
-      if (args.carCardsRequest.hasOwnProperty(p))
-      {
-        itemFound = false;
-        newAmount = 0;
-        //log.debug("looking for: " +p);
-        for(var i = 0; i < userInventoryObject.Inventory.length; i++)
-              {
-                if((userInventoryObject.Inventory[i].ItemId == p) && (userInventoryObject.Inventory[i].CatalogVersion == "CarCards"))
-                {
-                 // log.debug("adding amount to: " + userInventoryObject.Inventory[i].ItemInstanceId);
-                  if(userInventoryObject.Inventory[i].CustomData == undefined)
-                  {
-                    newAmount = Number(args.carCardsRequest[p]);
-                  }
-                  else
-                  {
-                    if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)
-                      newAmount = Number(args.carCardsRequest[p]);
-                    else
-                    {
-                      if(isNaN(Number(userInventoryObject.Inventory[i].CustomData.Amount)))
-                        newAmount = Number(args.carCardsRequest[p]);
-                      else
-                        newAmount = Number(userInventoryObject.Inventory[i].CustomData.Amount) + Number(args.carCardsRequest[p]);
-                    }
-                  }
-                  itemData = {"Amount" : newAmount};
-                  server.UpdateUserInventoryItemCustomData(
-                          {
-                            PlayFabId: currentPlayerId,
-                            ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
-                            Data: itemData
-                          }
-                          );
-                  itemFound = true;
-                  break;
-                }
-              }
-        if(itemFound == false)
-        {
-            var itemsToGrant = [p];
-            var grantVar = server.GrantItemsToUser(
-            {
-              CatalogVersion : "CarCards",
-              PlayFabId: currentPlayerId,
-              ItemIds : itemsToGrant
-            }
-            );
-
-            itemData = {"Amount" : args.carCardsRequest[p]};
-            server.UpdateUserInventoryItemCustomData(
-                 {
-                    PlayFabId: currentPlayerId,
-                    ItemInstanceId: grantVar.ItemGrantResults[0].ItemInstanceId,
-                    Data: itemData
-                 }
-                 );
-        }
-      }
-    }
-  //part cards
-  for(var p in args.partCardsRequest)
-    {
-      //log.debug(p + " : " + args.partCardsRequest[p]);
-      if (args.partCardsRequest.hasOwnProperty(p))
-      {
-        itemFound = false;
-        newAmount = 0;
-       // log.debug("looking for: " +p);
-        for(var i = 0; i < userInventoryObject.Inventory.length; i++)
-              {
-                if((userInventoryObject.Inventory[i].ItemId == p) && (userInventoryObject.Inventory[i].CatalogVersion == "PartCards"))
-                {
-                 // log.debug("adding amount to: " + userInventoryObject.Inventory[i].ItemInstanceId);
-                  if(userInventoryObject.Inventory[i].CustomData == undefined)
-                  {
-                    newAmount = Number(args.partCardsRequest[p]);
-                  }
-                  else
-                  {
-                    if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)
-                      newAmount = Number(args.partCardsRequest[p]);
-                    else
-                    {
-                      if(isNaN(Number(userInventoryObject.Inventory[i].CustomData.Amount)))
-                        newAmount = Number(args.partCardsRequest[p]);
-                      else
-                        newAmount = Number(userInventoryObject.Inventory[i].CustomData.Amount) + Number(args.partCardsRequest[p]);
-                    }
-                  }
-                  itemData = {"Amount" : newAmount};
-                  server.UpdateUserInventoryItemCustomData(
-                          {
-                            PlayFabId: currentPlayerId,
-                            ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
-                            Data: itemData
-                          }
-                          );
-                  itemFound = true;
-                  break;
-                }
-              }
-        if(itemFound == false)
-        {
-            var itemsToGrant = [p];
-            var grantVar = server.GrantItemsToUser(
-            {
-              CatalogVersion : "PartCards",
-              PlayFabId: currentPlayerId,
-              ItemIds : itemsToGrant
-            }
-            );
-
-            itemData = {"Amount" : args.partCardsRequest[p]};
-            server.UpdateUserInventoryItemCustomData(
-                 {
-                    PlayFabId: currentPlayerId,
-                    ItemInstanceId: grantVar.ItemGrantResults[0].ItemInstanceId,
-                    Data: itemData
-                 }
-                 );
-        }
-      }
-    }
-   var invObj = server.GetUserInventory(
-    {
-      PlayFabId: currentPlayerId
-    }
-    );
-   var returnObj = {
-      Result: "OK",
-      Message: "InventoryUpdated",
-      InventoryChange:invObj
-    };
-   return returnObj;
-}
-
-handlers.buyChest = function(args, context)
-{
-  var userInventoryObject=server.GetUserInventory(
-  {
-    PlayFabId:currentPlayerId
-  }
-  );
-  var bO = checkBalance(args.curr, args.cost, userInventoryObject.VirtualCurrency.SC, userInventoryObject.VirtualCurrency.HC);
-  if(bO != "OK") return generateFailObj("not enough money");
-  if(args.cost > 0)
-  {
-    var subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
-    {
-      PlayFabId: currentPlayerId,
-      VirtualCurrency : args.curr,
-      Amount: args.cost
-    }
-    );
-    var cU = {};
-    cU[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
-    var i =
-             {
-               VirtualCurrency: cU
-             };
-    var r = {
-           Result: "OK",
-           Message: "ChestBought",
-           InventoryChange:i
+        );
+      var marketObject = GenerateBlackMarket(currentPlayerId);
+      ////////////////
+      var currencyUpdated = {};
+      currencyUpdated[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
+      i =
+         {
+           VirtualCurrency: currencyUpdated
          };
-    return r;
+      marketObject["InventoryChange"] = i;
+      return marketObject;
+      ////////////////
+    }
+    return GenerateBlackMarket(currentPlayerId);
+  }
+
+  if(d.getTime() - parseInt(getInternalDataResult.Data.BMTime.Value) > parseInt(tData.Data.BlackMarketResetMinutes) *60*1000) // minutes *60*1000
+  {
+    //log.debug("regenerating market");
+    return GenerateBlackMarket(currentPlayerId);
+  }
+  //log.debug("get current market");
+  return GetCurrentBlackMarket(currentPlayerId, getInternalDataResult);
+};
+handlers.startGame = function(args, context) {
+  //let's see what subleague we are in and what win/loss ration we have
+  //wlratio
+  var wlStat = "10"; // 50/50 for newtimers
+  var wlStatInt = 0; // we change the bitwise representation to int32 and store it like that
+  var winRatio = 50;
+  var totalGames = 2;
+  var wins = 0;
+  var ps=server.GetPlayerStatistics(
+  {
+     PlayFabId: currentPlayerId,
+     StatisticNames: ["WinLoss"]
+  });
+  if(ps.Statistics.length != 0)
+  {
+      wlStatInt = ps.Statistics[0].Value.toString();
+      wlStat = Number(wlStatInt).toString(2);
+      totalGames = wlStat.length;
+      for(var i = 0; i < wlStat.length; i++)
+      {
+        if(wlStat[i] == "1") wins++;
+      }
+      winRatio = Math.round( 100* (wins/totalGames));
+  }
+  //start game so we assume it'sa lose until it's a win
+  //log.debug("wlStatBeforeshiftandAdd " + wlStat);
+  wlStat += "0";
+  //log.debug("wlStatBeforeshift " + wlStat);
+   if(wlStat.length > 20)
+   {
+    wlStat = wlStat.slice(1);
+   }
+  // log.debug("wlStat " + wlStat);
+  //trophy count and subleague distribution
+  var leagueTitleDataRequest = server.GetTitleData(
+    {
+      Key: ["LeagueSubdivisions","SubdivisionTrophyRanges","TrophyGainRange","TrophyLoseRange"]
+    }
+    );
+  var tc=server.GetPlayerStatistics(
+  {
+     PlayFabId: currentPlayerId,
+     StatisticNames: ["TrophyCount"]
+  });
+  var trophyCount = 0;
+  if(tc.Statistics.length != 0)
+  {
+    trophyCount = tc.Statistics[0].Value;
+  }
+  trophyCount = Number(trophyCount);
+  var sdval = leagueTitleDataRequest.Data["SubdivisionTrophyRanges"];
+  var sdvalParsed = JSON.parse(sdval);
+  var lsVal = leagueTitleDataRequest.Data["LeagueSubdivisions"];
+  var lsValParsed = JSON.parse(lsVal);
+  //log.debug("SubdivisionTrophyRanges " + sdvalParsed);
+  var subDivision = 43;
+  var nextSubDivision = 43;
+  var subDivisionRange = 200;
+          var rminmaxarr = leagueTitleDataRequest.Data["TrophyGainRange"].split("_");
+          var lminmaxarr = leagueTitleDataRequest.Data["TrophyLoseRange"].split("_");
+          var rMin = Number(rminmaxarr[0]);
+          var rMax = Number(rminmaxarr[1]);
+          var lMin = Number(lminmaxarr[0]);
+          var lMax = Number(lminmaxarr[1]);
+  for(var i = 0; i < sdvalParsed.subdivisions.length; i++)
+  {
+    if(trophyCount<Number(sdvalParsed.subdivisions[i]))
+    {
+      subDivision = i;
+      if(i < sdvalParsed.subdivisions.length - 1) nextSubDivision = i + 1;
+      break;
+    }
+  }
+  subDivisionRange = Number(sdvalParsed.subdivisions[nextSubDivision]) - Number(sdvalParsed.subdivisions[subDivision]);
+  log.debug("nextSubDivision " + nextSubDivision + " subDivision " + subDivision);
+  log.debug(" sdvalParsed.subdivisions[nextSubDivision] " + sdvalParsed.subdivisions[nextSubDivision] + " sdvalParsed.subdivisions[subDivision] " + sdvalParsed.subdivisions[subDivision]);
+  if(subDivisionRange <= 0) subDivisionRange = 400; // random 400
+  log.debug("subDivisionRange " + subDivisionRange);
+  //log.debug("user is in subdivision " + subDivision);
+
+  //matchmaking code
+  //let's get subdivision and neighbouring subdivisions
+  var subDivKeys = ["RecSubDivision"+subDivision];
+  var titleData = server.GetTitleInternalData(
+    {
+      Keys : "RecSubDivision"+subDivision
+    }
+    );
+  var recPool = titleData.Data["RecSubDivision"+subDivision];
+  var isIncompleteSubDivision = false;
+  //log.debug("recPool " + recPool);
+  if(recPool == undefined) isIncompleteSubDivision = true;
+  var recArray;
+  var opponentId;
+  var env;
+  var course;
+
+//previous opponents
+var oppPrev = "noop"; // ultimu
+var oppPrevPrev = "noop";// penultimu
+var oppArray;
+var oppDat = server.GetUserInternalData(
+{
+    PlayFabId: currentPlayerId,
+    Keys: ["lastOpp"]
+});
+
+if((oppDat.Data == undefined) || (oppDat.Data.lastOpp == undefined))
+{
+  //log.debug("opp data is undefined");
+  oppPrev = "noop";
+  oppPrevPrev = "noop";
+}
+else
+{
+  oppArray = oppDat.Data.lastOpp.Value.split(",");
+ // log.debug("oppArray is " + oppArray);
+  for(var i = 0; i < oppArray.length; i++)
+  {
+    if(i == 0) oppPrev = oppArray[i];
+    if(i == 1) oppPrevPrev = oppArray[i];
+  }
+ // log.debug("oppPrev is " + oppPrev);
+ // log.debug("oppPrevPrev is " + oppPrevPrev);
+}
+  if(isIncompleteSubDivision == false)
+  {
+    recArray = JSON.parse(recPool);
+    opponentId = recArray[recArray.length - 1].uId;
+    env = recArray[recArray.length - 1].e;
+    course = recArray[recArray.length - 1].c;
   }
   else
   {
-        var q = {
-           Result: "OK",
-           Message: "ChestBought",
-           InventoryChange:{}
-         };
-    return q;
+    recArray = [];
   }
-}
 
-handlers.getServerTime = function(args, context)
+  //default recording code
+  var subDivisionLength = 15; // we have 15 possible courses
+  var envCourseArray =
+  [
+  0,0,0,0,0,
+  0,0,0,0,0,
+  0,0,0,0,0
+  ]
+  //log.debug("subrecording pool has " + recArray.length + " length. Must have: " + subDivisionLength + " length");
+
+  if(recArray.length < subDivisionLength) isIncompleteSubDivision = true;
+
+  var validRecArray = new Array(recArray.length); // all recordings except yours
+  var vrAidx = 0;
+  var likelyRecArray = new Array(recArray.length); // all recordings minus yours AND minus oppPrev
+  var lrAidx = 0;
+  var moreLikelyRecArray = new Array(recArray.length); // all recordings minus yours AND minus oppPrev AND minus oppPrevPrev
+  var mlrAidx = 0;
+  //log.debug("iterating through recArray");
+  for(var i = 0; i < recArray.length; i++) // create valid rec pool OR check for missing env/course if subDivision has missing recordings
+  {
+      if(isIncompleteSubDivision == true)
+      {
+        envCourseArray[Number(recArray[i].e)*5 + Number(recArray[i].c)] = 1;
+      }
+      if(recArray[i].uId == currentPlayerId)
+        {
+         // log.debug("found: " + recArray[i].uId + "... skipping");
+          continue;
+        }
+        validRecArray[vrAidx] = recArray[i];
+        vrAidx++;
+      if(recArray[i].uId == oppPrev)
+        {
+         // log.debug("found: " + recArray[i].uId + "... skipping prev opp");
+          continue;
+        }
+        likelyRecArray[lrAidx] = recArray[i];
+        lrAidx++;
+      if(recArray[i].uId == oppPrevPrev)
+        {
+         // log.debug("found: " + recArray[i].uId + "... skipping prev prev opp");
+          continue;
+        }
+        moreLikelyRecArray[mlrAidx] = recArray[i];
+        mlrAidx++;
+  }
+//log.debug("isIncompleteSubDivision: " + isIncompleteSubDivision);
+//let's give default recording if necessary
+if(isIncompleteSubDivision == true)
 {
-	var t = new Date();
-	return { time: t};
+  var envToGet = 0;
+  var courseToGet = 0;
+  for(var i = 0; i < envCourseArray.length; i++)
+  {
+    if(envCourseArray[i] == 0)// we found a missing recording <- e = i/5; c = i%5;
+    {
+      envToGet = Math.floor(i/5);
+      courseToGet = i%5;
+      break;
+    }
+  }
+  //log.debug("gettingDefaultUser: env: " + envToGet + " course: " + courseToGet);
+  //let's see who the master account is
+    var masterAccountRequest = server.GetTitleData(
+    {
+      Keys : "MasterUser"
+    }
+    );
+    if(masterAccountRequest.Data["MasterUser"] != undefined)
+    {
+     // log.debug("master user: " + masterAccountRequest.Data["MasterUser"]);
+      var defaultRecordingData = server.GetUserReadOnlyData(
+      {
+        PlayFabId: masterAccountRequest.Data["MasterUser"],
+        Keys: [(envToGet + "_" + courseToGet + "_RecPos") , (envToGet + "_" + courseToGet + "_RecRot"), (envToGet + "_" + courseToGet + "_RecHeader")]
+      }
+      );
+      if(defaultRecordingData.Data != undefined)
+      {
+        //log.debug("defaultRecordingData: " + defaultRecordingData.Data);
+        if((defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecPos"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecRot"] != undefined) && (defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"] != undefined))
+        { // looks like we found a valid default recording
+          var updateTrophyInternal = true;
+          if(trophyCount == 0)
+          {
+            trophyCount = rMax;
+            updateTrophyInternal = false;
+          }
+          else
+          {
+            trophyCount -= lMin;
+          }
+          if(trophyCount <= 1) trophyCount = 1;
+          wlStatInt = parseInt(wlStat, 2);
+          //log.debug("updating WL to:  " + wlStatInt);
+          //update stats on server
+          var suArray = [];
+          var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
+          suArray.push(su);
+          var sut = {StatisticName: "TrophyCount", Version : "0", Value: trophyCount};
+          suArray.push(sut);
+          var sul = {StatisticName: "League", Version : "0", Value: cLeague};
+          suArray.push(sul);
+          //log.debug("updatingStats: " + suArray);
+          var updateRequest = server.UpdatePlayerStatistics(
+          {
+            PlayFabId: currentPlayerId,
+            Statistics: suArray
+          }
+          );
+          var dataToUpdate = {
+            "trophyWin" : rMax,
+            "trophyLose": lMin
+          }
+          if(updateTrophyInternal == false)
+          {
+            dataToUpdate["trophyWin"] = 0;
+            dataToUpdate["trophyLose"] = 0;
+          }
+          server.UpdateUserInternalData(
+          {
+            PlayFabId: currentPlayerId,
+            Data: dataToUpdate
+          });
+          //log.debug("found valid default rec");
+          return {
+            Result :"OK",
+            RecType: "Default",
+            PosData: defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecPos"].Value, //0_0_RecPos
+            RotData: defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecRot"].Value,
+            HeaderData: defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"].Value,
+            TrophyLose: lMin,
+            TrophyWin : rMax,
+            Opp: "Mniezo"
+                 };
+        }
+      }
+    }
 }
+//log.debug("looking for user generated recording");
+if(vrAidx == 0) return generateErrObj("no valid recording found for this subdivision");
+
+//we have 3 arrays. We want the likelyhood that you get the same previous opponents to be as low as possible
+//so we will see if moreLikelyRecArray is empty. If yes we check if likelyRecArray is empty.
+//if they are both empty we remain with the current validRecArray array
+var searchArray = validRecArray;
+var sAlen = vrAidx;
+  if(lrAidx > 0){sAlen = lrAidx; searchArray = likelyRecArray}
+  if(mlrAidx > 0){sAlen = mlrAidx; searchArray = moreLikelyRecArray}
+
+  var pivot = sAlen - 1; //in case your WLRatio is the highest in the pool
+  for(var i = 0; i < sAlen; i++) // write winstreak/losestreak code
+  {
+    if(searchArray[i].wl > winRatio) //let's find the pivot; we'll move it later based on WL ratio
+    {
+      pivot = i;
+      break;
+      //opponentId = recArray[i].uId;
+      //env = recArray[i].e;
+      //course = recArray[i].c;
+    }
+  }
+ // log.debug("pivot is: " + pivot);
+  var finalRecArraySize = Math.min(sAlen, 3); // for now 3 is the max number of recordings in the random final pool
+ // log.debug("finalRecArraySize: " + finalRecArraySize);
+  var finalRecArray = new Array(finalRecArraySize); // this array will be populated with the recordings around the pivot
+  for(var i = 0; i < finalRecArraySize; i++)
+  {
+    if(pivot <= 0) // get rightmost recordings
+    {
+      finalRecArray[i] = searchArray[i];
+      continue;
+    }
+    if(pivot >= sAlen - 1) // get leftmost recordings
+    {
+      finalRecArray[i] = searchArray[sAlen - 1 - i];
+      continue;
+    }
+    finalRecArray[i] = searchArray[(pivot - Math.floor(finalRecArraySize/2) + i)]; // get inner recordings
+  }
+  var randIdx = Math.floor(Math.random() * finalRecArraySize); // let's get a random one from this final pool
+    opponentId = finalRecArray[randIdx].uId;
+    env = finalRecArray[randIdx].e;
+    course = finalRecArray[randIdx].c;
+  var urodkr = [(env + "_" + course + "_RecPos") , (env + "_" + course + "_RecRot"), (env + "_" + course + "_RecHeader")];
+ // log.debug("requesting " + urodkr);
+  var recordingData = server.GetUserReadOnlyData(
+    {
+      PlayFabId: opponentId,
+      Keys: urodkr
+    }
+    );
+  if(recordingData == undefined) return generateErrObj("Did not find recording for this user: " + opponentId); // handle this later
+  //end matchmaking
+
+  var oI = server.GetPlayerCombinedInfo(
+    {
+      PlayFabId:opponentId,
+      InfoRequestParameters: {"GetUserAccountInfo": true,"GetUserInventory": false,"GetUserVirtualCurrency": false,"GetUserData": false,"GetUserReadOnlyData": false,"GetCharacterInventories": false,"GetCharacterList": false, "GetTitleData": false,"GetPlayerStatistics": false}
+    }
+    );
+  //found recording now let's reduce user's trophies
+          //let's extract opponent trophies so we know how muany trophies we give/takeaway from user
+          var trophiesToTake = 15; // min
+          var trophiesToGive = 30; // max
+          var userTrophies = trophyCount;
+          var oppTrophies;
+          var cLeague = Number(calculateLeague(trophyCount));
+          var recTypeSent = "UserGenerated";
+//log.debug("cLeague " + cLeague);
+  //        log.debug("lsValParsed: " + lsValParsed);
+  //        log.debug("sdvalParsed: " + sdvalParsed);
+  //        log.debug("lsValParsed.leagues: " + lsValParsed.leagues);
+  //        log.debug("sdvalParsed.subDivisions: " + sdvalParsed.subdivisions);
+
+          var minLeagueT
+          if(cLeague > 0)
+            minLeagueT = Number(sdvalParsed.subdivisions[lsValParsed.leagues[cLeague - 1]]);
+          else
+            minLeagueT = 0;
+
+          var maxLeagueT;
+          if(cLeague >= lsValParsed.leagues.length - 1)
+            maxLeagueT = minLeagueT * 2;
+          else
+            maxLeagueT = Number(sdvalParsed.subdivisions[lsValParsed.leagues[cLeague]]);
+
+//log.debug("maxLT " + maxLeagueT + " minLeagueT " + minLeagueT);
+
+          var opponentHeader = JSON.parse(recordingData.Data[env + "_" + course + "_RecHeader"].Value);
+          if(opponentHeader != undefined)
+          {
+            oppTrophies = opponentHeader.Trophies;
+          }
+          oppTrophies = Number(oppTrophies);
+          if(maxLeagueT - minLeagueT <= 0)
+          {
+              trophiesToTake = rMax;
+              trophiesToGive = lMin;
+          }
+          else
+          {
+            if(Number(Math.abs(userTrophies - oppTrophies)) > Number(subDivisionRange))
+            {
+              trophiesToTake = Math.floor((lMin + lMax)/2);
+              trophiesToGive = Math.floor((rMax + rMin)/2);
+              recTypeSent = "Default";
+            }
+            else
+            {
+            //  log.debug("rMin: " + rMin + " userTrophies: " + userTrophies + " oppTrophies " + oppTrophies + " maxLeagueT " + maxLeagueT + " minLeagueT " + minLeagueT + " rMax: " + rMax);
+              trophiesToTake = lMin + Math.floor((((userTrophies - oppTrophies)/(maxLeagueT - minLeagueT)) + 1) * ((lMax - lMin)/2));
+              trophiesToGive = rMin + Math.floor((((oppTrophies - userTrophies)/(maxLeagueT - minLeagueT)) + 1) * ((rMax - rMin)/2));
+            }
+          }
+
+  var updateTrophiesToGiveTake = true;
+  if(trophyCount == 0)
+  {
+    updateTrophiesToGiveTake = false;
+    trophyCount = rMax;
+  }
+  else
+  {
+    trophyCount -= Number(trophiesToTake);
+    if(trophyCount <= 1) trophyCount = 1;
+  }
+  //log.debug("trophiesToTake:  " + trophiesToTake);
+ // log.debug("trophiesToGive:  " + trophiesToGive);
+  wlStatInt = parseInt(wlStat, 2);
+ // log.debug("updating WL to:  " + wlStatInt);
+  //update stats on server
+  var suArray = [];
+  var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
+  suArray.push(su);
+  var sut = {StatisticName: "TrophyCount", Version : "0", Value: trophyCount};
+  suArray.push(sut);
+  var sul = {StatisticName: "League", Version : "0", Value: cLeague};
+  suArray.push(sul);
+ // log.debug("updatingStats: " + suArray);
+  var updateRequest = server.UpdatePlayerStatistics(
+  {
+    PlayFabId: currentPlayerId,
+    Statistics: suArray
+  }
+  );
+  var lastOppVal = opponentId + "," + oppPrev;
+            var dataToUpdate = {
+            "trophyWin" : trophiesToGive,
+            "trophyLose": trophiesToTake,
+            "lastOpp" : lastOppVal
+          }
+  if(updateTrophiesToGiveTake == false)
+  {
+          dataToUpdate["trophyWin"] = 0;
+          dataToUpdate["trophyLose"] = 0;
+  }
+          server.UpdateUserInternalData(
+          {
+            PlayFabId: currentPlayerId,
+            Data: dataToUpdate
+          });
+
+
+  return {
+    Result :"OK",
+    RecType: recTypeSent,
+    PosData: recordingData.Data[env + "_" + course + "_RecPos"].Value, //0_0_RecPos
+    RotData: recordingData.Data[env + "_" + course + "_RecRot"].Value,
+    HeaderData: recordingData.Data[env + "_" + course + "_RecHeader"].Value,
+    TrophyLose: trophiesToTake,
+    TrophyWin : trophiesToGive,
+    Opp: oI.InfoResultPayload.AccountInfo.TitleInfo.DisplayName
+         };
+}
+handlers.updateCarCust = function(args, context)
+{
+  var userInv = server.GetUserInventory(
+  {
+    PlayFabId : currentPlayerId,
+  }
+  );
+  var itemsToGive = [];
+  var carFound = "-1";
+  var DataToUpdate = {};
+  var customizations = {
+    PaintJobs : { itemOwned : "no", itemCustData: args.paintId, carItemId : "PaintId" },
+    Decals : { itemOwned : "no", itemCustData: args.decalId, carItemId : "DecalId" },
+    Plates : { itemOwned : "no", itemCustData: args.platesId, carItemId : "PlatesId" },
+    Rims : { itemOwned : "no", itemCustData: args.rimsId, carItemId : "RimsId" },
+    WindshieldText : { itemOwned : "no", itemCustData: args.wsId, carItemId : "WindshieldId" }
+  };
+
+  for(var i = 0; i < userInv.Inventory.length; i++)
+  {
+    if((userInv.Inventory[i].ItemId == args.carId) && (userInv.Inventory[i].CatalogVersion == "CarsProgress"))
+    {
+      carFound = userInv.Inventory[i].ItemInstanceId;
+    }
+    if(userInv.Inventory[i].ItemId in customizations)
+    {
+      customizations[userInv.Inventory[i].ItemId].itemOwned = "yes";
+      if(customizations[userInv.Inventory[i].ItemId].itemCustData in userInv.Inventory[i].CustomData)
+      {
+        DataToUpdate[customizations[userInv.Inventory[i].ItemId].carItemId] = customizations[userInv.Inventory[i].ItemId].itemCustData;
+      }
+      else
+      {
+        log.debug("user doesn't own: " + userInv.Inventory[i].ItemId + " " + customizations[userInv.Inventory[i].ItemId].itemCustData);
+      }
+    }
+  }
+  if(carFound == "-1")
+  {
+    return generateFailObj("User does not own car with id: " + args.carId);
+  }
+    //give inventory
+  for (var prop in customizations)
+  {
+    if (customizations.hasOwnProperty(prop))
+    {
+        if(customizations[prop].itemOwned == "no")
+        {
+           itemsToGive.push(prop);
+        }
+    }
+  }
+
+  if(DataToUpdate == {}) return generateFailObj("User doesn't own any of those customizations");
+  server.UpdateUserInventoryItemCustomData(
+     {
+       PlayFabId: currentPlayerId,
+       ItemInstanceId: carFound,
+       Data: DataToUpdate
+     }
+     );
+  var objectsUpdated =
+  [
+  {
+    ItemId : args.carId,
+    CatalogVersion: "CarsProgress",
+    CustomData : DataToUpdate
+  }
+  ];
+  if(itemsToGive.length > 0)
+  {
+    var grantRequest = server.GrantItemsToUser(
+    {
+      CatalogVersion : "Customization",
+      PlayFabId: currentPlayerId,
+      ItemIds : itemsToGive
+    }
+    );
+
+    var InvData = {
+      0 : "Owned"
+    };
+
+   for(var i = 0; i < grantRequest.ItemGrantResults.length; i++)
+  {
+    server.UpdateUserInventoryItemCustomData(
+         {
+           PlayFabId: currentPlayerId,
+           ItemInstanceId: grantRequest.ItemGrantResults[i].ItemInstanceId,
+           Data: InvData
+         }
+         );
+  }
+  }
+  var invChangeObj =
+      {
+          Inventory: objectsUpdated
+      };
+  var returnObj = {
+    Result: "OK",
+    Message: "InventoryUpdate",
+    InventoryChange:invChangeObj
+  };
+  return returnObj;
+
+};
+// matchmaking code
+handlers.updateTrophyCount = function(args, context) {
+  var t = 0;
+  var ps=server.GetPlayerStatistics(
+  {
+     PlayFabId: currentPlayerId,
+     StatisticNames: ["TrophyCount"]
+  });
+  if(ps.Statistics.length !== 0)
+  {
+    t = ps.Statistics[0].Value;
+  }
+  if(args.val == "rStart") t-=30;
+  if(t < 0) t=0;
+  if(args.val == "rWin") t+=60;
+  if(args.val == "rLose") return {val:t};
+  var suArray = [];
+  var su = {StatisticName : "TrophyCount", Version : "0", Value: t};
+  suArray.push(su);
+  var updateRequest = server.UpdatePlayerStatistics(
+  {
+    PlayFabId: currentPlayerId,
+    Statistics: suArray
+  }
+  );
+  if(args.val == "rWin") return {val:t};
+};

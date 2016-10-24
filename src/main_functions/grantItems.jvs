@@ -1,0 +1,104 @@
+handlers.grantItems = function(args)
+{
+  //retrieve user inventory
+  var userInventoryObject = server.GetUserInventory(
+  {
+    PlayFabId: currentPlayerId
+  }
+  );
+  //args.itemId, args.catalogId, args.amount
+
+  //old grant item code
+  //var itemsToGrant = [];
+  //for(var i = 0; i < args.amount; i++)
+  //{
+  //  itemsToGrant.push(args.itemId);
+  //}
+  //try
+  //{
+  // var grantVar = server.GrantItemsToUser(
+  // {
+  //  CatalogVersion : args.catalogId,
+  //   PlayFabId: currentPlayerId,
+  //   ItemIds : itemsToGrant
+  // }
+  // );
+  //new grant item code
+  var itemData;
+  var itemFound = false;
+  var newAmount;
+  for(var i = 0; i < userInventoryObject.Inventory.length; i++)
+        {
+          if((userInventoryObject.Inventory[i].ItemId == args.itemId) && (userInventoryObject.Inventory[i].CatalogVersion == args.catalogId))
+          {
+           // log.debug("adding amount to: " + userInventoryObject.Inventory[i].ItemInstanceId);
+            if(userInventoryObject.Inventory[i].CustomData == undefined)
+            {
+              newAmount = args.amount;
+            }
+            else
+            {
+              if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)
+                newAmount = args.amount;
+              else
+              {
+                if(isNaN(Number(userInventoryObject.Inventory[i].CustomData.Amount)))
+                  newAmount = args.amount;
+                else
+                  newAmount = Number(userInventoryObject.Inventory[i].CustomData.Amount) + args.amount;
+              }
+            }
+            itemData = {"Amount" : newAmount};
+            server.UpdateUserInventoryItemCustomData(
+                    {
+                      PlayFabId: currentPlayerId,
+                      ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
+                      Data: itemData
+                    }
+                    );
+            itemFound = true;
+            break;
+          }
+        }
+
+    if(itemFound == false)
+    {
+      var itemsToGrant = [];
+      itemsToGrant.push(args.itemId);
+      var grantVar = server.GrantItemsToUser(
+      {
+        CatalogVersion : args.catalogId,
+        PlayFabId: currentPlayerId,
+        ItemIds : itemsToGrant
+      }
+      );
+
+      itemData = {"Amount" : args.amount};
+      server.UpdateUserInventoryItemCustomData(
+           {
+              PlayFabId: currentPlayerId,
+              ItemInstanceId: grantVar.ItemGrantResults[0].ItemInstanceId,
+              Data: itemData
+           }
+           );
+    }
+   //for return
+   var objectsUpdated =
+   [
+   {
+     ItemId : args.itemId,
+     CatalogVersion: args.catalogId,
+     CustomData: itemData
+   }
+   ] ;
+    var invChangeObj =
+        {
+            Inventory: objectsUpdated
+        }
+    var returnObj = {
+      Result: "OK",
+      Message: "InventoryUpdated",
+      InventoryChange:invChangeObj
+    };
+   return returnObj;
+}

@@ -1,0 +1,25 @@
+//cheat scripts
+handlers.giveMoney = function(args)
+{
+  //args.curr, args.amount
+  var addUserCurrencyResult = server.AddUserVirtualCurrency(
+  {
+    PlayFabId: currentPlayerId,
+    VirtualCurrency : args.curr,
+    Amount: args.amount
+  }
+  );
+
+  var currencyUpdated = {};
+  currencyUpdated[addUserCurrencyResult.VirtualCurrency] = addUserCurrencyResult.Balance;
+  var invChangeObj =
+           {
+             VirtualCurrency: currencyUpdated
+           };
+  var r = {
+         Result: "OK",
+         Message: "CurrencyChanged",
+         InventoryChange:invChangeObj
+       };
+  return r;
+};
