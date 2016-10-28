@@ -19,8 +19,7 @@ function UpdateExperience(catalogId, itemIndex, xpArrayId, actionLevel)
     //action levels are represented by an object
     var ln = Number(xpGainByLevel.length);
     if(actionLevel >= ln) actionLevel = ln - 1;
-    log.debug("xpGainByLevel" + xpGainByLevel + " " + "ln" + ln);
-    xpToReceive = xpGainByLevel[ln];
+    xpToReceive = xpGainByLevel[actionLevel];
   }
 
   log.debug("Received exp:" + xpToReceive);
