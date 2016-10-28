@@ -22,5 +22,5 @@ function UpdateExperience(catalogId, itemIndex, xpArrayId, actionLevel)
     xpToReceive = xpGainByLevel[ln];
   }
 
-  debug.log(xpToReceive);
+  debug.log("Received exp:" + xpToReceive);
 }
