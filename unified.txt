@@ -313,7 +313,7 @@ function GetValueFromStatistics(statisticsArray, statisticsName, defaultValue)
 {
   var stat;
   //find statistic with given name
-  log.debug(statisticsArray.length);
+  log.debug("length " + statisticsArray.length);
   for (var i = 0; i < statisticsArray.length; i++)
   {
     log.debug(statisticsArray[i]);
@@ -676,7 +676,7 @@ function UpdateExperience(catalogId, itemIndex, xpArrayId, actionLevel, updateSe
   }
 
   //get current exprience
-  var ps=playerStatistics || server.GetPlayerStatistics({
+  var ps= playerStatistics || server.GetPlayerStatistics({
     PlayFabId: currentPlayerId,
     StatisticNames: ["Experience"]
   });

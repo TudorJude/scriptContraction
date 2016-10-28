@@ -25,7 +25,7 @@ function UpdateExperience(catalogId, itemIndex, xpArrayId, actionLevel, updateSe
   }
 
   //get current exprience
-  var ps=playerStatistics || server.GetPlayerStatistics({
+  var ps= playerStatistics || server.GetPlayerStatistics({
     PlayFabId: currentPlayerId,
     StatisticNames: ["Experience"]
   });
