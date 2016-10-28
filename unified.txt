@@ -1801,6 +1801,7 @@ handlers.purchaseItems = function(args, context)
       // log.debug("Checking to see if user has part and or has enough parts");
       var partFound = false;
       var part;
+      var newlvl = 0;
       for(var i = 0; i < userInventoryObject.Inventory.length; i++)
       {
         if((userInventoryObject.Inventory[i].ItemId == args.partId) && (userInventoryObject.Inventory[i].CatalogVersion == "PartCards"))
@@ -1821,7 +1822,7 @@ handlers.purchaseItems = function(args, context)
           //refactored code
           // log.debug("calculating " + args.partId + " cost and modifying " + tempDict[args.partId]);
           var partsRequired = parseInt(cardInfo.baseCardCost, 10) + (parseInt(car.CustomData[tempDict[args.partId]], 10) * parseInt(cardInfo.cardCostPerLvl, 10));
-          var newlvl = parseInt(car.CustomData[tempDict[args.partId]]) + 1;
+          newlvl = parseInt(car.CustomData[tempDict[args.partId]]) + 1;
           var currCost = Number(cardInfo.baseCurrCost) + (parseInt(car.CustomData[tempDict[args.partId]]) * Number(cardInfo.currCostPerLvl));
           CarDataToBeUpdated[tempDict[args.partId]] = newlvl;
           car.CustomData[tempDict[args.partId]] = newlvl;
