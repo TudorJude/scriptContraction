@@ -97,6 +97,16 @@ function generateErrObj(mess)
   return retObj;
 }
 
+function generateInventoryChange(mess, inventory)
+{
+  var r = {
+         Result: "OK",
+         Message: mess,
+         InventoryChange:inventory
+       };
+  return r;
+}
+
 function checkBalance(currType, cost, userSCBalance, userHCBalance)
 {
   if(currType == "SC")
@@ -322,13 +332,36 @@ function GetValueFromStatistics(statisticsArray, statisticsName, defaultValue)
   else
       return Number(stat.Value);
 }
+
+/**
+ * Returns catalog item or undifined
+ * @param {string} catalogId the catalog id of the requested item
+ * @param {string} itemId of the recuested item
+ */
+function getCatalogItem(catalogId, itemId)
+{
+  var items = server.GetCatalogItems({CatalogVersion : catalogId});
+  for (var i = 0; i < items.Catalog.length; i++) {
+    if(items.Catalog[i].ItemId === ItemId)
+      return items.Catalog[i];
+  }
+
+  return undefined;
+}
 handlers.buyChest = function(args, context)
 {
+  log.debug("Chest ID" + args.chestId);
+
+  var chestItem = getCatalogItem(Chests, args.chestId);
+  if(!chestItem) return generateFailObj("Invalid chest id: " + args.chestId);
+
+  log.debug("Chest ID 2" + chestItem.ItemId);
+
   var userInventoryObject=server.GetUserInventory(
   {
     PlayFabId:currentPlayerId
-  }
-  );
+  });
+
   var bO = checkBalance(args.curr, args.cost, userInventoryObject.VirtualCurrency.SC, userInventoryObject.VirtualCurrency.HC);
   if(bO != "OK") return generateFailObj("not enough money");
   if(args.cost > 0)
@@ -342,25 +375,11 @@ handlers.buyChest = function(args, context)
     );
     var cU = {};
     cU[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
-    var i =
-             {
-               VirtualCurrency: cU
-             };
-    var r = {
-           Result: "OK",
-           Message: "ChestBought",
-           InventoryChange:i
-         };
-    return r;
+    return generateInventoryChange("ChestBought", {VirtualCurrency: cU});
   }
   else
   {
-        var q = {
-           Result: "OK",
-           Message: "ChestBought",
-           InventoryChange:{}
-         };
-    return q;
+    return generateInventoryChange("ChestBought", {});
   }
 };
 handlers.endGame = function(args, context) {
@@ -663,6 +682,7 @@ function UpdateExperience(catalogId, itemIndex, xpArrayId, actionLevel, updateSe
   if(!isNaN(Number(xpGainByLevel))){
     //action levels are represented by a single number value, the amount to give is xpGain
     xpToReceive = Number(xpGainByLevel);
+    if(xpToReceive === 0) return 0;
   }
   else {
     //action levels are represented by an object

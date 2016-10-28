@@ -97,6 +97,16 @@ function generateErrObj(mess)
   return retObj;
 }
 
+function generateInventoryChange(mess, inventory)
+{
+  var r = {
+         Result: "OK",
+         Message: mess,
+         InventoryChange:inventory
+       };
+  return r;
+}
+
 function checkBalance(currType, cost, userSCBalance, userHCBalance)
 {
   if(currType == "SC")
@@ -321,4 +331,20 @@ function GetValueFromStatistics(statisticsArray, statisticsName, defaultValue)
       return defaultValue !== undefined ? defaultValue : 0;
   else
       return Number(stat.Value);
+}
+
+/**
+ * Returns catalog item or undifined
+ * @param {string} catalogId the catalog id of the requested item
+ * @param {string} itemId of the recuested item
+ */
+function getCatalogItem(catalogId, itemId)
+{
+  var items = server.GetCatalogItems({CatalogVersion : catalogId});
+  for (var i = 0; i < items.Catalog.length; i++) {
+    if(items.Catalog[i].ItemId === ItemId)
+      return items.Catalog[i];
+  }
+
+  return undefined;
 }

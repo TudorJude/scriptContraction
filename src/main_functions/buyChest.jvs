@@ -1,10 +1,17 @@
 handlers.buyChest = function(args, context)
 {
+  log.debug("Chest ID" + args.chestId);
+
+  var chestItem = getCatalogItem(Chests, args.chestId);
+  if(!chestItem) return generateFailObj("Invalid chest id: " + args.chestId);
+
+  log.debug("Chest ID 2" + chestItem.ItemId);
+
   var userInventoryObject=server.GetUserInventory(
   {
     PlayFabId:currentPlayerId
-  }
-  );
+  });
+
   var bO = checkBalance(args.curr, args.cost, userInventoryObject.VirtualCurrency.SC, userInventoryObject.VirtualCurrency.HC);
   if(bO != "OK") return generateFailObj("not enough money");
   if(args.cost > 0)
@@ -18,24 +25,10 @@ handlers.buyChest = function(args, context)
     );
     var cU = {};
     cU[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
-    var i =
-             {
-               VirtualCurrency: cU
-             };
-    var r = {
-           Result: "OK",
-           Message: "ChestBought",
-           InventoryChange:i
-         };
-    return r;
+    return generateInventoryChange("ChestBought", {VirtualCurrency: cU});
   }
   else
   {
-        var q = {
-           Result: "OK",
-           Message: "ChestBought",
-           InventoryChange:{}
-         };
-    return q;
+    return generateInventoryChange("ChestBought", {});
   }
 };

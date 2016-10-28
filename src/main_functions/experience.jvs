@@ -16,6 +16,7 @@ function UpdateExperience(catalogId, itemIndex, xpArrayId, actionLevel, updateSe
   if(!isNaN(Number(xpGainByLevel))){
     //action levels are represented by a single number value, the amount to give is xpGain
     xpToReceive = Number(xpGainByLevel);
+    if(xpToReceive === 0) return 0;
   }
   else {
     //action levels are represented by an object
