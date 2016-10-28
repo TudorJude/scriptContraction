@@ -462,6 +462,8 @@ handlers.purchaseItems = function(args, context)
           i["VirtualCurrency"]=currencyUpdated;
         }
 
+        UpdateExperience("Balancing", 0, "Car_" + cardInfo.rarity, 1, true);
+
         var r = {
           Result: "OK",
           Message: "InventoryUpdateNewCar",
