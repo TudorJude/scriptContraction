@@ -352,8 +352,8 @@ handlers.buyChest = function(args, context)
 {
   log.debug("Chest ID" + args.chestId);
 
-  var chestItem = getCatalogItem(Chests, args.chestId);
-  //if(!chestItem) return generateFailObj("Invalid chest id: " + args.chestId);
+  var chestItem = getCatalogItem("Chests", args.chestId);
+  if(!chestItem) return generateFailObj("Invalid chest id: " + args.chestId);
 
   log.debug("Chest ID 2" + chestItem.ItemId);
 
