@@ -674,6 +674,9 @@ handlers.purchaseItems = function(args, context)
         currencyUpdated[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
         i["VirtualCurrency"]=currencyUpdated;
       }
+
+        UpdateExperience("Balancing", 0, "Part_0", 1);
+
       var r = {
         Result: "OK",
         Message: "InventoryUpdatePart",
@@ -683,8 +686,6 @@ handlers.purchaseItems = function(args, context)
       break; // big switch
       case "custPurchase":
       // log.debug("Purchasing Customization: " + args.custId + " with val: " + args.custVal);
-
-      log.debug("Checking to see if customization exists in catalog");
       var custCatalog = server.GetCatalogItems(
         {
           CatalogVersion : "Customization"
@@ -802,8 +803,6 @@ handlers.purchaseItems = function(args, context)
             Amount: custPrice
           }
         );
-
-        UpdateExperience("Balancing", 0, "Part_0", 1);
 
         var currencyUpdated = {};
         currencyUpdated[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
