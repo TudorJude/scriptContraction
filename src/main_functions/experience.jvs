@@ -4,9 +4,10 @@
 * @param {int} itemIndex the index of the item holding xp data from the given catalog
 * @param {string} xpArrayId the id of the object holding xp data from the give item
 * @param {int} actionLevel the level of the exectued action (used to get the amount of xp to give)
+* @param {bool} updateServer update experience to the server
 * @param {int} playerStatistics array containing player experience, if not provided a GetPlayerStatistics will be done
 */
-function UpdateExperience(catalogId, itemIndex, xpArrayId, actionLevel, playerStatistics)
+function UpdateExperience(catalogId, itemIndex, xpArrayId, actionLevel, updateServer, playerStatistics)
 {
   var catalogItem = server.GetCatalogItems({CatalogVersion:catalogId});
   //the amount of xp gained at each action level
@@ -20,11 +21,20 @@ function UpdateExperience(catalogId, itemIndex, xpArrayId, actionLevel, playerSt
     //action levels are represented by an object
     var ln = Number(xpGainByLevel.length);
     if(actionLevel >= ln) actionLevel = ln - 1;
-    xpToReceive = xpGainByLevel[actionLevel];
+    xpToReceive = Number(xpGainByLevel[actionLevel]);
   }
 
+  //get current exprience
+  var ps=playerStatistics || server.GetPlayerStatistics({
+    PlayFabId: currentPlayerId,
+    StatisticNames: ["Experience"]
+  });
+  var currentExprience = GetValueFromStatistics(ps, "Experience", 0) + xpToReceive;
 
-  log.debug("PL " + handlers.currentPlayerId);
-  log.debug("PL " + currentPlayerId);
-  
+  if(!updateServer) return currentExprience;
+  var updateRequest = server.UpdatePlayerStatistics(
+  {
+    PlayFabId: currentPlayerId,
+    Statistics: [{StatisticName: "Experience", Version : "0", Value: currentExprience}]
+  });
 }
