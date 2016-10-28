@@ -1826,7 +1826,6 @@ handlers.purchaseItems = function(args, context)
           var currCost = Number(cardInfo.baseCurrCost) + (parseInt(car.CustomData[tempDict[args.partId]]) * Number(cardInfo.currCostPerLvl));
           CarDataToBeUpdated[tempDict[args.partId]] = newlvl;
           car.CustomData[tempDict[args.partId]] = newlvl;
-          log.debug("New lvl " + newlvl);
           // log.debug("we need: " + partsRequired + " cards and " + currCost + " money => base: " + parseInt(cardInfo.baseCurrCost) + " lvls: " + parseInt(car.CustomData[tempDict[args.partId]]) + " perLvlCost: " + parseInt(cardInfo.currCostPerLvl) + " equalling: "  + ((parseInt(car.CustomData[tempDict[args.partId]], 10) * parseInt(cardInfo.currCostPerLvl, 10))));
           var updateCardData;
           var costCheckObj = checkBalance(cardInfo.currType, currCost, playerSC, playerHC);
@@ -1926,8 +1925,7 @@ handlers.purchaseItems = function(args, context)
         i["VirtualCurrency"]=currencyUpdated;
       }
 
-      log.debug("HAKUNA " + cardInfo.rarity + " | " + newLvl);
-      UpdateExperience("Balancing", 0, "Parts_" + cardInfo.rarity, newLvl, true);
+      UpdateExperience("Balancing", 0, "Parts_" + cardInfo.rarity, newlvl, true);
 
       var r = {
         Result: "OK",
