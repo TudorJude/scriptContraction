@@ -9,7 +9,6 @@ function UpdateExperience(catalogId, itemIndex, xpArrayId, actionLevel)
 {
   var catalogItem = server.GetCatalogItems({CatalogVersion:catalogId});
   //the amount of xp gained at each action level
-  log.debug(JSON.parse(catalogItem.Catalog[itemIndex].CustomData)[xpArrayId]);
   var xpGainByLevel = JSON.parse(catalogItem.Catalog[itemIndex].CustomData)[xpArrayId];
   var xpToReceive = 0;
   if(!isNaN(Number(xpGainByLevel))){
@@ -20,6 +19,7 @@ function UpdateExperience(catalogId, itemIndex, xpArrayId, actionLevel)
     //action levels are represented by an object
     var ln = Number(xpGainByLevel.length);
     if(actionLevel >= ln) actionLevel = ln - 1;
+    log.debug("xpGainByLevel" + xpGainByLevel + " " + "ln" + ln);
     xpToReceive = xpGainByLevel[ln];
   }
 
