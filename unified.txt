@@ -342,7 +342,7 @@ function getCatalogItem(catalogId, itemId)
 {
   var items = server.GetCatalogItems({CatalogVersion : catalogId});
   for (var i = 0; i < items.Catalog.length; i++) {
-    if(items.Catalog[i].ItemId === ItemId)
+    if(items.Catalog[i].ItemId === itemId)
       return items.Catalog[i];
   }
 
