@@ -1924,7 +1924,7 @@ handlers.purchaseItems = function(args, context)
         i["VirtualCurrency"]=currencyUpdated;
       }
 
-      UpdateExperience("Balancing", 0, "Parts_" + cardInfo.rarity, 0, true);
+      UpdateExperience("Balancing", 0, "Parts_" + cardInfo.rarity, newLvl, true);
 
       var r = {
         Result: "OK",
