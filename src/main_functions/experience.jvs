@@ -4,8 +4,9 @@
 * @param {int} itemIndex the index of the item holding xp data from the given catalog
 * @param {string} xpArrayId the id of the object holding xp data from the give item
 * @param {int} actionLevel the level of the exectued action (used to get the amount of xp to give)
+* @param {int} playerStatistics array containing player experience, if not provided a GetPlayerStatistics will be done
 */
-function UpdateExperience(catalogId, itemIndex, xpArrayId, actionLevel)
+function UpdateExperience(catalogId, itemIndex, xpArrayId, actionLevel, playerStatistics)
 {
   var catalogItem = server.GetCatalogItems({CatalogVersion:catalogId});
   //the amount of xp gained at each action level
@@ -22,5 +23,8 @@ function UpdateExperience(catalogId, itemIndex, xpArrayId, actionLevel)
     xpToReceive = xpGainByLevel[actionLevel];
   }
 
-  log.debug("Received exp:" + xpToReceive);
+
+  log.debug("PL " + handlers.currentPlayerId);
+  log.debug("PL " + currentPlayerId);
+  
 }
