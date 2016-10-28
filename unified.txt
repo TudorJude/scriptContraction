@@ -647,7 +647,7 @@ function UpdateExperience(catalogId, itemIndex, xpArrayId, actionLevel)
     xpToReceive = xpGainByLevel[ln];
   }
 
-  debug.log(xpToReceive);
+  log.debug("Received exp:" + xpToReceive);
 }
 handlers.getServerTime = function(args, context)
 {
@@ -1887,6 +1887,10 @@ handlers.purchaseItems = function(args, context)
         currencyUpdated[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
         i["VirtualCurrency"]=currencyUpdated;
       }
+
+        UpdateExperience("Balancing", 0, "Part_0", 1);
+        log.debug("HEY THERE MUCHACHOS!")
+
       var r = {
         Result: "OK",
         Message: "InventoryUpdatePart",
@@ -1896,8 +1900,6 @@ handlers.purchaseItems = function(args, context)
       break; // big switch
       case "custPurchase":
       // log.debug("Purchasing Customization: " + args.custId + " with val: " + args.custVal);
-
-      log.debug("Checking to see if customization exists in catalog");
       var custCatalog = server.GetCatalogItems(
         {
           CatalogVersion : "Customization"
@@ -2015,8 +2017,6 @@ handlers.purchaseItems = function(args, context)
             Amount: custPrice
           }
         );
-
-        UpdateExperience("Balancing", 0, "Part_0", 1);
 
         var currencyUpdated = {};
         currencyUpdated[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
