@@ -675,8 +675,8 @@ handlers.purchaseItems = function(args, context)
         i["VirtualCurrency"]=currencyUpdated;
       }
 
-        UpdateExperience("Balancing", 0, "Part_0", 1);
-        log.debug("HEY THERE MUCHACHOS!")
+      log.debug("HEY THERE MUCHACHOS!")
+      UpdateExperience("Balancing", 0, "Part_0", 1);
 
       var r = {
         Result: "OK",
