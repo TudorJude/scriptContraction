@@ -190,7 +190,7 @@ handlers.purchaseItems = function(args, context)
         i["VirtualCurrency"] = currencyUpdated;
       }
 
-      UpdateExperience("Balancing", 0, "Car_" + cardInfo.rarity, newLvl, true);
+      UpdateExperience("Balancing", "BalancingItem", "Car_" + cardInfo.rarity, newLvl, true);
 
       var r = {
         Result: "OK",
@@ -465,7 +465,7 @@ handlers.purchaseItems = function(args, context)
           i["VirtualCurrency"]=currencyUpdated;
         }
 
-        UpdateExperience("Balancing", 0, "Car_" + cardInfo.rarity, 1, true);
+        UpdateExperience("Balancing", "BalancingItem", "Car_" + cardInfo.rarity, 1, true);
 
         var r = {
           Result: "OK",
@@ -681,7 +681,7 @@ handlers.purchaseItems = function(args, context)
         i["VirtualCurrency"]=currencyUpdated;
       }
 
-      UpdateExperience("Balancing", 0, "Parts_" + cardInfo.rarity, newlvl, true);
+      UpdateExperience("Balancing", "BalancingItem", "Parts_" + cardInfo.rarity, newlvl, true);
 
       var r = {
         Result: "OK",

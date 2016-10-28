@@ -171,12 +171,8 @@ handlers.openChest = function(args, context)
 
   //if no chest id is provided, it means that this function is used for inventory update
   if(args.chestId){
-
-    var chestItem = getCatalogItem("Chests", args.chestId);
-    if(!chestItem) return generateFailObj("Invalid chest id: " + args.chestId);
-
-    log.debug("Chest id " + args.chestId);
-
+    //give experience for opening chest
+    UpdateExperience("Chests", args.chestId, "xpGain", 0, true)
   }
 
 

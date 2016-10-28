@@ -660,17 +660,16 @@ handlers.endGame = function(args, context) {
 /**
 * Updates the amount of experience the user has based on given variables
 * @param {string} catalogId the ID of the catalog holding xp data
-* @param {int} itemIndex the index of the item holding xp data from the given catalog
+* @param {string} itemId the id of the item holding xp data from the given catalog
 * @param {string} xpArrayId the id of the object holding xp data from the give item
 * @param {int} actionLevel the level of the exectued action (used to get the amount of xp to give)
 * @param {bool} updateServer update experience to the server
 * @param {int} playerStatistics array containing player experience, if not provided a GetPlayerStatistics will be done
 */
-function UpdateExperience(catalogId, itemIndex, xpArrayId, actionLevel, updateServer, playerStatistics)
+function UpdateExperience(catalogId, itemId, xpArrayId, actionLevel, updateServer, playerStatistics)
 {
-  var catalogItem = server.GetCatalogItems({CatalogVersion:catalogId});
   //the amount of xp gained at each action level
-  var xpGainByLevel = JSON.parse(catalogItem.Catalog[itemIndex].CustomData)[xpArrayId];
+  var xpGainByLevel = JSON.parse(getCatalogItem(catalogId, itemId).CustomData)[xpArrayId];
   var xpToReceive = 0;
   if(!isNaN(Number(xpGainByLevel))){
     //action levels are represented by a single number value, the amount to give is xpGain
@@ -1107,12 +1106,8 @@ handlers.openChest = function(args, context)
 
   //if no chest id is provided, it means that this function is used for inventory update
   if(args.chestId){
-
-    var chestItem = getCatalogItem("Chests", args.chestId);
-    if(!chestItem) return generateFailObj("Invalid chest id: " + args.chestId);
-
-    log.debug("Chest id " + args.chestId);
-
+    //give experience for opening chest
+    UpdateExperience("Chests", args.chestId, "xpGain", 0, true)
   }
 
 
@@ -1456,7 +1451,7 @@ handlers.purchaseItems = function(args, context)
         i["VirtualCurrency"] = currencyUpdated;
       }
 
-      UpdateExperience("Balancing", 0, "Car_" + cardInfo.rarity, newLvl, true);
+      UpdateExperience("Balancing", "BalancingItem", "Car_" + cardInfo.rarity, newLvl, true);
 
       var r = {
         Result: "OK",
@@ -1731,7 +1726,7 @@ handlers.purchaseItems = function(args, context)
           i["VirtualCurrency"]=currencyUpdated;
         }
 
-        UpdateExperience("Balancing", 0, "Car_" + cardInfo.rarity, 1, true);
+        UpdateExperience("Balancing", "BalancingItem", "Car_" + cardInfo.rarity, 1, true);
 
         var r = {
           Result: "OK",
@@ -1947,7 +1942,7 @@ handlers.purchaseItems = function(args, context)
         i["VirtualCurrency"]=currencyUpdated;
       }
 
-      UpdateExperience("Balancing", 0, "Parts_" + cardInfo.rarity, newlvl, true);
+      UpdateExperience("Balancing", "BalancingItem", "Parts_" + cardInfo.rarity, newlvl, true);
 
       var r = {
         Result: "OK",
