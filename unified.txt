@@ -679,7 +679,7 @@ function UpdateExperience(catalogId, itemIndex, xpArrayId, actionLevel, updateSe
   var ps= playerStatistics || server.GetPlayerStatistics({
     PlayFabId: currentPlayerId,
     StatisticNames: ["Experience"]
-  });
+  }).Statistics;
   var currentExprience = GetValueFromStatistics(ps, "Experience", 0) + xpToReceive;
 
   if(!updateServer) return currentExprience;
