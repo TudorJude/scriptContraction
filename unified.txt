@@ -313,13 +313,9 @@ function GetValueFromStatistics(statisticsArray, statisticsName, defaultValue)
 {
   var stat;
   //find statistic with given name
-  log.debug("length " + statisticsArray.length);
   for (var i = 0; i < statisticsArray.length; i++)
-  {
-    log.debug(statisticsArray[i]);
    if(statisticsArray[i].StatisticName === statisticsName)
       stat = statisticsArray[i];
-    }
 
   if(stat === undefined)
       return defaultValue !== undefined ? defaultValue : 0;
@@ -1928,7 +1924,7 @@ handlers.purchaseItems = function(args, context)
         i["VirtualCurrency"]=currencyUpdated;
       }
 
-      UpdateExperience("Balancing", 0, "Parts_0", 1, true);
+      UpdateExperience("Balancing", 0, "Parts_" + cardInfo.rarity, 0, true);
 
       var r = {
         Result: "OK",

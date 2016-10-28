@@ -313,13 +313,9 @@ function GetValueFromStatistics(statisticsArray, statisticsName, defaultValue)
 {
   var stat;
   //find statistic with given name
-  log.debug("length " + statisticsArray.length);
   for (var i = 0; i < statisticsArray.length; i++)
-  {
-    log.debug(statisticsArray[i]);
    if(statisticsArray[i].StatisticName === statisticsName)
       stat = statisticsArray[i];
-    }
 
   if(stat === undefined)
       return defaultValue !== undefined ? defaultValue : 0;
