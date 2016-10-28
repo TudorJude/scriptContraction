@@ -634,7 +634,7 @@ function UpdateExperience(catalogId, itemIndex, xpArrayId, actionLevel)
 {
   var catalogItem = server.GetCatalogItems({CatalogVersion:catalogId});
   //the amount of xp gained at each action level
-  log.debug(catalogItem.Catalog[itemIndex].CustomData + "  " + catalogItem.Catalog[itemIndex].CustomData[xpArrayId]);
+  log.debug(catalogItem.Catalog[itemIndex].CustomData[xpArrayId]);
   var xpGainByLevel = catalogItem.Catalog[itemIndex].CustomData[xpArrayId];
   var xpToReceive = 0;
   if(!isNaN(Number(xpGainByLevel))){
@@ -1890,7 +1890,7 @@ handlers.purchaseItems = function(args, context)
       }
 
       log.debug("HEY THERE MUCHACHOS!")
-      UpdateExperience("Balancing", 0, "Part_0", 1);
+      UpdateExperience("Balancing", 0, "Parts_0", 1);
 
       var r = {
         Result: "OK",

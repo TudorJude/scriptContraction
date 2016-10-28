@@ -676,7 +676,7 @@ handlers.purchaseItems = function(args, context)
       }
 
       log.debug("HEY THERE MUCHACHOS!")
-      UpdateExperience("Balancing", 0, "Part_0", 1);
+      UpdateExperience("Balancing", 0, "Parts_0", 1);
 
       var r = {
         Result: "OK",
