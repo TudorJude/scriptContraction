@@ -1925,6 +1925,7 @@ handlers.purchaseItems = function(args, context)
         i["VirtualCurrency"]=currencyUpdated;
       }
 
+      log.debug("HAKUNA " + cardInfo.rarity + " | " + newLvl);
       UpdateExperience("Balancing", 0, "Parts_" + cardInfo.rarity, newLvl, true);
 
       var r = {
