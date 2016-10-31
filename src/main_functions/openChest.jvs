@@ -171,10 +171,13 @@ handlers.openChest = function(args, context)
 
   var outInventory =   server.GetUserInventory({PlayFabId: currentPlayerId});
 
+  //give experience for opening chest:
   //if no chest id is provided, it means that this function is used for inventory update
   if(args.chestId){
-    //give experience for opening chest
-    outInventory.Experience = UpdateExperience("Chests", args.chestId, "xpGain", 0, true);
+    var totalXp = UpdateExperience("Chests", args.chestId, "xpGain", 0, true);
+    //if totalXp is 0 it means that no xp update was done
+    if(totalXp > 0)
+      outInventory.Experience = totalXp;
   }
 
   return generateInventoryChange("InventoryUpdated", outInventory);
