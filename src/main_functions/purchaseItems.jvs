@@ -50,7 +50,7 @@ handlers.purchaseItems = function(args, context)
     }
 
     if(cardInfo === undefined)
-      return generateErrObj("CardNotFoundForCarwithID: " + args.carId + ". It is possible that the carCard ID and the Car ID do not coincide. Check Playfab catalog data.");
+    return generateErrObj("CardNotFoundForCarwithID: " + args.carId + ". It is possible that the carCard ID and the Car ID do not coincide. Check Playfab catalog data.");
 
     if(carFound === true)
     {
@@ -180,10 +180,10 @@ handlers.purchaseItems = function(args, context)
       if(subtractUserCurrencyResult!=undefined)
       {
         currencyUpdated[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
-        i["VirtualCurrency"] = currencyUpdated;
+        i.VirtualCurrency = currencyUpdated;
       }
 
-      UpdateExperience("Balancing", "BalancingItem", "Car_" + cardInfo.rarity, newLvl, true);
+      i.Experience = UpdateExperience("Balancing", "BalancingItem", "Car_" + cardInfo.rarity, newLvl, true);
       return generateInventoryChange("InventoryUpdate", i);
     }
     else
@@ -442,17 +442,17 @@ handlers.purchaseItems = function(args, context)
 
         var currencyUpdated = {};
 
-        var i =
+        i =
         {
           Inventory: objectsUpdated
         }
         if(subtractUserCurrencyResult != undefined)
         {
           currencyUpdated[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
-          i["VirtualCurrency"]=currencyUpdated;
+          i.VirtualCurrency =currencyUpdated;
         }
 
-        UpdateExperience("Balancing", "BalancingItem", "Car_" + cardInfo.rarity, 1, true);
+        i.Experience = UpdateExperience("Balancing", "BalancingItem", "Car_" + cardInfo.rarity, 1, true);
         return generateInventoryChange("InventoryUpdateNewCar", i);
       }
 
@@ -479,7 +479,7 @@ handlers.purchaseItems = function(args, context)
       }
 
       if(carExists === false)
-        return generateErrObj("car with ID: " + args.carId + " not found in catalog.");
+      return generateErrObj("car with ID: " + args.carId + " not found in catalog.");
 
       // log.debug("Checking to see if part exists in catalog");
       var partsCatalog = server.GetCatalogItems(
@@ -501,7 +501,7 @@ handlers.purchaseItems = function(args, context)
       }
 
       if(partExists == false)
-        return generateErrObj("part with ID: " + args.partId + " not found in catalog.");
+      return generateErrObj("part with ID: " + args.partId + " not found in catalog.");
 
       //log.debug("Checking to see if user has car: " + args.carId);
       var carFound = false;
@@ -638,19 +638,15 @@ handlers.purchaseItems = function(args, context)
 
 
       var currencyUpdated = {};
-      var i =
-      {
-        Inventory: objectsUpdated
-      }
-      if(subtractUserCurrencyResult!=undefined)
+      i ={Inventory: objectsUpdated};
+      if(subtractUserCurrencyResult !== undefined)
       {
         currencyUpdated[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
-        i["VirtualCurrency"]=currencyUpdated;
+        i.VirtualCurrency = currencyUpdated;
       }
 
-      UpdateExperience("Balancing", "BalancingItem", "Parts_" + cardInfo.rarity, newlvl, true);
+      i.Experience = UpdateExperience("Balancing", "BalancingItem", "Parts_" + cardInfo.rarity, newlvl, true);
       return generateInventoryChange("InventoryUpdatePart", i);
-      break; // big switch
 
       case "custPurchase":
       // log.debug("Purchasing Customization: " + args.custId + " with val: " + args.custVal);
@@ -686,7 +682,7 @@ handlers.purchaseItems = function(args, context)
       }
 
       if(custCatalogItem == undefined)
-        return generateErrObj("Customization does not exist in catalog.");
+      return generateErrObj("Customization does not exist in catalog.");
 
       //  log.debug("Checking to see if user has said customization");
       var customizationItem;
@@ -724,7 +720,7 @@ handlers.purchaseItems = function(args, context)
         );
 
         if(custToGive.ItemGrantResults[0].Result == false)
-          return generateErrObj("something went wrong while granting user customization class object.");
+        return generateErrObj("something went wrong while granting user customization class object.");
 
         customizationItemInstance = custToGive.ItemGrantResults[0].ItemInstanceId;
       }
@@ -801,13 +797,13 @@ handlers.purchaseItems = function(args, context)
       }
 
       if(packExists == false)
-        return generateErrObj("pack with ID: " + args.packId + " not found in catalog.");
+      return generateErrObj("pack with ID: " + args.packId + " not found in catalog.");
 
       if(packPrice <= 0)
-        return generateErrObj("pack with ID: " + args.packId + " shouldn't have negative cost.");
+      return generateErrObj("pack with ID: " + args.packId + " shouldn't have negative cost.");
 
       if(packPrice > playerHC)
-        return generateFailObj("Not enough HC.");
+      return generateFailObj("Not enough HC.");
 
       var subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
         {
@@ -835,6 +831,6 @@ handlers.purchaseItems = function(args, context)
       break;
 
       default:
-        log.debug("invalid purchase parameter");
+      log.debug("invalid purchase parameter");
     }
   };

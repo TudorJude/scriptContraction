@@ -37,4 +37,5 @@ function UpdateExperience(catalogId, itemId, xpArrayId, actionLevel, updateServe
     PlayFabId: currentPlayerId,
     Statistics: [{StatisticName: "Experience", Version : "0", Value: currentExprience}]
   });
+  return currentExprience;
 }
