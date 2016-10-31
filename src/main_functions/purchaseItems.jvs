@@ -50,14 +50,7 @@ handlers.purchaseItems = function(args, context)
     }
 
     if(cardInfo === undefined)
-    {
-      log.error("cardInfo undefined!");
-      var returnObj = {
-        Result: "Error",
-        Message: "CardNotFoundForCarwithID: " + args.carId + ". It is possible that the carCard ID and the Car ID do not coincide. Check Playfab catalog data."
-      };
-      return returnObj;
-    }
+      return generateErrObj("CardNotFoundForCarwithID: " + args.carId + ". It is possible that the carCard ID and the Car ID do not coincide. Check Playfab catalog data.");
 
     if(carFound === true)
     {
@@ -191,13 +184,7 @@ handlers.purchaseItems = function(args, context)
       }
 
       UpdateExperience("Balancing", "BalancingItem", "Car_" + cardInfo.rarity, newLvl, true);
-
-      var r = {
-        Result: "OK",
-        Message: "InventoryUpdate",
-        InventoryChange:i
-      };
-      return r;
+      return generateInventoryChange("InventoryUpdate", i);
     }
     else
     {
@@ -466,13 +453,7 @@ handlers.purchaseItems = function(args, context)
         }
 
         UpdateExperience("Balancing", "BalancingItem", "Car_" + cardInfo.rarity, 1, true);
-
-        var r = {
-          Result: "OK",
-          Message: "InventoryUpdateNewCar",
-          InventoryChange:i
-        };
-        return r;
+        return generateInventoryChange("InventoryUpdateNewCar", i);
       }
 
       break;
@@ -497,15 +478,8 @@ handlers.purchaseItems = function(args, context)
         }
       }
 
-      if(carExists == false)
-      {
-        log.error("invalid car ID");
-        var r = {
-          Result: "Error",
-          Message: "car with ID: " + args.carId + " not found in catalog."
-        };
-        return r;
-      }
+      if(carExists === false)
+        return generateErrObj("car with ID: " + args.carId + " not found in catalog.");
 
       // log.debug("Checking to see if part exists in catalog");
       var partsCatalog = server.GetCatalogItems(
@@ -527,14 +501,7 @@ handlers.purchaseItems = function(args, context)
       }
 
       if(partExists == false)
-      {
-        log.error("invalid part ID");
-        var returnObj = {
-          Result: "Error",
-          Message: "part with ID: " + args.partId + " not found in catalog."
-        };
-        return returnObj;
-      }
+        return generateErrObj("part with ID: " + args.partId + " not found in catalog.");
 
       //log.debug("Checking to see if user has car: " + args.carId);
       var carFound = false;
@@ -682,14 +649,9 @@ handlers.purchaseItems = function(args, context)
       }
 
       UpdateExperience("Balancing", "BalancingItem", "Parts_" + cardInfo.rarity, newlvl, true);
-
-      var r = {
-        Result: "OK",
-        Message: "InventoryUpdatePart",
-        InventoryChange:i
-      };
-      return r;
+      return generateInventoryChange("InventoryUpdatePart", i);
       break; // big switch
+
       case "custPurchase":
       // log.debug("Purchasing Customization: " + args.custId + " with val: " + args.custVal);
       var custCatalog = server.GetCatalogItems(
@@ -724,14 +686,7 @@ handlers.purchaseItems = function(args, context)
       }
 
       if(custCatalogItem == undefined)
-      {
-        log.error("Customization does not exist in catalog");
-        var returnObj = {
-          Result: "Error",
-          Message: "Customization does not exist in catalog."
-        };
-        return returnObj;
-      }
+        return generateErrObj("Customization does not exist in catalog.");
 
       //  log.debug("Checking to see if user has said customization");
       var customizationItem;
@@ -769,14 +724,8 @@ handlers.purchaseItems = function(args, context)
         );
 
         if(custToGive.ItemGrantResults[0].Result == false)
-        {
-          log.error("something went wrong while granting user customization class object");
-          var returnObj =    {
-            Result: "Error",
-            Message: "something went wrong while granting user customization class object."
-          };
-          return returnObj;
-        }
+          return generateErrObj("something went wrong while granting user customization class object.");
+
         customizationItemInstance = custToGive.ItemGrantResults[0].ItemInstanceId;
       }
 
@@ -825,12 +774,7 @@ handlers.purchaseItems = function(args, context)
           Inventory: objectsUpdated
         };
       }
-      var r = {
-        Result: "OK",
-        Message: "InventoryUpdateNewCustomization",
-        InventoryChange:i
-      };
-      return r;
+      return generateInventoryChange("InventoryUpdateNewCustomization", i)
 
       break; // big switch
       case "softCurrencyPurchase":
@@ -857,27 +801,13 @@ handlers.purchaseItems = function(args, context)
       }
 
       if(packExists == false)
-      {
-        var returnObj = {
-          Result: "Error",
-          Message: "pack with ID: " + args.packId + " not found in catalog."
-        };
-        return returnObj;
-      }
+        return generateErrObj("pack with ID: " + args.packId + " not found in catalog.");
 
       if(packPrice <= 0)
-      {
-        var returnObj = {
-          Result: "Error",
-          Message: "pack with ID: " + args.packId + " shouldn't have negative cost."
-        };
-        return returnObj;
-      }
+        return generateErrObj("pack with ID: " + args.packId + " shouldn't have negative cost.");
 
       if(packPrice > playerHC)
-      {
         return generateFailObj("Not enough HC.");
-      }
 
       var subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
         {
@@ -901,14 +831,10 @@ handlers.purchaseItems = function(args, context)
       {
         VirtualCurrency: currencyUpdated
       };
-      var returnObj = {
-        Result: "OK",
-        Message: "SoftCurrencyPurchased",
-        InventoryChange:invChangeObj
-      };
-      return returnObj;
+      return generateInventoryChange("SoftCurrencyPurchased", invChangeObj)
       break;
+
       default:
-      log.debug("invalid purchase parameter");
+        log.debug("invalid purchase parameter");
     }
   };
