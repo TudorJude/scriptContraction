@@ -198,7 +198,6 @@ function calculateLeague(currentTrophies)
     for(i = 0; i < partCardsCatalog.Catalog.length; i++) //refactored
     {
       partCardInfo = JSON.parse(partCardsCatalog.Catalog[i].CustomData);
-      log.debug(partCardsCatalog.Catalog[i].ItemId + " " + pr + " + " + getObjectValueFromLevel(partCardInfo, "prPerLvl", Number(tempDict[partCardsCatalog.Catalog[i].ItemId])));
       pr += getObjectValueFromLevel(partCardInfo, "prPerLvl", Number(tempDict[partCardsCatalog.Catalog[i].ItemId]));
     }
     log.debug("End pr: " + pr);
