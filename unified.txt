@@ -2787,8 +2787,9 @@ function upgradePart(args, userInventoryObject, playerSC, playerHC)
 
       newlvl = parseInt(car.CustomData[tempDict[args.partId]]) + 1;
       var partsRequired = getObjectValueFromLevel(cardInfo, "cardCostPerLvl", newlvl);
-      log.debug("PartsRequired: " + partsRequired + " for level " + newlvl);
-      var currCost = Number(cardInfo.baseCurrCost) + (parseInt(car.CustomData[tempDict[args.partId]]) * Number(cardInfo.currCostPerLvl));
+      var currCost = getObjectValueFromLevel(cardInfo, "currCostPerLvl", newlvl);
+      log.debug("PartsRequired: " + partsRequired + " Currency Cost: " + currCost + " for level " + newlvl);
+
       CarDataToBeUpdated[tempDict[args.partId]] = newlvl;
       car.CustomData[tempDict[args.partId]] = newlvl;
       // log.debug("we need: " + partsRequired + " cards and " + currCost + " money => base: " + parseInt(cardInfo.baseCurrCost) + " lvls: " + parseInt(car.CustomData[tempDict[args.partId]]) + " perLvlCost: " + parseInt(cardInfo.currCostPerLvl) + " equalling: "  + ((parseInt(car.CustomData[tempDict[args.partId]], 10) * parseInt(cardInfo.currCostPerLvl, 10))));
