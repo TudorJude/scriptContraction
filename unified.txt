@@ -4,78 +4,78 @@ function checkCarDataValidity(inventoryCarData, carCardsCatalog)
   {
     try
     {
-          var CarData = {
-              "CarLvl" : "1",
-              "EngineLvl" : "0",
-              "ExhaustLvl" : "0",
-              "GearboxLvl" : "0",
-              "SuspensionLvl" : "0"
-            };
+      var CarData = {
+        "CarLvl" : "1",
+        "EngineLvl" : "0",
+        "ExhaustLvl" : "0",
+        "GearboxLvl" : "0",
+        "SuspensionLvl" : "0"
+      };
 
-          server.UpdateUserInventoryItemCustomData(
-              {
-                PlayFabId: currentPlayerId,
-                ItemInstanceId: inventoryCarData.ItemInstanceId,
-                Data: CarData
-              }
-              );
-              CarData = {
-                    "TiresLvl" : "0",
-                    "TurboLvl" : "0",
-                    "PaintId" : "0",
-                    "DecalId" : "0",
-                    "RimsId" : "0"
-                  };
-              server.UpdateUserInventoryItemCustomData(
-              {
-                PlayFabId: currentPlayerId,
-                ItemInstanceId: inventoryCarData.ItemInstanceId,
-                Data: CarData
-              }
-              );
-              var pr = 0;
-              for(var i =0; i < carCardsCatalog.Catalog.length; i++)
-              {
-                  if(carCardsCatalog.Catalog[i].ItemId == inventoryCarData.ItemId)
-                  {
-                    var carCardInfo = JSON.parse(carCardsCatalog.Catalog[i].CustomData);
-                    pr = parseInt(carCardInfo.basePr);
-                    break;
-                  }
-              }
-              CarData = {
-                    "PlatesId" : "0",
-                    "WindshieldId" : "0",
-                    "Pr" : pr
-                  };
-              server.UpdateUserInventoryItemCustomData(
-              {
-                PlayFabId: currentPlayerId,
-                ItemInstanceId: inventoryCarData.ItemInstanceId,
-                Data: CarData
-              }
-              );
-       }
-       catch(err)
-       {
-        return "PlayFabError";
-       }
-       var newData = {
-              "CarLvl" : "1",
-              "EngineLvl" : "0",
-              "ExhaustLvl" : "0",
-              "GearboxLvl" : "0",
-              "SuspensionLvl" : "0",
-              "TiresLvl" : "0",
-              "TurboLvl" : "0",
-              "PaintId" : "0",
-              "DecalId" : "0",
-              "RimsId" : "0" ,
-              "PlatesId" : "0",
-              "WindshieldId" : "0",
-              "Pr" : pr
-       };
-       return newData;
+      server.UpdateUserInventoryItemCustomData(
+        {
+          PlayFabId: currentPlayerId,
+          ItemInstanceId: inventoryCarData.ItemInstanceId,
+          Data: CarData
+        }
+      );
+      CarData = {
+        "TiresLvl" : "0",
+        "TurboLvl" : "0",
+        "PaintId" : "0",
+        "DecalId" : "0",
+        "RimsId" : "0"
+      };
+      server.UpdateUserInventoryItemCustomData(
+        {
+          PlayFabId: currentPlayerId,
+          ItemInstanceId: inventoryCarData.ItemInstanceId,
+          Data: CarData
+        }
+      );
+      var pr = 0;
+      for(var i =0; i < carCardsCatalog.Catalog.length; i++)
+      {
+        if(carCardsCatalog.Catalog[i].ItemId == inventoryCarData.ItemId)
+        {
+          var carCardInfo = JSON.parse(carCardsCatalog.Catalog[i].CustomData);
+          pr = parseInt(carCardInfo.basePr);
+          break;
+        }
+      }
+      CarData = {
+        "PlatesId" : "0",
+        "WindshieldId" : "0",
+        "Pr" : pr
+      };
+      server.UpdateUserInventoryItemCustomData(
+        {
+          PlayFabId: currentPlayerId,
+          ItemInstanceId: inventoryCarData.ItemInstanceId,
+          Data: CarData
+        }
+      );
+    }
+    catch(err)
+    {
+      return "PlayFabError";
+    }
+    var newData = {
+      "CarLvl" : "1",
+      "EngineLvl" : "0",
+      "ExhaustLvl" : "0",
+      "GearboxLvl" : "0",
+      "SuspensionLvl" : "0",
+      "TiresLvl" : "0",
+      "TurboLvl" : "0",
+      "PaintId" : "0",
+      "DecalId" : "0",
+      "RimsId" : "0" ,
+      "PlatesId" : "0",
+      "WindshieldId" : "0",
+      "Pr" : pr
+    };
+    return newData;
   }
   return "OK";
 }
@@ -100,10 +100,10 @@ function generateErrObj(mess)
 function generateInventoryChange(mess, inventory)
 {
   var r = {
-         Result: "OK",
-         Message: mess,
-         InventoryChange:inventory
-       };
+    Result: "OK",
+    Message: mess,
+    InventoryChange:inventory
+  };
   return r;
 }
 
@@ -112,12 +112,12 @@ function checkBalance(currType, cost, userSCBalance, userHCBalance)
   if(currType == "SC")
   {
     if(userSCBalance < cost)
-      return generateFailObj("NotEnoughSC");
+    return generateFailObj("NotEnoughSC");
   }
   else
   {
     if(userHCBalance < cost)
-      return generateFailObj("NotEnoughHC");
+    return generateFailObj("NotEnoughHC");
   }
   return "OK";
 }
@@ -126,35 +126,35 @@ function calculateLeague(currentTrophies)
 {
   var league = 1;
   var td = server.GetTitleData(
-  {
-    Keys : ["LeagueSubdivisions", "SubdivisionTrophyRanges"]
-  });
-  if(td.Data["LeagueSubdivisions"] == undefined) return league;
-  if(td.Data["SubdivisionTrophyRanges"] == undefined) return league;
-  var leaguesSubdivisions = JSON.parse(td.Data.LeagueSubdivisions);
-  var leaguesSubdivisionsParsed = leaguesSubdivisions.leagues;
-  var sdvtr = JSON.parse(td.Data.SubdivisionTrophyRanges);
-  var sdvtrParsed = sdvtr.subdivisions;
+    {
+      Keys : ["LeagueSubdivisions", "SubdivisionTrophyRanges"]
+    });
+    if(td.Data["LeagueSubdivisions"] == undefined) return league;
+    if(td.Data["SubdivisionTrophyRanges"] == undefined) return league;
+    var leaguesSubdivisions = JSON.parse(td.Data.LeagueSubdivisions);
+    var leaguesSubdivisionsParsed = leaguesSubdivisions.leagues;
+    var sdvtr = JSON.parse(td.Data.SubdivisionTrophyRanges);
+    var sdvtrParsed = sdvtr.subdivisions;
 
-  for(var i = 0; i < leaguesSubdivisionsParsed.length; i++)
-  {
-    if(Number(currentTrophies) > Number(sdvtrParsed[leaguesSubdivisionsParsed[i]]))
+    for(var i = 0; i < leaguesSubdivisionsParsed.length; i++)
+    {
+      if(Number(currentTrophies) > Number(sdvtrParsed[leaguesSubdivisionsParsed[i]]))
       continue;
       return i;
+    }
   }
-}
 
-function recalculateCarPr(CarData, carId, _carCardsCatalog, _partsCardCatalog)
-{
+  function recalculateCarPr(CarData, carId, _carCardsCatalog, _partsCardCatalog)
+  {
     var pr = 0;
     var carCardsCatalog;
     if(_carCardsCatalog == undefined)
     {
       carCardsCatalog = server.GetCatalogItems(
-         {
-           CatalogVersion : "CarCards"
-         }
-         );
+        {
+          CatalogVersion : "CarCards"
+        }
+      );
     }
     else
     {
@@ -175,10 +175,10 @@ function recalculateCarPr(CarData, carId, _carCardsCatalog, _partsCardCatalog)
     if(_partsCardCatalog == undefined)
     {
       partCardsCatalog = server.GetCatalogItems(
-       {
-         CatalogVersion : "PartCards"
-       }
-       );
+        {
+          CatalogVersion : "PartCards"
+        }
+      );
     }
     else
     {
@@ -186,168 +186,188 @@ function recalculateCarPr(CarData, carId, _carCardsCatalog, _partsCardCatalog)
     }
 
     var tempDict =
-        {
-          Exhaust: CarData.ExhaustLvl,
-          Engine: CarData.EngineLvl,
-          Gearbox: CarData.GearboxLvl,
-          Suspension: CarData.SuspensionLvl,
-          Tires: CarData.TiresLvl,
-          Turbo: CarData.TurboLvl
-        };
+    {
+      Exhaust: CarData.ExhaustLvl,
+      Engine: CarData.EngineLvl,
+      Gearbox: CarData.GearboxLvl,
+      Suspension: CarData.SuspensionLvl,
+      Tires: CarData.TiresLvl,
+      Turbo: CarData.TurboLvl
+    };
     var partCardInfo;
     for(var i = 0; i < partCardsCatalog.Catalog.length; i++) //refactored
     {
       partCardInfo = JSON.parse(partCardsCatalog.Catalog[i].CustomData);
       pr += parseInt(partCardInfo.basePr) + (parseInt(partCardInfo.prPerLvl) * tempDict[partCardsCatalog.Catalog[i].ItemId]);
     }
-  return pr;
-}
+    return pr;
+  }
 
-function GenerateBlackMarket(currentPlayerId)
-{
-  //getting user league
-  var league = 1;
-  var ps=server.GetPlayerStatistics(
+  function GenerateBlackMarket(currentPlayerId)
   {
-     PlayFabId: currentPlayerId,
-     StatisticNames: ["League"]
-  });
-  if(ps.Statistics.length != 0)
-  {
-    league = ps.Statistics[0].Value.toString();
-  }
-  //getting parts
-  var partsCatalog = server.GetCatalogItems(
-     {
-       CatalogVersion : "PartCards"
-     }
-     );
-  var dataToUpdate = {};
-  var d = new Date();
-  dataToUpdate["BMTime"] = d.getTime();
-  //get first part
-  var part0Index = Math.floor(Math.random() * partsCatalog.Catalog.length);
-  var cardParsed = JSON.parse(partsCatalog.Catalog[part0Index].CustomData);
-  if(cardParsed == undefined) return generateErrObj("Part card " + partsCatalog.Catalog[i].ItemId + " has no custom data.");
-  dataToUpdate["BMItem0"] = partsCatalog.Catalog[part0Index].ItemId + "_" + cardParsed.BMCurrType + "_" + cardParsed.BMbasePrice + "_" + 0 + "_" + cardParsed.BMpriceIncrPerBuy;
-  //generate second part card
-  var part1Index = Math.floor(Math.random() * partsCatalog.Catalog.length);
-  if(part1Index == part0Index) part1Index = partsCatalog.Catalog.length - part0Index - 1;
-  cardParsed = JSON.parse(partsCatalog.Catalog[part1Index].CustomData);
-  if(cardParsed == undefined) return generateErrObj("Part card " + partsCatalog.Catalog[i].ItemId + " has no custom data.");
-  dataToUpdate["BMItem1"] = partsCatalog.Catalog[part1Index].ItemId + "_" + cardParsed.BMCurrType + "_" + cardParsed.BMbasePrice + "_" + 0 + "_" + cardParsed.BMpriceIncrPerBuy;
-  //getting car cards
-  var carsCatalog = server.GetCatalogItems(
-   {
-     CatalogVersion : "CarCards"
-   }
-   );
-  var carCardParsed;
-  var nonRareIndexes = [];
-  var rareIndexes = [];
-  for(var i = 0; i < carsCatalog.Catalog.length; i++)
-  {
-    carCardParsed = JSON.parse(carsCatalog.Catalog[i].CustomData)
-    if(carCardParsed == undefined) return generateErrObj("Car card " + carsCatalog.Catalog[i].ItemId + " has no custom data.");
-    if(carCardParsed.unlockedAtRank > league + 1) continue;
-    if(carCardParsed.rareCar == "false")
-      nonRareIndexes.push(carsCatalog.Catalog[i].ItemId + "_" + carCardParsed.BMCurrType + "_" + carCardParsed.BMbasePrice + "_" + 0 + "_" + carCardParsed.BMpriceIncrPerBuy);
-    else
-      rareIndexes.push(carsCatalog.Catalog[i].ItemId + "_" + carCardParsed.BMCurrType + "_" + carCardParsed.BMbasePrice + "_" + 0 + "_" + carCardParsed.BMpriceIncrPerBuy);
-  }
-  if(nonRareIndexes.length <= 0)
-  {
-    dataToUpdate["BMItem2"] = rareIndexes[Math.floor(Math.random() * rareIndexes.length)];
-    dataToUpdate["BMItem3"] = rareIndexes[Math.floor(Math.random() * rareIndexes.length)];
-  }
-  else
-    if(rareIndexes.length <= 0)
-    {
-      dataToUpdate["BMItem2"] = nonRareIndexes[Math.floor(Math.random() * nonRareIndexes.length)];
-      dataToUpdate["BMItem3"] = nonRareIndexes[Math.floor(Math.random() * nonRareIndexes.length)];
-    }
-    else
-    {
+    //getting user league
+    var league = 1;
+    var ps=server.GetPlayerStatistics(
+      {
+        PlayFabId: currentPlayerId,
+        StatisticNames: ["League"]
+      });
+      if(ps.Statistics.length != 0)
+      {
+        league = ps.Statistics[0].Value.toString();
+      }
+      //getting parts
+      var partsCatalog = server.GetCatalogItems(
+        {
+          CatalogVersion : "PartCards"
+        }
+      );
+      var dataToUpdate = {};
+      var d = new Date();
+      dataToUpdate["BMTime"] = d.getTime();
+      //get first part
+      var part0Index = Math.floor(Math.random() * partsCatalog.Catalog.length);
+      var cardParsed = JSON.parse(partsCatalog.Catalog[part0Index].CustomData);
+      if(cardParsed == undefined) return generateErrObj("Part card " + partsCatalog.Catalog[i].ItemId + " has no custom data.");
+      dataToUpdate["BMItem0"] = partsCatalog.Catalog[part0Index].ItemId + "_" + cardParsed.BMCurrType + "_" + cardParsed.BMbasePrice + "_" + 0 + "_" + cardParsed.BMpriceIncrPerBuy;
+      //generate second part card
+      var part1Index = Math.floor(Math.random() * partsCatalog.Catalog.length);
+      if(part1Index == part0Index) part1Index = partsCatalog.Catalog.length - part0Index - 1;
+      cardParsed = JSON.parse(partsCatalog.Catalog[part1Index].CustomData);
+      if(cardParsed == undefined) return generateErrObj("Part card " + partsCatalog.Catalog[i].ItemId + " has no custom data.");
+      dataToUpdate["BMItem1"] = partsCatalog.Catalog[part1Index].ItemId + "_" + cardParsed.BMCurrType + "_" + cardParsed.BMbasePrice + "_" + 0 + "_" + cardParsed.BMpriceIncrPerBuy;
+      //getting car cards
+      var carsCatalog = server.GetCatalogItems(
+        {
+          CatalogVersion : "CarCards"
+        }
+      );
+      var carCardParsed;
+      var nonRareIndexes = [];
+      var rareIndexes = [];
+      for(var i = 0; i < carsCatalog.Catalog.length; i++)
+      {
+        carCardParsed = JSON.parse(carsCatalog.Catalog[i].CustomData)
+        if(carCardParsed == undefined) return generateErrObj("Car card " + carsCatalog.Catalog[i].ItemId + " has no custom data.");
+        if(carCardParsed.unlockedAtRank > league + 1) continue;
+        if(carCardParsed.rareCar == "false")
+        nonRareIndexes.push(carsCatalog.Catalog[i].ItemId + "_" + carCardParsed.BMCurrType + "_" + carCardParsed.BMbasePrice + "_" + 0 + "_" + carCardParsed.BMpriceIncrPerBuy);
+        else
+        rareIndexes.push(carsCatalog.Catalog[i].ItemId + "_" + carCardParsed.BMCurrType + "_" + carCardParsed.BMbasePrice + "_" + 0 + "_" + carCardParsed.BMpriceIncrPerBuy);
+      }
+      if(nonRareIndexes.length <= 0)
+      {
+        dataToUpdate["BMItem2"] = rareIndexes[Math.floor(Math.random() * rareIndexes.length)];
+        dataToUpdate["BMItem3"] = rareIndexes[Math.floor(Math.random() * rareIndexes.length)];
+      }
+      else
+      if(rareIndexes.length <= 0)
+      {
+        dataToUpdate["BMItem2"] = nonRareIndexes[Math.floor(Math.random() * nonRareIndexes.length)];
+        dataToUpdate["BMItem3"] = nonRareIndexes[Math.floor(Math.random() * nonRareIndexes.length)];
+      }
+      else
+      {
         dataToUpdate["BMItem2"] = nonRareIndexes[Math.floor(Math.random() * nonRareIndexes.length)];
         dataToUpdate["BMItem3"] = rareIndexes[Math.floor(Math.random() * rareIndexes.length)];
+      }
+      server.UpdateUserInternalData(
+        {
+          PlayFabId : currentPlayerId,
+          Data : dataToUpdate
+        }
+      );
+      var tK = [];
+      tK.push("BlackMarketResetMinutes");
+      var tData = server.GetTitleData(
+        {
+          PlayFabId : currentPlayerId,
+          Keys : tK
+        }
+      );
+      dataToUpdate["BMTime"] = parseInt(tData.Data.BlackMarketResetMinutes) * 60;
+      return dataToUpdate;
     }
-  server.UpdateUserInternalData(
+
+    function GetCurrentBlackMarket(currentPlayerId, getInternalDataResult)
     {
-      PlayFabId : currentPlayerId,
-      Data : dataToUpdate
+      var bmObj = {};
+      var d = new Date();
+
+      var tK = [];
+      tK.push("BlackMarketResetMinutes");
+      var tData = server.GetTitleData(
+        {
+          PlayFabId : currentPlayerId,
+          Keys : tK
+        }
+      );
+
+      bmObj["BMTime"] = parseInt(tData.Data.BlackMarketResetMinutes) * 60 - Math.floor((d.getTime() - getInternalDataResult.Data.BMTime.Value) / 1000);
+      for(var i = 0; i < 4; i++)
+      {
+        bmObj["BMItem" + i] = getInternalDataResult.Data["BMItem" + i].Value;
+      }
+      return bmObj;
     }
-  );
-  var tK = [];
-  tK.push("BlackMarketResetMinutes");
-  var tData = server.GetTitleData(
+
+
+
+    /**
+    * Returns the statistics value from the provided statistics array
+    * @param {array} statisticsArray containing statistics objects
+    * @param {string} statisticsName id of the searched statistic
+    * @param {value} statisticsName (optional) default value returned if statistic is not found
+    */
+    function GetValueFromStatistics(statisticsArray, statisticsName, defaultValue)
     {
-      PlayFabId : currentPlayerId,
-      Keys : tK
-    }
-    );
-  dataToUpdate["BMTime"] = parseInt(tData.Data.BlackMarketResetMinutes) * 60;
-  return dataToUpdate;
-}
-
-function GetCurrentBlackMarket(currentPlayerId, getInternalDataResult)
-{
-  var bmObj = {};
-  var d = new Date();
-
-  var tK = [];
-  tK.push("BlackMarketResetMinutes");
-  var tData = server.GetTitleData(
-    {
-      PlayFabId : currentPlayerId,
-      Keys : tK
-    }
-    );
-
-  bmObj["BMTime"] = parseInt(tData.Data.BlackMarketResetMinutes) * 60 - Math.floor((d.getTime() - getInternalDataResult.Data.BMTime.Value) / 1000);
-  for(var i = 0; i < 4; i++)
-  {
-    bmObj["BMItem" + i] = getInternalDataResult.Data["BMItem" + i].Value;
-  }
-  return bmObj;
-}
-
-
-
-/**
- * Returns the statistics value from the provided statistics array
- * @param {array} statisticsArray containing statistics objects
- * @param {string} statisticsName id of the searched statistic
- * @param {value} statisticsName (optional) default value returned if statistic is not found
- */
-function GetValueFromStatistics(statisticsArray, statisticsName, defaultValue)
-{
-  var stat;
-  //find statistic with given name
-  for (var i = 0; i < statisticsArray.length; i++)
-   if(statisticsArray[i].StatisticName === statisticsName)
+      var stat;
+      //find statistic with given name
+      for (var i = 0; i < statisticsArray.length; i++)
+      if(statisticsArray[i].StatisticName === statisticsName)
       stat = statisticsArray[i];
 
-  if(stat === undefined)
+      if(stat === undefined)
       return defaultValue !== undefined ? defaultValue : 0;
-  else
+      else
       return Number(stat.Value);
-}
+    }
 
-/**
- * Returns catalog item or undifined
- * @param {string} catalogId the catalog id of the requested item
- * @param {string} itemId of the recuested item
- */
-function getCatalogItem(catalogId, itemId)
-{
-  var items = server.GetCatalogItems({CatalogVersion : catalogId});
-  for (var i = 0; i < items.Catalog.length; i++) {
-    if(items.Catalog[i].ItemId === itemId)
-      return items.Catalog[i];
-  }
+    /**
+    * Returns catalog item or undifined
+    * @param {string} catalogId the catalog id of the requested item
+    * @param {string} itemId of the recuested item
+    */
+    function getCatalogItem(catalogId, itemId)
+    {
+      var items = server.GetCatalogItems({CatalogVersion : catalogId});
+      for (var i = 0; i < items.Catalog.length; i++) {
+        if(items.Catalog[i].ItemId === itemId)
+        return items.Catalog[i];
+      }
 
-  return undefined;
-}
+      return undefined;
+    }
+
+
+    /**
+    * Returns the item value from the object with id itemId at index level
+    * The given object must have a 'length' property used to clamp level inbounds
+    * @param  {object} holdingObject, object in which itemId is searched
+    * @param  {string} itemId, property id of the object that contains the desired value
+    * @param  {int} level, index of the desired value
+    * @param  {value} defaultValue, 0 if none provided
+    * @return {value}, defaultValue or the value at index level in object itemId
+    */
+    function getObjectValueFromLevel(holdingObject, itemId, level, defaultValue) {
+      if(!defaultValue) defaultValue = 0;
+      if(!holdingObject.length) return defaultValue;
+
+      // clamp ln to lenght is it can't get out of bounds
+      var ln = Number(holdingObject.length);
+      if(level >= ln) level = ln - 1;
+      return Number(holdingObject[level]) || defaultValue;
+    }
 handlers.buyChest = function(args, context)
 {
   var userInventoryObject=server.GetUserInventory(
@@ -2721,6 +2741,7 @@ function upgradePart(args, userInventoryObject, playerSC, playerHC)
     }
   }
 
+
   if(partExists == false)
   return generateErrObj("part with ID: " + args.partId + " not found in catalog.");
 
@@ -2763,10 +2784,9 @@ function upgradePart(args, userInventoryObject, playerSC, playerHC)
         Tires: "TiresLvl",
         Turbo: "TurboLvl"
       };
-      //refactored code
-      // log.debug("calculating " + args.partId + " cost and modifying " + tempDict[args.partId]);
-      var partsRequired = parseInt(cardInfo.baseCardCost, 10) + (parseInt(car.CustomData[tempDict[args.partId]], 10) * parseInt(cardInfo.cardCostPerLvl, 10));
+
       newlvl = parseInt(car.CustomData[tempDict[args.partId]]) + 1;
+      var partsRequired = getObjectValueFromLevel(cardInfo, "cardCostPerLvl", newlvl);
       var currCost = Number(cardInfo.baseCurrCost) + (parseInt(car.CustomData[tempDict[args.partId]]) * Number(cardInfo.currCostPerLvl));
       CarDataToBeUpdated[tempDict[args.partId]] = newlvl;
       car.CustomData[tempDict[args.partId]] = newlvl;
