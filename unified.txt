@@ -198,7 +198,8 @@ function calculateLeague(currentTrophies)
     for(var i = 0; i < partCardsCatalog.Catalog.length; i++) //refactored
     {
       partCardInfo = JSON.parse(partCardsCatalog.Catalog[i].CustomData);
-      pr += parseInt(partCardInfo.basePr) + getObjectValueFromLevel(partCardInfo, "prPerLvl", tempDict[partCardsCatalog.Catalog[i].ItemId]);
+      log.debug(partCardsCatalog.Catalog[i].ItemId + " " + Number(tempDict[partCardsCatalog.Catalog[i].ItemId]));
+      pr += parseInt(partCardInfo.basePr) + getObjectValueFromLevel(partCardInfo, "prPerLvl", Number(tempDict[partCardsCatalog.Catalog[i].ItemId]));
     }
     return pr;
   }
@@ -2788,7 +2789,6 @@ function upgradePart(args, userInventoryObject, playerSC, playerHC)
       newlvl = parseInt(car.CustomData[tempDict[args.partId]]) + 1;
       var partsRequired = getObjectValueFromLevel(cardInfo, "cardCostPerLvl", newlvl);
       var currCost = getObjectValueFromLevel(cardInfo, "currCostPerLvl", newlvl);
-      log.debug("PartsRequired: " + partsRequired + " Currency Cost: " + currCost + " for level " + newlvl);
 
       CarDataToBeUpdated[tempDict[args.partId]] = newlvl;
       car.CustomData[tempDict[args.partId]] = newlvl;
