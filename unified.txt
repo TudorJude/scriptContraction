@@ -198,7 +198,7 @@ function calculateLeague(currentTrophies)
     for(var i = 0; i < partCardsCatalog.Catalog.length; i++) //refactored
     {
       partCardInfo = JSON.parse(partCardsCatalog.Catalog[i].CustomData);
-      pr += parseInt(partCardInfo.basePr) + getObjectValueFromLevel(partCardsCatalog, "prPerLvl", tempDict[partCardsCatalog.Catalog[i].ItemId]);
+      pr += parseInt(partCardInfo.basePr) + getObjectValueFromLevel(partCardInfo, "prPerLvl", tempDict[partCardsCatalog.Catalog[i].ItemId]);
     }
     return pr;
   }
