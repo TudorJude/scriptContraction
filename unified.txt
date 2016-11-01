@@ -148,7 +148,7 @@ function calculateLeague(currentTrophies)
   {
     var pr = 0;
     var carCardsCatalog;
-    if(_carCardsCatalog == undefined)
+    if(_carCardsCatalog === undefined)
     {
       carCardsCatalog = server.GetCatalogItems(
         {
@@ -165,14 +165,14 @@ function calculateLeague(currentTrophies)
       if(carCardsCatalog.Catalog[i].ItemId == carId)
       {
         var carCardInfo = JSON.parse(carCardsCatalog.Catalog[i].CustomData);
-        pr += parseInt(carCardInfo.basePr) + getObjectValueFromLevel(carCardInfo, "prPerLvl", CarData.CarLvl - 1);
+        pr = parseInt(carCardInfo.basePr) + getObjectValueFromLevel(carCardInfo, "prPerLvl", CarData.CarLvl - 1);
         break;
       }
     }
 
     //calcualte pr based on each part level
     var partCardsCatalog;
-    if(_partsCardCatalog == undefined)
+    if(_partsCardCatalog === undefined)
     {
       partCardsCatalog = server.GetCatalogItems(
         {
@@ -198,8 +198,10 @@ function calculateLeague(currentTrophies)
     for(i = 0; i < partCardsCatalog.Catalog.length; i++) //refactored
     {
       partCardInfo = JSON.parse(partCardsCatalog.Catalog[i].CustomData);
-      pr += parseInt(partCardInfo.basePr) + getObjectValueFromLevel(partCardInfo, "prPerLvl", Number(tempDict[partCardsCatalog.Catalog[i].ItemId]));
+      log.debug(partCardsCatalog.Catalog[i].ItemId + " " + pr + " + " + getObjectValueFromLevel(partCardInfo, "prPerLvl", Number(tempDict[partCardsCatalog.Catalog[i].ItemId])));
+      pr += getObjectValueFromLevel(partCardInfo, "prPerLvl", Number(tempDict[partCardsCatalog.Catalog[i].ItemId]));
     }
+    log.debug("End pr: " + pr);
     return pr;
   }
 
@@ -2855,7 +2857,7 @@ function upgradePart(args, userInventoryObject, playerSC, playerHC)
   }
   var newPr = recalculateCarPr(car.CustomData, car.ItemId, undefined, partsCatalog);
   CarDataToBeUpdated.Pr = newPr;
-  log.debug("New pr: " + newPr);
+  
   server.UpdateUserInventoryItemCustomData(
     {
       PlayFabId: currentPlayerId,
