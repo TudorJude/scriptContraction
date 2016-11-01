@@ -198,7 +198,6 @@ function calculateLeague(currentTrophies)
     for(i = 0; i < partCardsCatalog.Catalog.length; i++) //refactored
     {
       partCardInfo = JSON.parse(partCardsCatalog.Catalog[i].CustomData);
-      log.debug(partCardsCatalog.Catalog[i].ItemId + " " + getObjectValueFromLevel(partCardInfo, "prPerLvl", Number(tempDict[partCardsCatalog.Catalog[i].ItemId])));
       pr += parseInt(partCardInfo.basePr) + getObjectValueFromLevel(partCardInfo, "prPerLvl", Number(tempDict[partCardsCatalog.Catalog[i].ItemId]));
     }
     return pr;
@@ -2760,7 +2759,7 @@ function upgradePart(args, userInventoryObject, playerSC, playerHC)
     }
   }
 
-  if(carFound == false)
+  if(carFound === false)
   {
     return generateFailObj("car with ID: " + args.carId + " not found in user inventory.");
   }
@@ -2768,14 +2767,14 @@ function upgradePart(args, userInventoryObject, playerSC, playerHC)
   var partFound = false;
   var part;
   var newlvl = 0;
-  for(var i = 0; i < userInventoryObject.Inventory.length; i++)
+  var CarDataToBeUpdated = {};
+  for(i = 0; i < userInventoryObject.Inventory.length; i++)
   {
     if((userInventoryObject.Inventory[i].ItemId == args.partId) && (userInventoryObject.Inventory[i].CatalogVersion == "PartCards"))
     {
       partFound = true;
       //log.debug("part is in user's inventory!");
       part = userInventoryObject.Inventory[i];
-      var CarDataToBeUpdated = {};
       var tempDict =
       {
         Exhaust: "ExhaustLvl",
@@ -2799,13 +2798,13 @@ function upgradePart(args, userInventoryObject, playerSC, playerHC)
       // log.debug("consuming part instance: " + userInventoryObject.Inventory[i].ItemInstanceId);
       try
       {
-        if(userInventoryObject.Inventory[i].CustomData == undefined)//let's check if item has custom data
+        if(userInventoryObject.Inventory[i].CustomData === undefined)//let's check if item has custom data
         {
           return generateFailObj("Insufficient cards");
         }
         else
         {
-          if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)//let's check if item has amount custom data
+          if(userInventoryObject.Inventory[i].CustomData.Amount === undefined)//let's check if item has amount custom data
           {
             return generateFailObj("Insufficient cards");
           }
@@ -2856,6 +2855,7 @@ function upgradePart(args, userInventoryObject, playerSC, playerHC)
   }
   var newPr = recalculateCarPr(car.CustomData, car.ItemId, undefined, partsCatalog);
   CarDataToBeUpdated.Pr = newPr;
+  log.debug("New pr: " + newPr);
   server.UpdateUserInventoryItemCustomData(
     {
       PlayFabId: currentPlayerId,
