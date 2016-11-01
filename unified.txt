@@ -361,12 +361,12 @@ function calculateLeague(currentTrophies)
     */
     function getObjectValueFromLevel(holdingObject, itemId, level, defaultValue) {
       if(!defaultValue) defaultValue = 0;
-      if(!holdingObject.length) return defaultValue;
+      if(!holdingObject[itemId] || !holdingObject[itemId].length) return defaultValue;
 
       // clamp ln to lenght is it can't get out of bounds
-      var ln = Number(holdingObject.length);
+      var ln = Number(holdingObject[itemId].length);
       if(level >= ln) level = ln - 1;
-      return Number(holdingObject[level]) || defaultValue;
+      return Number(holdingObject[itemId][level]) || defaultValue;
     }
 handlers.buyChest = function(args, context)
 {
@@ -2787,6 +2787,7 @@ function upgradePart(args, userInventoryObject, playerSC, playerHC)
 
       newlvl = parseInt(car.CustomData[tempDict[args.partId]]) + 1;
       var partsRequired = getObjectValueFromLevel(cardInfo, "cardCostPerLvl", newlvl);
+      log.debug("PartsRequired: " + partsRequired + " for level " + newlvl);
       var currCost = Number(cardInfo.baseCurrCost) + (parseInt(car.CustomData[tempDict[args.partId]]) * Number(cardInfo.currCostPerLvl));
       CarDataToBeUpdated[tempDict[args.partId]] = newlvl;
       car.CustomData[tempDict[args.partId]] = newlvl;

@@ -361,10 +361,10 @@ function calculateLeague(currentTrophies)
     */
     function getObjectValueFromLevel(holdingObject, itemId, level, defaultValue) {
       if(!defaultValue) defaultValue = 0;
-      if(!holdingObject.length) return defaultValue;
+      if(!holdingObject[itemId] || !holdingObject[itemId].length) return defaultValue;
 
       // clamp ln to lenght is it can't get out of bounds
-      var ln = Number(holdingObject.length);
+      var ln = Number(holdingObject[itemId].length);
       if(level >= ln) level = ln - 1;
-      return Number(holdingObject[level]) || defaultValue;
+      return Number(holdingObject[itemId][level]) || defaultValue;
     }
