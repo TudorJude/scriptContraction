@@ -34,11 +34,11 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
 
   if(carFound === true)
   {
-    //log.debug("user has car: " +  args.carId + "... upgrading");
-
-    //let's check that the user has enough money + cards
+    //test if maximum pr level was reached
     var newLvl = (parseInt(car.CustomData.CarLvl) + 1);
-    var currCost = parseInt(cardInfo.baseCurrCost) + (parseInt(car.CustomData.CarLvl) * parseInt(cardInfo.currCostPerLvl));
+    if(newlvl >= Number(cardInfo.prPerLvl.length))
+        return generateFailObj("Maximum pr level was reached!");
+
     var currCost = getObjectValueFromLevel(cardInfo, "currCostPerLvl", newlvl);
     var costCheckObj = checkBalance(cardInfo.currType, currCost, playerSC, playerHC);
     if(costCheckObj != "OK") return costCheckObj;
@@ -46,7 +46,7 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
 
     //log.debug("user has enough currency. Let's check for card balance");
 
-    var cardCost = parseInt(cardInfo.baseCardCost) + (parseInt(car.CustomData.CarLvl) * parseInt(cardInfo.cardCostPerLvl));
+    var cardCost =  getObjectValueFromLevel(cardInfo, "cardCostPerLvl", newlvl);
     car.CustomData.CarLvl = newLvl;
     // log.debug("cardCost: " + cardCost);
     var cardFound = false;
