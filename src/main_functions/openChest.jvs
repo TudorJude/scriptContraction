@@ -175,8 +175,6 @@ handlers.openChest = function(args, context)
   //if no chest id is provided, it means that this function is used for inventory update
   if(args.chestId){
     var totalXp = UpdateExperience("Chests", args.chestId, "xpGain", 0, true);
-    //if totalXp is 0 it means that no xp update was done
-    if(totalXp > 0)
       outInventory.Experience = totalXp;
   }
 

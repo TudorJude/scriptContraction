@@ -11,11 +11,26 @@ function UpdateExperience(catalogId, itemId, xpArrayId, actionLevel, updateServe
 {
   //the amount of xp gained at each action level
   var xpGainByLevel = JSON.parse(getCatalogItem(catalogId, itemId).CustomData)[xpArrayId];
+
+  //xp cap to stop the user to level up past a given level
+  var lvlThresholds = JSON.parse(getCatalogItem("Balancing", "BalancingItem").CustomData).LevelThresholds;
+  var xpCap = lvlThresholds[lvlThresholds.length - 1];
+
+  //get current exprience
+  var ps= playerStatistics || server.GetPlayerStatistics({
+    PlayFabId: currentPlayerId,
+    StatisticNames: ["Experience"]
+  }).Statistics;
+  var currentExprience = GetValueFromStatistics(ps, "Experience", 0);
+
+  if(currentExprience >= xpCap)
+    return xpCap;
+
   var xpToReceive = 0;
   if(!isNaN(Number(xpGainByLevel))){
     //action levels are represented by a single number value, the amount to give is xpGain
     xpToReceive = Number(xpGainByLevel);
-    if(xpToReceive === 0) return 0;
+    if(xpToReceive === 0) return currentExprience;
   }
   else {
     //action levels are represented by an object
@@ -24,12 +39,8 @@ function UpdateExperience(catalogId, itemId, xpArrayId, actionLevel, updateServe
     xpToReceive = Number(xpGainByLevel[actionLevel]);
   }
 
-  //get current exprience
-  var ps= playerStatistics || server.GetPlayerStatistics({
-    PlayFabId: currentPlayerId,
-    StatisticNames: ["Experience"]
-  }).Statistics;
-  var currentExprience = GetValueFromStatistics(ps, "Experience", 0) + xpToReceive;
+  //cap and update player's current experience
+  currentExprience = Matf.min(currentExprience + xpToReceive, xpCap);
 
   if(!updateServer) return currentExprience;
   var updateRequest = server.UpdatePlayerStatistics(

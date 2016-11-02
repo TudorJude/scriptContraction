@@ -691,11 +691,26 @@ function UpdateExperience(catalogId, itemId, xpArrayId, actionLevel, updateServe
 {
   //the amount of xp gained at each action level
   var xpGainByLevel = JSON.parse(getCatalogItem(catalogId, itemId).CustomData)[xpArrayId];
+
+  //xp cap to stop the user to level up past a given level
+  var lvlThresholds = JSON.parse(getCatalogItem("Balancing", "BalancingItem").CustomData).LevelThresholds;
+  var xpCap = lvlThresholds[lvlThresholds.length - 1];
+
+  //get current exprience
+  var ps= playerStatistics || server.GetPlayerStatistics({
+    PlayFabId: currentPlayerId,
+    StatisticNames: ["Experience"]
+  }).Statistics;
+  var currentExprience = GetValueFromStatistics(ps, "Experience", 0);
+
+  if(currentExprience >= xpCap)
+    return xpCap;
+
   var xpToReceive = 0;
   if(!isNaN(Number(xpGainByLevel))){
     //action levels are represented by a single number value, the amount to give is xpGain
     xpToReceive = Number(xpGainByLevel);
-    if(xpToReceive === 0) return 0;
+    if(xpToReceive === 0) return currentExprience;
   }
   else {
     //action levels are represented by an object
@@ -704,12 +719,8 @@ function UpdateExperience(catalogId, itemId, xpArrayId, actionLevel, updateServe
     xpToReceive = Number(xpGainByLevel[actionLevel]);
   }
 
-  //get current exprience
-  var ps= playerStatistics || server.GetPlayerStatistics({
-    PlayFabId: currentPlayerId,
-    StatisticNames: ["Experience"]
-  }).Statistics;
-  var currentExprience = GetValueFromStatistics(ps, "Experience", 0) + xpToReceive;
+  //cap and update player's current experience
+  currentExprience = Matf.min(currentExprience + xpToReceive, xpCap);
 
   if(!updateServer) return currentExprience;
   var updateRequest = server.UpdatePlayerStatistics(
@@ -1132,8 +1143,6 @@ handlers.openChest = function(args, context)
   //if no chest id is provided, it means that this function is used for inventory update
   if(args.chestId){
     var totalXp = UpdateExperience("Chests", args.chestId, "xpGain", 0, true);
-    //if totalXp is 0 it means that no xp update was done
-    if(totalXp > 0)
       outInventory.Experience = totalXp;
   }
 
@@ -2305,6 +2314,7 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
     //let's check that the user has enough money + cards
     var newLvl = (parseInt(car.CustomData.CarLvl) + 1);
     var currCost = parseInt(cardInfo.baseCurrCost) + (parseInt(car.CustomData.CarLvl) * parseInt(cardInfo.currCostPerLvl));
+    var currCost = getObjectValueFromLevel(cardInfo, "currCostPerLvl", newlvl);
     var costCheckObj = checkBalance(cardInfo.currType, currCost, playerSC, playerHC);
     if(costCheckObj != "OK") return costCheckObj;
 
@@ -2856,7 +2866,7 @@ function upgradePart(args, userInventoryObject, playerSC, playerHC)
   }
   var newPr = recalculateCarPr(car.CustomData, car.ItemId, undefined, partsCatalog);
   CarDataToBeUpdated.Pr = newPr;
-  
+
   server.UpdateUserInventoryItemCustomData(
     {
       PlayFabId: currentPlayerId,

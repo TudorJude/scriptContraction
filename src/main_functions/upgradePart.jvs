@@ -152,7 +152,7 @@ function upgradePart(args, userInventoryObject, playerSC, playerHC)
   }
   var newPr = recalculateCarPr(car.CustomData, car.ItemId, undefined, partsCatalog);
   CarDataToBeUpdated.Pr = newPr;
-  
+
   server.UpdateUserInventoryItemCustomData(
     {
       PlayFabId: currentPlayerId,
