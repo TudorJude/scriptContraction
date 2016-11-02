@@ -190,27 +190,27 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
           //  }
           //  );
           //new consume code
-          if(userInventoryObject.Inventory[i].CustomData == undefined)//let's check if item has custom data
+          if(userInventoryObject.Inventory[i].CustomData === undefined)//let's check if item has custom data
           {
             return generateFailObj("Insufficient cards, CustomData null");
           }
           else
           {
-            if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)//let's check if item has amount custom data
+            if(userInventoryObject.Inventory[i].CustomData.Amount === undefined)//let's check if item has amount custom data
             {
               return generateFailObj("Insufficient cards, CustomData.Amount null");
             }
             else // let's check and see if the user has sufficent cards
             {
-              if(Number(userInventoryObject.Inventory[i].CustomData.Amount) >= Number(cardInfo.baseCardCost)) // he does so let's remove the appropriate amount
+              if(Number(userInventoryObject.Inventory[i].CustomData.Amount) >= Number(cardInfo.cardCostPerLvl[1])) // he does so let's remove the appropriate amount
               {
                 carCardInstance = userInventoryObject.Inventory[i].ItemInstanceId;
-                userInventoryObject.Inventory[i].CustomData.Amount -= cardInfo.baseCardCost;
+                userInventoryObject.Inventory[i].CustomData.Amount -= cardInfo.cardCostPerLvl[1];
                 cardData = {"Amount" : userInventoryObject.Inventory[i].CustomData.Amount};
               }
               else
               {
-                return generateFailObj("Insufficient cards: " + userInventoryObject.Inventory[i].CustomData.Amount + " vs " + cardInfo.baseCardCost+".");
+                return generateFailObj("Insufficient cards: " + userInventoryObject.Inventory[i].CustomData.Amount + " vs " + cardInfo.cardCostPerLvl[1]+".");
               }
             }
           }
@@ -230,7 +230,7 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
 
     //log.debug("user has enough cards to purchase car. Checking if enough currency is availabe");
 
-    var costCheckObj = checkBalance(cardInfo.currType, cardInfo.baseCurrCost, playerSC, playerHC);
+    var costCheckObj = checkBalance(cardInfo.currType, cardInfo.currCostPerLvl[1], playerSC, playerHC);
     if(costCheckObj != "OK") return costCheckObj;
 
     var itemsToGive = [];
@@ -244,7 +244,7 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
       }
     );
 
-    if(carToGive.ItemGrantResults[0].Result == false)
+    if(carToGive.ItemGrantResults[0].Result === false)
     {
       log.error("Something went wrong while giving user the item, refunding cards");
       //new refund code
@@ -261,7 +261,7 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
       );
     }
     var subtractUserCurrencyResult;
-    if(cardInfo.baseCurrCost > 0){
+    if(cardInfo.currCostPerLvl[1] > 0){
       subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
         {
           PlayFabId: currentPlayerId,
@@ -303,7 +303,7 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
     CarData = {
       "PlatesId" : "0",
       "WindshieldId" : "0",
-      "Pr" : cardInfo.basePr
+      "Pr" : cardInfo.basePr + cardInfo.prPerLvl[1]
     };
     server.UpdateUserInventoryItemCustomData(
       {
@@ -392,7 +392,7 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
         "RimsId" : "0"   ,
         "PlatesId" : "0",
         "WindshieldId" : "0",
-        "Pr" : cardInfo.basePr
+        "Pr" : cardInfo.basePr + cardInfo.prPerLvl[1]
       };
       var objectsUpdated =
       [
