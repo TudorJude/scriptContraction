@@ -83,6 +83,11 @@ function upgradePart(args, userInventoryObject, playerSC, playerHC)
       };
 
       newlvl = parseInt(car.CustomData[tempDict[args.partId]]) + 1;
+
+      //test if maximum pr level was reached
+      if(newlvl >= cardInfo.cardCostPerLvl.prPerLvl.length)
+          return generateFailObj("Maximum pr level was reached!");
+
       var partsRequired = getObjectValueFromLevel(cardInfo, "cardCostPerLvl", newlvl);
       var currCost = getObjectValueFromLevel(cardInfo, "currCostPerLvl", newlvl);
 
