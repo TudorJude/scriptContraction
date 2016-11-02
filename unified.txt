@@ -2310,7 +2310,7 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
   {
     //test if maximum pr level was reached
     var newLvl = (parseInt(car.CustomData.CarLvl) + 1);
-    if(newlvl >= Number(cardInfo.prPerLvl.length))
+    if(newLvl >= Number(cardInfo.prPerLvl.length))
         return generateFailObj("Maximum pr level was reached!");
 
     var currCost = getObjectValueFromLevel(cardInfo, "currCostPerLvl", newlvl);
