@@ -40,7 +40,7 @@ function UpdateExperience(catalogId, itemId, xpArrayId, actionLevel, updateServe
   }
 
   //cap and update player's current experience
-  currentExprience = Matf.min(currentExprience + xpToReceive, xpCap);
+  currentExprience = Math.min(currentExprience + xpToReceive, xpCap);
 
   if(!updateServer) return currentExprience;
   var updateRequest = server.UpdatePlayerStatistics(
