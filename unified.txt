@@ -2476,7 +2476,6 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
             }
             else // let's check and see if the user has sufficent cards
             {
-              log.debug("Card Cost -> " + cardInfo.cardCostPerLvl + " " + cardInfo.cardCostPerLvl[1] + " " + cardInfo.cardCostPerLvl["1"]);
               if(Number(userInventoryObject.Inventory[i].CustomData.Amount) >= Number(cardInfo.cardCostPerLvl[1])) // he does so let's remove the appropriate amount
               {
                 carCardInstance = userInventoryObject.Inventory[i].ItemInstanceId;
@@ -2541,7 +2540,7 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
         {
           PlayFabId: currentPlayerId,
           VirtualCurrency : cardInfo.currType,
-          Amount: cardInfo.baseCurrCost
+          Amount: cardInfo.currCostPerLvl[1]
         }
       );
     }
