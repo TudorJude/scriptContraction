@@ -303,7 +303,7 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
     CarData = {
       "PlatesId" : "0",
       "WindshieldId" : "0",
-      "Pr" : Number(cardInfo.basePr) + cardInfo.prPerLvl[1]
+      "Pr" : Number(cardInfo.basePr) + Number(cardInfo.prPerLvl[1])
     };
     server.UpdateUserInventoryItemCustomData(
       {
