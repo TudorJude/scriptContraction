@@ -165,7 +165,7 @@ function calculateLeague(currentTrophies)
       if(carCardsCatalog.Catalog[i].ItemId == carId)
       {
         var carCardInfo = JSON.parse(carCardsCatalog.Catalog[i].CustomData);
-        pr = parseInt(carCardInfo.basePr) + getObjectValueFromLevel(carCardInfo, "prPerLvl", CarData.CarLvl - 1);
+        pr = parseInt(carCardInfo.basePr) + getObjectValueFromLevel(carCardInfo, "prPerLvl", CarData.CarLvl);
         break;
       }
     }
