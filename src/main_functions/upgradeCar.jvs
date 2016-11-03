@@ -306,8 +306,6 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
       "Pr" : (Number(cardInfo.basePr) + cardInfo.prPerLvl[1])
     };
 
-    log.debug("PR: " + (Number(cardInfo.basePr) + cardInfo.prPerLvl[1]));
-
     server.UpdateUserInventoryItemCustomData(
       {
         PlayFabId: currentPlayerId,
@@ -395,7 +393,7 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
         "RimsId" : "0"   ,
         "PlatesId" : "0",
         "WindshieldId" : "0",
-        "Pr" : cardInfo.basePr + cardInfo.prPerLvl[1]
+        "Pr" : Number(cardInfo.basePr) + cardInfo.prPerLvl[1]
       };
       var objectsUpdated =
       [
