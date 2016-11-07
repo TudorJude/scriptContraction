@@ -463,8 +463,8 @@ handlers.endGame = function(args, context) {
     Keys: ["trophyLose","trophyWin"]
   });
   var refund;
-  log.debug("pDat.Data[trophyLose] " + pDat.Data["trophyLose"].Value);
-  log.debug("pDat.Data[trophyWin] " + pDat.Data["trophyWin"].Value);
+  //log.debug("pDat.Data[trophyLose] " + pDat.Data["trophyLose"].Value);
+  //log.debug("pDat.Data[trophyWin] " + pDat.Data["trophyWin"].Value);
   if((pDat.Data["trophyLose"] == undefined) || (pDat.Data["trophyWin"] == undefined)) refund = 45;
   else refund = Number(pDat.Data["trophyLose"].Value) + Number(pDat.Data["trophyWin"].Value);
   //log.debug("refund: " + refund);
@@ -495,6 +495,7 @@ handlers.endGame = function(args, context) {
   }
   );
   //user ran out of time so we don't store recording
+  //legacy code
   if(args.outcome == "rOot")
     {
         var newPlayerStats =
@@ -504,7 +505,9 @@ handlers.endGame = function(args, context) {
         }
         return {Result : newPlayerStats};
     }
-
+    //if the user has a score of 0 we get out of this function
+    var recHeader = JSON.parse(args.recordingHeader);
+    log.debug("score: " + recHeader.Score)
   //let's see which Subdivision this player is in
   var sdval = titleDataRequest.Data["SubdivisionTrophyRanges"];
   var sdvalParsed = JSON.parse(sdval);
@@ -540,6 +543,7 @@ handlers.endGame = function(args, context) {
       Data:dict
     }
   );
+
   //log.debug("updated user read only data for " + currentPlayerId + " " + playerData);
   var titleDataVal = server.GetTitleInternalData(
     {
