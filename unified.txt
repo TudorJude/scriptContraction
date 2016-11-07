@@ -496,7 +496,8 @@ handlers.endGame = function(args, context) {
   );
   //user ran out of time so we don't store recording
   //legacy code
-  if(args.outcome == "rOot")
+  var recHeader = JSON.parse(args.recordingHeader);
+  if(Number(recHeader.Score) <= 10)
     {
         var newPlayerStats =
         {
