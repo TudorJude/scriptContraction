@@ -1,5 +1,40 @@
 handlers.openChest = function(args, context)
 {
+  //level reward mechanic
+  //args.level == -1 if it's regular open chest operation
+  //args.level >= 0 if it's a reward for leveing up to level args.level
+  if(Number(args.level) >= 0)
+  {
+    var lastRewardLevel = server.GetUserInternalData(
+    {
+      PlayFabId : currentPlayerId,
+      Keys : ["LastLevelReward"]
+    });
+    var levelItemDataToUpdate = {};
+    levelItemDataToUpdate["LastLevelReward"] = args.level;
+    if(lastRewardLevel.Data == undefined)
+    {
+      server.UpdateUserInternalData(
+      {
+        PlayFabId : currentPlayerId, 
+        Data : levelItemDataToUpdate
+      }
+        );
+    }
+    else
+    { 
+      if(Number(lastRewardLevel.Data.Value) < Number(args.level))
+      {
+        server.UpdateUserInternalData(
+        {
+          PlayFabId : currentPlayerId, 
+          Data : levelItemDataToUpdate
+        }
+          );
+      }
+      else return generateFailObj("already got reward for level: " + args.level);
+    }
+  }
   var objectsUpdated = [];
   var currencyUpdated = [];
   var invChangeObj;
@@ -171,9 +206,9 @@ handlers.openChest = function(args, context)
 
   var outInventory =   server.GetUserInventory({PlayFabId: currentPlayerId});
 
-  //give experience for opening chest:
+  //give experience for opening chest unless this chest was opened as part of leveling up reward:
   //if no chest id is provided, it means that this function is used for inventory update
-  if(args.chestId){
+  if((args.chestId) && (Number(args.level) < 0)){
     var totalXp = UpdateExperience("Chests", args.chestId, "xpGain", 0, true);
       outInventory.Experience = totalXp;
   }
