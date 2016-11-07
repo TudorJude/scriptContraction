@@ -20,6 +20,19 @@ handlers.openChest = function(args, context)
         Data : levelItemDataToUpdate
       }
         );
+      //give bundle to user
+      //ids of bundles are of the form 001, 002, ... , 012 etc so padded with 0s until it has 3 digits
+      var str = "" + args.level;
+      var pad = "000";
+      var ans = pad.substring(0, pad.length - str.length) + str; 
+      server.GrantItemsToUser(
+      {
+        CatalogVersion : "LevelUpRewards",
+        PlayFabId : currentPlayerId, 
+        ItemIds : ans
+      }
+        );
+      
     }
     else
     { 
@@ -31,7 +44,19 @@ handlers.openChest = function(args, context)
           Data : levelItemDataToUpdate
         }
           );
-      }
+        //give bundle to user
+        //ids of bundles are of the form 001, 002, ... , 012 etc so padded with 0s until it has 3 digits
+        var str = "" + args.level;
+        var pad = "000";
+        var ans = pad.substring(0, pad.length - str.length) + str; 
+        server.GrantItemsToUser(
+        {
+          CatalogVersion : "LevelUpRewards",
+          PlayFabId : currentPlayerId, 
+          ItemIds : ans
+        }
+          );      
+        }
       else return generateFailObj("already got reward for level: " + args.level);
     }
   }
