@@ -1057,7 +1057,7 @@ handlers.openChest = function(args, context)
         }
           );      
         }
-      else return generateFailObj("already got reward for level: " + args.level);
+        else return generateFailObj("already got reward for level: " + lastRewardLevel.Data.Value);
     }
   }
   var objectsUpdated = [];
