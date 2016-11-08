@@ -975,26 +975,37 @@ handlers.openChest = function(args, context)
   //level reward mechanic
   //args.level == -1 if it's regular open chest operation
   //args.level >= 0 if it's a reward for leveing up to level args.level
-  if(Number(args.level) >= 0)
+  if(args.isLevelUp == true)
   {
-    var lastRewardLevel = server.GetUserInternalData(
+    var lastRewardLevel = server.GetUserReadOnlyData(
     {
       PlayFabId : currentPlayerId,
       Keys : ["LastLevelReward"]
     });
     var levelItemDataToUpdate = {};
-    levelItemDataToUpdate["LastLevelReward"] = args.level;
+    levelItemDataToUpdate["LastLevelReward"] = 1;
     if(lastRewardLevel.Data == undefined)
     {
-      server.UpdateUserInternalData(
+      server.UpdateUserReadOnlyData(
       {
         PlayFabId : currentPlayerId, 
         Data : levelItemDataToUpdate
       }
         );
+
+      var suArray = [];
+      var su = {StatisticName : "Experience", Version : "0", Value: 0};
+      suArray.push(su);
+
+      server.UpdatePlayerStatistics(
+      {
+        PlayFabId : currentPlayerId,
+        Statistics: suArray
+      });
+
       //give bundle to user
       //ids of bundles are of the form 001, 002, ... , 012 etc so padded with 0s until it has 3 digits
-      var str = "" + args.level;
+      var str = "" + 1;
       var pad = "000";
       var ans = pad.substring(0, pad.length - str.length) + str; 
       server.GrantItemsToUser(
@@ -1008,9 +1019,26 @@ handlers.openChest = function(args, context)
     }
     else
     { 
-      if(Number(lastRewardLevel.Data.Value) < Number(args.level))
+      var lvlThresholds = JSON.parse(getCatalogItem("Balancing", "BalancingItem").CustomData).LevelThresholds;
+        //get current exprience
+      var ps= server.GetPlayerStatistics(
       {
-        server.UpdateUserInternalData(
+            PlayFabId: currentPlayerId,
+            StatisticNames: ["Experience"]
+      }).Statistics;
+      var currentExprience = GetValueFromStatistics(ps, "Experience", 0);
+      var currLvl = 100;
+      for(var i = 0; i < lvlThresholds.length; i++)
+      {
+        if(currentExprience >= lvlThresholds[i]) continue;
+        currLvl = i; break;
+      }
+
+      if(Number(lastRewardLevel.Data.Value) < Number(currLvl))
+      {
+        lastRewardLevel.Data.Value = Number(lastRewardLevel.Data.Value) + 1;
+        levelItemDataToUpdate["LastLevelReward"] = lastRewardLevel.Data.Value;
+        server.UpdateUserReadOnlyData(
         {
           PlayFabId : currentPlayerId, 
           Data : levelItemDataToUpdate
@@ -1018,7 +1046,7 @@ handlers.openChest = function(args, context)
           );
         //give bundle to user
         //ids of bundles are of the form 001, 002, ... , 012 etc so padded with 0s until it has 3 digits
-        var str = "" + args.level;
+        var str = "" + lastRewardLevel.Data.Value;
         var pad = "000";
         var ans = pad.substring(0, pad.length - str.length) + str; 
         server.GrantItemsToUser(
@@ -1205,7 +1233,7 @@ handlers.openChest = function(args, context)
 
   //give experience for opening chest unless this chest was opened as part of leveling up reward:
   //if no chest id is provided, it means that this function is used for inventory update
-  if((args.chestId) && (Number(args.level) < 0)){
+  if((args.chestId) && (args.isLevelUp != true)){
     var totalXp = UpdateExperience("Chests", args.chestId, "xpGain", 0, true);
       outInventory.Experience = totalXp;
   }
