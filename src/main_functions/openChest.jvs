@@ -11,7 +11,7 @@ handlers.openChest = function(args, context)
       Keys : ["LastLevelReward"]
     });
     var levelItemDataToUpdate = {};
-    levelItemDataToUpdate["LastLevelReward"] = 1;
+    levelItemDataToUpdate["LastLevelReward"] = 0;
     if(lastRewardLevel.Data.LastLevelReward == undefined)
     {
       server.UpdateUserReadOnlyData(
@@ -20,7 +20,7 @@ handlers.openChest = function(args, context)
         Data : levelItemDataToUpdate
       }
         );      
-      lastRewardLevel.Data.LastLevelReward = 1;
+      lastRewardLevel.Data.LastLevelReward = 0;
     }
     // now let's see if the user gets a reward
       var lvlThresholds = JSON.parse(getCatalogItem("Balancing", "BalancingItem").CustomData).LevelThresholds;
