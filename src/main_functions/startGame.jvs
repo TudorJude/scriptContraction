@@ -72,10 +72,7 @@ handlers.startGame = function(args, context) {
     }
   }
   subDivisionRange = Number(sdvalParsed.subdivisions[nextSubDivision]) - Number(sdvalParsed.subdivisions[subDivision]);
-  log.debug("nextSubDivision " + nextSubDivision + " subDivision " + subDivision);
-  log.debug(" sdvalParsed.subdivisions[nextSubDivision] " + sdvalParsed.subdivisions[nextSubDivision] + " sdvalParsed.subdivisions[subDivision] " + sdvalParsed.subdivisions[subDivision]);
   if(subDivisionRange <= 0) subDivisionRange = 400; // random 400
-  log.debug("subDivisionRange " + subDivisionRange);
   //log.debug("user is in subdivision " + subDivision);
 
   //matchmaking code

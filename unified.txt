@@ -977,6 +977,7 @@ handlers.openChest = function(args, context)
   //args.level >= 0 if it's a reward for leveing up to level args.level
   if(args.isLevelUp == true)
   {
+  	var lastLvlReward = 0;
     var lastRewardLevel = server.GetUserReadOnlyData(
     {
       PlayFabId : currentPlayerId,
@@ -992,7 +993,10 @@ handlers.openChest = function(args, context)
         Data : levelItemDataToUpdate
       }
         );      
-      lastRewardLevel.Data.LastLevelReward = 0;
+    }
+    else
+    {
+    	lastLvlReward = lastRewardLevel.Data.LastLevelReward.Value;
     }
     // now let's see if the user gets a reward
       var lvlThresholds = JSON.parse(getCatalogItem("Balancing", "BalancingItem").CustomData).LevelThresholds;
@@ -1022,10 +1026,10 @@ handlers.openChest = function(args, context)
         currLvl = i; break;
       }
 
-      if(Number(lastRewardLevel.Data.LastLevelReward) < Number(currLvl))
+      if(Number(lastLvlReward) < Number(currLvl))
       {
-        lastRewardLevel.Data.LastLevelReward = Number(lastRewardLevel.Data.LastLevelReward) + 1;
-        levelItemDataToUpdate["LastLevelReward"] = lastRewardLevel.Data.LastLevelReward;
+        lastLvlReward = Number(lastLvlReward) + 1;
+        levelItemDataToUpdate["LastLevelReward"] = lastLvlReward;
         server.UpdateUserReadOnlyData(
         {
           PlayFabId : currentPlayerId, 
@@ -1034,7 +1038,7 @@ handlers.openChest = function(args, context)
           );
         //give bundle to user
         //ids of bundles are of the form 001, 002, ... , 012 etc so padded with 0s until it has 3 digits
-        var str = "" + lastRewardLevel.Data.LastLevelReward;
+        var str = "" + lastLvlReward;
         var pad = "000";
         var ans = pad.substring(0, pad.length - str.length) + str; 
         server.GrantItemsToUser(
@@ -1045,7 +1049,7 @@ handlers.openChest = function(args, context)
         }
           );      
         }
-        else return generateFailObj("already got reward for level: " + lastRewardLevel.Data.LastLevelReward);
+        else return generateFailObj("already got reward for level: " + lastLvlReward);
 
   }
   var objectsUpdated = [];
@@ -1841,10 +1845,7 @@ handlers.startGame = function(args, context) {
     }
   }
   subDivisionRange = Number(sdvalParsed.subdivisions[nextSubDivision]) - Number(sdvalParsed.subdivisions[subDivision]);
-  log.debug("nextSubDivision " + nextSubDivision + " subDivision " + subDivision);
-  log.debug(" sdvalParsed.subdivisions[nextSubDivision] " + sdvalParsed.subdivisions[nextSubDivision] + " sdvalParsed.subdivisions[subDivision] " + sdvalParsed.subdivisions[subDivision]);
   if(subDivisionRange <= 0) subDivisionRange = 400; // random 400
-  log.debug("subDivisionRange " + subDivisionRange);
   //log.debug("user is in subdivision " + subDivision);
 
   //matchmaking code
