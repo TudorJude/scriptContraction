@@ -1019,14 +1019,14 @@ handlers.openChest = function(args, context)
 	        Statistics: suArray
 	      });
       }
-      var currLvl = 100;
+      var currLvl = lvlThresholds.length;
       for(var i = 0; i < lvlThresholds.length; i++)
       {
         if(currentExprience >= lvlThresholds[i]) continue;
         currLvl = i; break;
       }
 
-      if(Number(args.levelUpRewardIndex) < Number(currLvl))
+      if(Number(args.levelUpRewardIndex) <= Number(currLvl))
       {
         lastLvlReward = Number(args.levelUpRewardIndex);
         levelItemDataToUpdate["LastLevelReward"] = lastLvlReward;
