@@ -975,7 +975,7 @@ handlers.openChest = function(args, context)
   //level reward mechanic
   //args.level == -1 if it's regular open chest operation
   //args.level >= 0 if it's a reward for leveing up to level args.level
-  if(args.isLevelUp == true)
+  if(args.levelUpRewardIndex > 0)
   {
   	var lastLvlReward = 0;
     var lastRewardLevel = server.GetUserReadOnlyData(
@@ -1026,9 +1026,9 @@ handlers.openChest = function(args, context)
         currLvl = i; break;
       }
 
-      if(Number(lastLvlReward) < Number(currLvl))
+      if(Number(args.levelUpRewardIndex) < Number(currLvl))
       {
-        lastLvlReward = Number(lastLvlReward) + 1;
+        lastLvlReward = Number(args.levelUpRewardIndex);
         levelItemDataToUpdate["LastLevelReward"] = lastLvlReward;
         server.UpdateUserReadOnlyData(
         {
@@ -1225,7 +1225,7 @@ handlers.openChest = function(args, context)
 
   //give experience for opening chest unless this chest was opened as part of leveling up reward:
   //if no chest id is provided, it means that this function is used for inventory update
-  if((args.chestId) && (args.isLevelUp != true)){
+  if((args.chestId) && (args.levelUpRewardIndex <= 0)){
     var totalXp = UpdateExperience("Chests", args.chestId, "xpGain", 0, true);
       outInventory.Experience = totalXp;
   }
