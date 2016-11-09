@@ -12,7 +12,7 @@ handlers.openChest = function(args, context)
     });
     var levelItemDataToUpdate = {};
     levelItemDataToUpdate["LastLevelReward"] = 1;
-    log("lastLevelReward: " + lastRewardLevel.Data);
+    log.debug("lastLevelReward: " + lastRewardLevel.Data);
     if(lastRewardLevel.Data == undefined)
     {
       server.UpdateUserReadOnlyData(
