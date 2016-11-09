@@ -12,7 +12,6 @@ handlers.openChest = function(args, context)
     });
     var levelItemDataToUpdate = {};
     levelItemDataToUpdate["LastLevelReward"] = 1;
-    log.debug("lastLevelReward: " + JSON.stringify(lastRewardLevel.Data.LastLevelReward));
     if(lastRewardLevel.Data.LastLevelReward == undefined)
     {
       server.UpdateUserReadOnlyData(
@@ -20,34 +19,10 @@ handlers.openChest = function(args, context)
         PlayFabId : currentPlayerId, 
         Data : levelItemDataToUpdate
       }
-        );
-
-      var suArray = [];
-      var su = {StatisticName : "Experience", Version : "0", Value: 0};
-      suArray.push(su);
-
-      server.UpdatePlayerStatistics(
-      {
-        PlayFabId : currentPlayerId,
-        Statistics: suArray
-      });
-
-      //give bundle to user
-      //ids of bundles are of the form 001, 002, ... , 012 etc so padded with 0s until it has 3 digits
-      var str = "" + 1;
-      var pad = "000";
-      var ans = pad.substring(0, pad.length - str.length) + str; 
-      server.GrantItemsToUser(
-      {
-        CatalogVersion : "LevelUpRewards",
-        PlayFabId : currentPlayerId, 
-        ItemIds : ans
-      }
-        );
-      
+        );      
+      lastRewardLevel.Data.LastLevelReward = 1;
     }
-    else
-    { 
+    // now let's see if the user gets a reward
       var lvlThresholds = JSON.parse(getCatalogItem("Balancing", "BalancingItem").CustomData).LevelThresholds;
         //get current exprience
       var ps= server.GetPlayerStatistics(
@@ -56,6 +31,18 @@ handlers.openChest = function(args, context)
             StatisticNames: ["Experience"]
       }).Statistics;
       var currentExprience = GetValueFromStatistics(ps, "Experience", 0);
+      if(currentExprience == 0) // this most likely means that the user doesn't have the exp statistic so let's give it to them
+      {
+      	  var suArray = [];
+	      var su = {StatisticName : "Experience", Version : "0", Value: 0};
+	      suArray.push(su);
+
+	      server.UpdatePlayerStatistics(
+	      {
+	        PlayFabId : currentPlayerId,
+	        Statistics: suArray
+	      });
+      }
       var currLvl = 100;
       for(var i = 0; i < lvlThresholds.length; i++)
       {
@@ -63,10 +50,10 @@ handlers.openChest = function(args, context)
         currLvl = i; break;
       }
 
-      if(Number(lastRewardLevel.Data.Value) < Number(currLvl))
+      if(Number(lastRewardLevel.Data.LastLevelReward) < Number(currLvl))
       {
-        lastRewardLevel.Data.Value = Number(lastRewardLevel.Data.Value) + 1;
-        levelItemDataToUpdate["LastLevelReward"] = lastRewardLevel.Data.Value;
+        lastRewardLevel.Data.LastLevelReward = Number(lastRewardLevel.Data.LastLevelReward) + 1;
+        levelItemDataToUpdate["LastLevelReward"] = lastRewardLevel.Data.LastLevelReward;
         server.UpdateUserReadOnlyData(
         {
           PlayFabId : currentPlayerId, 
@@ -75,7 +62,7 @@ handlers.openChest = function(args, context)
           );
         //give bundle to user
         //ids of bundles are of the form 001, 002, ... , 012 etc so padded with 0s until it has 3 digits
-        var str = "" + lastRewardLevel.Data.Value;
+        var str = "" + lastRewardLevel.Data.LastLevelReward;
         var pad = "000";
         var ans = pad.substring(0, pad.length - str.length) + str; 
         server.GrantItemsToUser(
@@ -86,8 +73,8 @@ handlers.openChest = function(args, context)
         }
           );      
         }
-        else return generateFailObj("already got reward for level: " + lastRewardLevel.Data.Value);
-    }
+        else return generateFailObj("already got reward for level: " + lastRewardLevel.Data.LastLevelReward);
+
   }
   var objectsUpdated = [];
   var currencyUpdated = [];
