@@ -222,20 +222,51 @@ function calculateLeague(currentTrophies)
           CatalogVersion : "PartCards"
         }
       );
+      //getting bias numbers for rare, common and epic chance
+      var tK = ["BlackMarketResetMinutes", "BlackMarketRarityBias"];
+      var tData = server.GetTitleData(
+        {
+          PlayFabId : currentPlayerId,
+          Keys : tK
+        }
+      );
+      var bias = tData.Data.BlackMarketRarityBias;
+      var biasParsed = JSON.parse(bias);
+      //let's create a common parts list, a rare parts list and an epic parts list
+      var partCardParsed;
+      var commonParts = [];
+      var rareParts = [];
+      var epicParts = [];
+      for(var i = 0; i < partsCatalog.Catalog.length; i++)
+      {
+        partCardParsed = JSON.parse(partsCatalog.Catalog[i].CustomData)
+        if(partCardParsed == undefined) return generateErrObj("Part card " + partsCatalog.Catalog[i].ItemId + " has no custom data.");
+        if(partCardParsed.rarity == 0) commonParts.push(partsCatalog.Catalog[i].ItemId + "_" + partCardParsed.BMCurrType + "_" + partCardParsed.BMbasePrice + "_" + 0 + "_" + partCardParsed.BMpriceIncrPerBuy);
+        if(partCardParsed.rarity == 1) rareParts.push(partsCatalog.Catalog[i].ItemId + "_" + partCardParsed.BMCurrType + "_" + partCardParsed.BMbasePrice + "_" + 0 + "_" + partCardParsed.BMpriceIncrPerBuy);
+        if(partCardParsed.rarity == 2) epicParts.push(partsCatalog.Catalog[i].ItemId + "_" + partCardParsed.BMCurrType + "_" + partCardParsed.BMbasePrice + "_" + 0 + "_" + partCardParsed.BMpriceIncrPerBuy);
+      }
+
       var dataToUpdate = {};
       var d = new Date();
       dataToUpdate["BMTime"] = d.getTime();
-      //get first part
-      var part0Index = Math.floor(Math.random() * partsCatalog.Catalog.length);
-      var cardParsed = JSON.parse(partsCatalog.Catalog[part0Index].CustomData);
-      if(cardParsed == undefined) return generateErrObj("Part card " + partsCatalog.Catalog[i].ItemId + " has no custom data.");
-      dataToUpdate["BMItem0"] = partsCatalog.Catalog[part0Index].ItemId + "_" + cardParsed.BMCurrType + "_" + cardParsed.BMbasePrice + "_" + 0 + "_" + cardParsed.BMpriceIncrPerBuy;
+      //get first part. It is always common
+      var part0Index = Math.floor(Math.random() * commonParts.length);
+      dataToUpdate["BMItem0"] = commonParts[part0Index];
+      if(commonParts.length >= 2) commonParts.splice(part0Index, 1);
       //generate second part card
-      var part1Index = Math.floor(Math.random() * partsCatalog.Catalog.length);
-      if(part1Index == part0Index) part1Index = partsCatalog.Catalog.length - part0Index - 1;
-      cardParsed = JSON.parse(partsCatalog.Catalog[part1Index].CustomData);
-      if(cardParsed == undefined) return generateErrObj("Part card " + partsCatalog.Catalog[i].ItemId + " has no custom data.");
-      dataToUpdate["BMItem1"] = partsCatalog.Catalog[part1Index].ItemId + "_" + cardParsed.BMCurrType + "_" + cardParsed.BMbasePrice + "_" + 0 + "_" + cardParsed.BMpriceIncrPerBuy;
+      var searchArray = commonParts;
+      if(Math.floor(Math.random() * 100) < Number(biasParsed.parts[2])) //biasParsed.parts[2]% chance to be the epic card
+        searchArray = epicParts;
+      else 
+      {
+        var newPerc = Number(biasParsed.parts[0]) + Number(biasParsed.parts[1]);
+        if (Math.floor(Math.random() * newPerc) > Number(biasParsed.parts[0])) // this means that it's going to be rare
+        {
+          searchArray = rareParts;
+        }
+      }
+      var part1Index = Math.floor(Math.random() * searchArray.length);
+      dataToUpdate["BMItem1"] = searchArray[part1Index];
       //getting car cards
       var carsCatalog = server.GetCatalogItems(
         {
@@ -243,46 +274,41 @@ function calculateLeague(currentTrophies)
         }
       );
       var carCardParsed;
-      var nonRareIndexes = [];
+      var commonIndexes = [];
       var rareIndexes = [];
+      var epicIndexes = [];
       for(var i = 0; i < carsCatalog.Catalog.length; i++)
       {
         carCardParsed = JSON.parse(carsCatalog.Catalog[i].CustomData)
         if(carCardParsed == undefined) return generateErrObj("Car card " + carsCatalog.Catalog[i].ItemId + " has no custom data.");
         if(carCardParsed.unlockedAtRank > league + 1) continue;
-        if(carCardParsed.rareCar == "false")
-        nonRareIndexes.push(carsCatalog.Catalog[i].ItemId + "_" + carCardParsed.BMCurrType + "_" + carCardParsed.BMbasePrice + "_" + 0 + "_" + carCardParsed.BMpriceIncrPerBuy);
-        else
-        rareIndexes.push(carsCatalog.Catalog[i].ItemId + "_" + carCardParsed.BMCurrType + "_" + carCardParsed.BMbasePrice + "_" + 0 + "_" + carCardParsed.BMpriceIncrPerBuy);
+        if(carCardParsed.rarity == "0") commonIndexes.push(carsCatalog.Catalog[i].ItemId + "_" + carCardParsed.BMCurrType + "_" + carCardParsed.BMbasePrice + "_" + 0 + "_" + carCardParsed.BMpriceIncrPerBuy);
+        if(carCardParsed.rarity == "1") rareIndexes.push(carsCatalog.Catalog[i].ItemId + "_" + carCardParsed.BMCurrType + "_" + carCardParsed.BMbasePrice + "_" + 0 + "_" + carCardParsed.BMpriceIncrPerBuy);
+        if(carCardParsed.rarity == "2") epicIndexes.push(carsCatalog.Catalog[i].ItemId + "_" + carCardParsed.BMCurrType + "_" + carCardParsed.BMbasePrice + "_" + 0 + "_" + carCardParsed.BMpriceIncrPerBuy);
       }
-      if(nonRareIndexes.length <= 0)
+      var carIdx = Math.floor(Math.random() * commonIndexes.length);
+      dataToUpdate["BMItem2"] = commonIndexes[carIdx];
+      if(commonIndexes.length >= 2) commonIndexes.splice(carIdx, 1);
+
+      var carSearchArray = commonIndexes;
+      if(Math.floor(Math.random() * 100) < Number(biasParsed.cars[2])) //biasParsed.cars[2]% chance to be the epic card
+        carSearchArray = epicIndexes;
+      else 
       {
-        dataToUpdate["BMItem2"] = rareIndexes[Math.floor(Math.random() * rareIndexes.length)];
-        dataToUpdate["BMItem3"] = rareIndexes[Math.floor(Math.random() * rareIndexes.length)];
+        var newPerc = Number(biasParsed.cars[0]) + Number(biasParsed.cars[1]);
+        if (Math.floor(Math.random() * newPerc) > Number(biasParsed.cars[0])) // this means that it's going to be rare
+        {
+          carSearchArray = rareIndexes;
+        }
       }
-      else
-      if(rareIndexes.length <= 0)
-      {
-        dataToUpdate["BMItem2"] = nonRareIndexes[Math.floor(Math.random() * nonRareIndexes.length)];
-        dataToUpdate["BMItem3"] = nonRareIndexes[Math.floor(Math.random() * nonRareIndexes.length)];
-      }
-      else
-      {
-        dataToUpdate["BMItem2"] = nonRareIndexes[Math.floor(Math.random() * nonRareIndexes.length)];
-        dataToUpdate["BMItem3"] = rareIndexes[Math.floor(Math.random() * rareIndexes.length)];
-      }
+
+      carIdx = Math.floor(Math.random() * carSearchArray.length);
+      dataToUpdate["BMItem3"] = commonIndexes[carIdx];
+
       server.UpdateUserInternalData(
         {
           PlayFabId : currentPlayerId,
           Data : dataToUpdate
-        }
-      );
-      var tK = [];
-      tK.push("BlackMarketResetMinutes");
-      var tData = server.GetTitleData(
-        {
-          PlayFabId : currentPlayerId,
-          Keys : tK
         }
       );
       dataToUpdate["BMTime"] = parseInt(tData.Data.BlackMarketResetMinutes) * 60;
