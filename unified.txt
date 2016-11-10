@@ -212,6 +212,7 @@ function calculateLeague(currentTrophies)
         PlayFabId: currentPlayerId,
         StatisticNames: ["League"]
       });
+    if(Number(league) <= 0) league = 1; // clamped
       if(ps.Statistics.length != 0)
       {
         league = ps.Statistics[0].Value.toString();
@@ -253,7 +254,8 @@ function calculateLeague(currentTrophies)
       var part0Index = Math.floor(Math.random() * commonParts.length);
       dataToUpdate["BMItem0"] = commonParts[part0Index];
       if(commonParts.length >= 2) commonParts.splice(part0Index, 1);
-      //generate second part card
+      //generate second car card
+
       var searchArray = commonParts;
       if(Math.floor(Math.random() * 100) < Number(biasParsed.parts[2])) //biasParsed.parts[2]% chance to be the epic card
         searchArray = epicParts;
