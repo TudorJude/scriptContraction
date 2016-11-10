@@ -283,7 +283,7 @@ function calculateLeague(currentTrophies)
       {
         carCardParsed = JSON.parse(carsCatalog.Catalog[i].CustomData)
         if(carCardParsed == undefined) return generateErrObj("Car card " + carsCatalog.Catalog[i].ItemId + " has no custom data.");
-        if(Number(carCardParsed.unlockedAtRank) > Number(league) + 1) continue;
+        if(Number(carCardParsed.unlockedAtRank) > (Number(league) + 1)) continue;
         if(carCardParsed.rarity == "0") commonIndexes.push(carsCatalog.Catalog[i].ItemId + "_" + carCardParsed.BMCurrType + "_" + carCardParsed.BMbasePrice + "_" + 0 + "_" + carCardParsed.BMpriceIncrPerBuy);
         if(carCardParsed.rarity == "1") rareIndexes.push(carsCatalog.Catalog[i].ItemId + "_" + carCardParsed.BMCurrType + "_" + carCardParsed.BMbasePrice + "_" + 0 + "_" + carCardParsed.BMpriceIncrPerBuy);
         if(carCardParsed.rarity == "2") epicIndexes.push(carsCatalog.Catalog[i].ItemId + "_" + carCardParsed.BMCurrType + "_" + carCardParsed.BMbasePrice + "_" + 0 + "_" + carCardParsed.BMpriceIncrPerBuy);
