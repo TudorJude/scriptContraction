@@ -322,7 +322,7 @@ function calculateLeague(currentTrophies)
       }
 
       carIdx = Math.floor(Math.random() * carSearchArray.length);
-      dataToUpdate["BMItem3"] = commonIndexes[carIdx];
+      dataToUpdate["BMItem3"] = carSearchArray[carIdx];
 
       server.UpdateUserInternalData(
         {
