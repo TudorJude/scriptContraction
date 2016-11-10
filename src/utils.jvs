@@ -262,7 +262,7 @@ function calculateLeague(currentTrophies)
       else 
       {
         var newPerc = Number(biasParsed.parts[0]) + Number(biasParsed.parts[1]);
-        if (Math.floor(Math.random() * newPerc) > Number(biasParsed.parts[0])) // this means that it's going to be rare
+        if (Math.floor(Math.random() * newPerc) >= Number(biasParsed.parts[0])) // this means that it's going to be rare
         {
           searchArray = rareParts;
         }
@@ -292,13 +292,30 @@ function calculateLeague(currentTrophies)
       dataToUpdate["BMItem2"] = commonIndexes[carIdx];
       if(commonIndexes.length >= 2) commonIndexes.splice(carIdx, 1);
 
+      if(rareIndexes.length <= 0)
+      {
+        if(epicIndexes.length <= 0)
+          {
+            rareIndexes = commonIndexes;
+            epicIndexes = commonIndexes;
+          }
+          else
+          {
+            rareIndexes = epicIndexes;
+          }
+      }
+      if(epicIndexes.length <= 0)
+      {
+        epicIndexes = rareIndexes;
+      }
+
       var carSearchArray = commonIndexes;
       if(Math.floor(Math.random() * 100) < Number(biasParsed.cars[2])) //biasParsed.cars[2]% chance to be the epic card
         carSearchArray = epicIndexes;
       else 
       {
         var newPerc = Number(biasParsed.cars[0]) + Number(biasParsed.cars[1]);
-        if (Math.floor(Math.random() * newPerc) > Number(biasParsed.cars[0])) // this means that it's going to be rare
+        if (Math.floor(Math.random() * newPerc) >= Number(biasParsed.cars[0])) // this means that it's going to be rare
         {
           carSearchArray = rareIndexes;
         }
