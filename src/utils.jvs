@@ -105,7 +105,7 @@ function CheckMaintenance()
     }
     );
     if(maintenanceData.Data["Maintenance"]) return maintenanceData.Data["Maintenance"];
-    else return true;
+    else return "true";
 }
 
 function generateMaintenanceObj()

@@ -105,7 +105,7 @@ function CheckMaintenance()
     }
     );
     if(maintenanceData.Data["Maintenance"]) return maintenanceData.Data["Maintenance"];
-    else return true;
+    else return "true";
 }
 
 function generateMaintenanceObj()
@@ -1445,7 +1445,7 @@ handlers.purchaseBMItem = function(args, context)
 };
 handlers.purchaseItems = function(args, context)
 {
-  if(CheckMaintenance() == true) generateMaintenanceObj();
+  if(CheckMaintenance() == "true") generateMaintenanceObj();
   //retrieve user inventory
   //log.debug("RETRIEVING USER INVENTORY");
   var userInventoryObject = server.GetUserInventory(
