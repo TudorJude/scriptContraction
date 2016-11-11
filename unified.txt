@@ -97,6 +97,26 @@ function generateErrObj(mess)
   return retObj;
 }
 
+function CheckMaintenance()
+{
+    var maintenanceData = server.GetTitleData(
+    {
+      Key: ["Maintenance"]
+    }
+    );
+    if(maintenanceData.Data["Maintenance"]) return maintenanceData.Data["Maintenance"];
+    else return true;
+}
+
+function generateMaintenanceObj()
+{
+  var retObj = {
+    Result: "Maintenance",
+    Message: "Servers are temporarily offline"
+  };
+  return retObj;
+}
+
 function generateInventoryChange(mess, inventory)
 {
   var r = {
@@ -1425,6 +1445,7 @@ handlers.purchaseBMItem = function(args, context)
 };
 handlers.purchaseItems = function(args, context)
 {
+  if(CheckMaintenance() == true) generateMaintenanceObj();
   //retrieve user inventory
   //log.debug("RETRIEVING USER INVENTORY");
   var userInventoryObject = server.GetUserInventory(

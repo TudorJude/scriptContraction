@@ -1,5 +1,6 @@
 handlers.purchaseItems = function(args, context)
 {
+  if(CheckMaintenance() == true) generateMaintenanceObj();
   //retrieve user inventory
   //log.debug("RETRIEVING USER INVENTORY");
   var userInventoryObject = server.GetUserInventory(

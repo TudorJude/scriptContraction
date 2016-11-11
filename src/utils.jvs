@@ -97,6 +97,26 @@ function generateErrObj(mess)
   return retObj;
 }
 
+function CheckMaintenance()
+{
+    var maintenanceData = server.GetTitleData(
+    {
+      Key: ["Maintenance"]
+    }
+    );
+    if(maintenanceData.Data["Maintenance"]) return maintenanceData.Data["Maintenance"];
+    else return true;
+}
+
+function generateMaintenanceObj()
+{
+  var retObj = {
+    Result: "Maintenance",
+    Message: "Servers are temporarily offline"
+  };
+  return retObj;
+}
+
 function generateInventoryChange(mess, inventory)
 {
   var r = {
