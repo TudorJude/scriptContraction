@@ -212,11 +212,12 @@ function calculateLeague(currentTrophies)
         PlayFabId: currentPlayerId,
         StatisticNames: ["League"]
       });
-    if(Number(league) <= 0) league = 1; // clamped
+    
       if(ps.Statistics.length != 0)
       {
         league = ps.Statistics[0].Value.toString();
       }
+      if(Number(league) <= 0) league = 1; // clamped
       //getting parts
       var partsCatalog = server.GetCatalogItems(
         {
