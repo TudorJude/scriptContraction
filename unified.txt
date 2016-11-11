@@ -1446,7 +1446,7 @@ handlers.purchaseBMItem = function(args, context)
 handlers.purchaseItems = function(args, context)
 {
   log.debug("MaintenanceMode is:  " + CheckMaintenance());
-  if(CheckMaintenance() == "true") generateMaintenanceObj();
+  if(CheckMaintenance() == "true") return generateMaintenanceObj();
   //retrieve user inventory
   //log.debug("RETRIEVING USER INVENTORY");
   var userInventoryObject = server.GetUserInventory(
