@@ -1,5 +1,6 @@
 handlers.purchaseItems = function(args, context)
 {
+  log.debug("MaintenanceMode is:  " + CheckMaintenance());
   if(CheckMaintenance() == "true") generateMaintenanceObj();
   //retrieve user inventory
   //log.debug("RETRIEVING USER INVENTORY");
