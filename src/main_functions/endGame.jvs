@@ -1,8 +1,8 @@
 handlers.endGame = function(args, context) {
   //let's recalculate the player's win/loss ratio
-  var debugMode = "false";
+  var debugMode = false;
   if(args != undefined) debugMode = args.debug;
-  if(debugMode == "false") //debug mode bypasses maintenance
+  if(debugMode == false) //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }

@@ -1,8 +1,8 @@
 handlers.purchaseBMItem = function(args, context)
 {
-  var debugMode = "false";
-  if(args) debugMode = args.debug;
-  if(debugMode == "false") //debug mode bypasses maintenance
+  var debugMode = false;
+  if(args != undefined) debugMode = args.debug;
+  if(debugMode == false) //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }

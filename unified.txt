@@ -436,9 +436,9 @@ function calculateLeague(currentTrophies)
     }
 handlers.buyChest = function(args, context)
 {
-  var debugMode = "false";
+  var debugMode = false;
   if(args != undefined) debugMode = args.debug;
-  if(debugMode == "false") //debug mode bypasses maintenance
+  if(debugMode == false) //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }
@@ -470,9 +470,9 @@ handlers.buyChest = function(args, context)
 };
 handlers.endGame = function(args, context) {
   //let's recalculate the player's win/loss ratio
-  var debugMode = "false";
+  var debugMode = false;
   if(args != undefined) debugMode = args.debug;
-  if(debugMode == "false") //debug mode bypasses maintenance
+  if(debugMode == false) //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }
@@ -922,9 +922,9 @@ server.UpdateUserInventoryItemCustomData(
 };
 handlers.openChest = function(args, context)
 {
-  var debugMode = "false";
+  var debugMode = false;
   if(args != undefined) debugMode = args.debug;
-  if(debugMode == "false") //debug mode bypasses maintenance
+  if(debugMode == false) //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }
@@ -1190,9 +1190,9 @@ handlers.openChest = function(args, context)
 };
 handlers.purchaseBMItem = function(args, context)
 {
-  var debugMode = "false";
-  if(args) debugMode = args.debug;
-  if(debugMode == "false") //debug mode bypasses maintenance
+  var debugMode = false;
+  if(args != undefined) debugMode = args.debug;
+  if(debugMode == false) //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }
@@ -1556,9 +1556,9 @@ handlers.purchaseItems = function(args, context)
 };
 handlers.requestCurrency = function(args)
 {
-  var debugMode = "false";
+  var debugMode = false;
   if(args != undefined) debugMode = args.debug;
-  if(debugMode == "false") //debug mode bypasses maintenance
+  if(debugMode == false) //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }
@@ -1575,9 +1575,9 @@ handlers.requestCurrency = function(args)
 };
 handlers.requestInventory = function(args)
 {
-  var debugMode = "false";
+  var debugMode = false;
   if(args != undefined) debugMode = args.debug;
-  if(debugMode == "false") //debug mode bypasses maintenance
+  if(debugMode == false) //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }
@@ -1661,9 +1661,9 @@ handlers.requestInventory = function(args)
 };
 handlers.retrieveBlackMarket = function(args, context)
 {
-  var debugMode = "false";
+  var debugMode = false;
   if(args != undefined) debugMode = args.debug;
-  if(debugMode == "false") //debug mode bypasses maintenance
+  if(debugMode == false) //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }
@@ -1760,9 +1760,9 @@ handlers.retrieveBlackMarket = function(args, context)
 handlers.startGame = function(args, context) {
   //let's see what subleague we are in and what win/loss ration we have
   //wlratio
-  var debugMode = "false";
+  var debugMode = false;
   if(args != undefined) debugMode = args.debug;
-  if(debugMode == "false") //debug mode bypasses maintenance
+  if(debugMode == false) //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }
@@ -2227,9 +2227,9 @@ var sAlen = vrAidx;
 }
 handlers.updateCarCust = function(args, context)
 {
-  var debugMode = "false";
+  var debugMode = false;
   if(args != undefined) debugMode = args.debug;
-  if(debugMode == "false") //debug mode bypasses maintenance
+  if(debugMode == false) //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }
