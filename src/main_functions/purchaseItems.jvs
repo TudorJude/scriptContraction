@@ -1,5 +1,6 @@
 handlers.purchaseItems = function(args, context)
 {
+  log.debug("args debug is: " + args.debug);
   if(args.debug == "false") //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
