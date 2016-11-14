@@ -1952,15 +1952,20 @@ if(isIncompleteSubDivision == true)
 {
   var envToGet = 0;
   var courseToGet = 0;
+  var recordlessTracks = [];
+
   for(var i = 0; i < envCourseArray.length; i++)
   {
     if(envCourseArray[i] == 0)// we found a missing recording <- e = i/5; c = i%5;
     {
-      envToGet = Math.floor(i/5);
-      courseToGet = i%5;
-      break;
+      recordlessTracks.push(i);
     }
   }
+
+  var courseIndexMissing = recordlessTracks[Math.floor(Math.random() * recordlessTracks.length)];
+      envToGet = Math.floor(courseIndexMissing/5);
+      courseToGet = courseIndexMissing%5;
+
   //log.debug("gettingDefaultUser: env: " + envToGet + " course: " + courseToGet);
   //let's see who the master account is
     var masterAccountRequest = server.GetTitleData(
