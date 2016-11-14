@@ -1,6 +1,10 @@
 handlers.startGame = function(args, context) {
   //let's see what subleague we are in and what win/loss ration we have
   //wlratio
+  if(args.debug == "false") //debug mode bypasses maintenance
+  {
+      if(CheckMaintenance() == "true") return generateMaintenanceObj();
+  }
   var wlStat = "10"; // 50/50 for newtimers
   var wlStatInt = 0; // we change the bitwise representation to int32 and store it like that
   var winRatio = 50;

@@ -1,5 +1,9 @@
 handlers.requestInventory = function(args)
 {
+  if(args.debug == "false") //debug mode bypasses maintenance
+  {
+      if(CheckMaintenance() == "true") return generateMaintenanceObj();
+  }
   var userInventoryObject = server.GetUserInventory(
   {
     PlayFabId: currentPlayerId,

@@ -1,5 +1,9 @@
 handlers.openChest = function(args, context)
 {
+	if(args.debug == "false") //debug mode bypasses maintenance
+	{
+  		if(CheckMaintenance() == "true") return generateMaintenanceObj();
+	}
   //level reward mechanic
   //args.level == -1 if it's regular open chest operation
   //args.level >= 0 if it's a reward for leveing up to level args.level

@@ -436,6 +436,11 @@ function calculateLeague(currentTrophies)
     }
 handlers.buyChest = function(args, context)
 {
+  if(args.debug == "false") //debug mode bypasses maintenance
+  {
+      if(CheckMaintenance() == "true") return generateMaintenanceObj();
+  }
+
   var userInventoryObject=server.GetUserInventory(
   {
     PlayFabId:currentPlayerId
@@ -463,6 +468,10 @@ handlers.buyChest = function(args, context)
 };
 handlers.endGame = function(args, context) {
   //let's recalculate the player's win/loss ratio
+  if(args.debug == "false") //debug mode bypasses maintenance
+  {
+      if(CheckMaintenance() == "true") return generateMaintenanceObj();
+  }
   var wlStat = "01";
   var wlStatInt = 0;
   var curWL = "0";
@@ -805,135 +814,6 @@ handlers.getServerTime = function(args, context)
 	var t = new Date();
 	return { time: t};
 }
-//cheat scripts
-handlers.giveMoney = function(args)
-{
-  //args.curr, args.amount
-  var addUserCurrencyResult = server.AddUserVirtualCurrency(
-  {
-    PlayFabId: currentPlayerId,
-    VirtualCurrency : args.curr,
-    Amount: args.amount
-  }
-  );
-
-  var currencyUpdated = {};
-  currencyUpdated[addUserCurrencyResult.VirtualCurrency] = addUserCurrencyResult.Balance;
-  var invChangeObj =
-           {
-             VirtualCurrency: currencyUpdated
-           };
-  var r = {
-         Result: "OK",
-         Message: "CurrencyChanged",
-         InventoryChange:invChangeObj
-       };
-  return r;
-};
-handlers.grantItems = function(args)
-{
-  //retrieve user inventory
-  var userInventoryObject = server.GetUserInventory(
-  {
-    PlayFabId: currentPlayerId
-  }
-  );
-  //args.itemId, args.catalogId, args.amount
-
-  //old grant item code
-  //var itemsToGrant = [];
-  //for(var i = 0; i < args.amount; i++)
-  //{
-  //  itemsToGrant.push(args.itemId);
-  //}
-  //try
-  //{
-  // var grantVar = server.GrantItemsToUser(
-  // {
-  //  CatalogVersion : args.catalogId,
-  //   PlayFabId: currentPlayerId,
-  //   ItemIds : itemsToGrant
-  // }
-  // );
-  //new grant item code
-  var itemData;
-  var itemFound = false;
-  var newAmount;
-  for(var i = 0; i < userInventoryObject.Inventory.length; i++)
-        {
-          if((userInventoryObject.Inventory[i].ItemId == args.itemId) && (userInventoryObject.Inventory[i].CatalogVersion == args.catalogId))
-          {
-           // log.debug("adding amount to: " + userInventoryObject.Inventory[i].ItemInstanceId);
-            if(userInventoryObject.Inventory[i].CustomData == undefined)
-            {
-              newAmount = args.amount;
-            }
-            else
-            {
-              if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)
-                newAmount = args.amount;
-              else
-              {
-                if(isNaN(Number(userInventoryObject.Inventory[i].CustomData.Amount)))
-                  newAmount = args.amount;
-                else
-                  newAmount = Number(userInventoryObject.Inventory[i].CustomData.Amount) + args.amount;
-              }
-            }
-            itemData = {"Amount" : newAmount};
-            server.UpdateUserInventoryItemCustomData(
-                    {
-                      PlayFabId: currentPlayerId,
-                      ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
-                      Data: itemData
-                    }
-                    );
-            itemFound = true;
-            break;
-          }
-        }
-
-    if(itemFound == false)
-    {
-      var itemsToGrant = [];
-      itemsToGrant.push(args.itemId);
-      var grantVar = server.GrantItemsToUser(
-      {
-        CatalogVersion : args.catalogId,
-        PlayFabId: currentPlayerId,
-        ItemIds : itemsToGrant
-      }
-      );
-
-      itemData = {"Amount" : args.amount};
-      server.UpdateUserInventoryItemCustomData(
-           {
-              PlayFabId: currentPlayerId,
-              ItemInstanceId: grantVar.ItemGrantResults[0].ItemInstanceId,
-              Data: itemData
-           }
-           );
-    }
-   //for return
-   var objectsUpdated =
-   [
-   {
-     ItemId : args.itemId,
-     CatalogVersion: args.catalogId,
-     CustomData: itemData
-   }
-   ] ;
-    var invChangeObj =
-        {
-            Inventory: objectsUpdated
-        }
-    var returnObj = {
-      Result: "OK",
-      Message: "InventoryUpdated",
-      InventoryChange:invChangeObj
-    };
-   return returnObj;
-}
 handlers.initServerData = function(args)
 {
 //create trophy statistic
@@ -1038,6 +918,10 @@ server.UpdateUserInventoryItemCustomData(
 };
 handlers.openChest = function(args, context)
 {
+	if(args.debug == "false") //debug mode bypasses maintenance
+	{
+  		if(CheckMaintenance() == "true") return generateMaintenanceObj();
+	}
   //level reward mechanic
   //args.level == -1 if it's regular open chest operation
   //args.level >= 0 if it's a reward for leveing up to level args.level
@@ -1300,6 +1184,10 @@ handlers.openChest = function(args, context)
 };
 handlers.purchaseBMItem = function(args, context)
 {
+  if(args.debug == "false") //debug mode bypasses maintenance
+  {
+      if(CheckMaintenance() == "true") return generateMaintenanceObj();
+  }
   //log.debug("purchasing item " + args.itemId + " from black market");
   if((args.itemId < 0) || (args.itemId > 3)) return generateFailObj("invalid item index");
   var keysToGet = [];
@@ -1445,8 +1333,10 @@ handlers.purchaseBMItem = function(args, context)
 };
 handlers.purchaseItems = function(args, context)
 {
-  log.debug("MaintenanceMode is:  " + CheckMaintenance());
-  if(CheckMaintenance() == "true") return generateMaintenanceObj();
+  if(args.debug == "false") //debug mode bypasses maintenance
+  {
+      if(CheckMaintenance() == "true") return generateMaintenanceObj();
+  }
   //retrieve user inventory
   //log.debug("RETRIEVING USER INVENTORY");
   var userInventoryObject = server.GetUserInventory(
@@ -1656,6 +1546,10 @@ handlers.purchaseItems = function(args, context)
 };
 handlers.requestCurrency = function(args)
 {
+  if(args.debug == "false") //debug mode bypasses maintenance
+  {
+      if(CheckMaintenance() == "true") return generateMaintenanceObj();
+  }
   var userInventoryObject = server.GetUserInventory(
   {
     PlayFabId: currentPlayerId,
@@ -1669,6 +1563,10 @@ handlers.requestCurrency = function(args)
 };
 handlers.requestInventory = function(args)
 {
+  if(args.debug == "false") //debug mode bypasses maintenance
+  {
+      if(CheckMaintenance() == "true") return generateMaintenanceObj();
+  }
   var userInventoryObject = server.GetUserInventory(
   {
     PlayFabId: currentPlayerId,
@@ -1749,6 +1647,10 @@ handlers.requestInventory = function(args)
 };
 handlers.retrieveBlackMarket = function(args, context)
 {
+  if(args.debug == "false") //debug mode bypasses maintenance
+  {
+      if(CheckMaintenance() == "true") return generateMaintenanceObj();
+  }
   //let's get last BM Time Call
   var keysToGet = [];
   keysToGet.push("BMTime");
@@ -1842,6 +1744,10 @@ handlers.retrieveBlackMarket = function(args, context)
 handlers.startGame = function(args, context) {
   //let's see what subleague we are in and what win/loss ration we have
   //wlratio
+  if(args.debug == "false") //debug mode bypasses maintenance
+  {
+      if(CheckMaintenance() == "true") return generateMaintenanceObj();
+  }
   var wlStat = "10"; // 50/50 for newtimers
   var wlStatInt = 0; // we change the bitwise representation to int32 and store it like that
   var winRatio = 50;
@@ -2298,6 +2204,10 @@ var sAlen = vrAidx;
 }
 handlers.updateCarCust = function(args, context)
 {
+  if(args.debug == "false") //debug mode bypasses maintenance
+  {
+      if(CheckMaintenance() == "true") return generateMaintenanceObj();
+  }
   var userInv = server.GetUserInventory(
   {
     PlayFabId : currentPlayerId,
@@ -2401,33 +2311,6 @@ handlers.updateCarCust = function(args, context)
   };
   return returnObj;
 
-};
-// matchmaking code
-handlers.updateTrophyCount = function(args, context) {
-  var t = 0;
-  var ps=server.GetPlayerStatistics(
-  {
-     PlayFabId: currentPlayerId,
-     StatisticNames: ["TrophyCount"]
-  });
-  if(ps.Statistics.length !== 0)
-  {
-    t = ps.Statistics[0].Value;
-  }
-  if(args.val == "rStart") t-=30;
-  if(t < 0) t=0;
-  if(args.val == "rWin") t+=60;
-  if(args.val == "rLose") return {val:t};
-  var suArray = [];
-  var su = {StatisticName : "TrophyCount", Version : "0", Value: t};
-  suArray.push(su);
-  var updateRequest = server.UpdatePlayerStatistics(
-  {
-    PlayFabId: currentPlayerId,
-    Statistics: suArray
-  }
-  );
-  if(args.val == "rWin") return {val:t};
 };
 function upgradeCar(args, userInventoryObject, playerSC, playerHC)
 {

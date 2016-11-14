@@ -1,5 +1,9 @@
 handlers.updateCarCust = function(args, context)
 {
+  if(args.debug == "false") //debug mode bypasses maintenance
+  {
+      if(CheckMaintenance() == "true") return generateMaintenanceObj();
+  }
   var userInv = server.GetUserInventory(
   {
     PlayFabId : currentPlayerId,

@@ -1,7 +1,9 @@
 handlers.purchaseItems = function(args, context)
 {
-  log.debug("MaintenanceMode is:  " + CheckMaintenance());
-  if(CheckMaintenance() == "true") return generateMaintenanceObj();
+  if(args.debug == "false") //debug mode bypasses maintenance
+  {
+      if(CheckMaintenance() == "true") return generateMaintenanceObj();
+  }
   //retrieve user inventory
   //log.debug("RETRIEVING USER INVENTORY");
   var userInventoryObject = server.GetUserInventory(
