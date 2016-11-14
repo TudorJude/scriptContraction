@@ -436,7 +436,9 @@ function calculateLeague(currentTrophies)
     }
 handlers.buyChest = function(args, context)
 {
-  if(args.debug == "false") //debug mode bypasses maintenance
+  var debugMode = "false";
+  if(args) debugMode = args.debug;
+  if(debugMode == "false") //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }
@@ -468,7 +470,9 @@ handlers.buyChest = function(args, context)
 };
 handlers.endGame = function(args, context) {
   //let's recalculate the player's win/loss ratio
-  if(args.debug == "false") //debug mode bypasses maintenance
+  var debugMode = "false";
+  if(args) debugMode = args.debug;
+  if(debugMode == "false") //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }
@@ -918,10 +922,12 @@ server.UpdateUserInventoryItemCustomData(
 };
 handlers.openChest = function(args, context)
 {
-	if(args.debug == "false") //debug mode bypasses maintenance
-	{
-  		if(CheckMaintenance() == "true") return generateMaintenanceObj();
-	}
+  var debugMode = "false";
+  if(args) debugMode = args.debug;
+  if(debugMode == "false") //debug mode bypasses maintenance
+  {
+      if(CheckMaintenance() == "true") return generateMaintenanceObj();
+  }
   //level reward mechanic
   //args.level == -1 if it's regular open chest operation
   //args.level >= 0 if it's a reward for leveing up to level args.level
@@ -1184,7 +1190,9 @@ handlers.openChest = function(args, context)
 };
 handlers.purchaseBMItem = function(args, context)
 {
-  if(args.debug == "false") //debug mode bypasses maintenance
+  var debugMode = "false";
+  if(args) debugMode = args.debug;
+  if(debugMode == "false") //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }
@@ -1333,8 +1341,9 @@ handlers.purchaseBMItem = function(args, context)
 };
 handlers.purchaseItems = function(args, context)
 {
-  log.debug("args debug is: " + args.debug);
-  if(args.debug == "false") //debug mode bypasses maintenance
+  var debugMode = "false";
+  if(args) debugMode = args.debug;
+  if(debugMode == "false") //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }
@@ -1547,7 +1556,9 @@ handlers.purchaseItems = function(args, context)
 };
 handlers.requestCurrency = function(args)
 {
-  if(args.debug == "false") //debug mode bypasses maintenance
+  var debugMode = "false";
+  if(args) debugMode = args.debug;
+  if(debugMode == "false") //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }
@@ -1564,7 +1575,9 @@ handlers.requestCurrency = function(args)
 };
 handlers.requestInventory = function(args)
 {
-  if(args.debug == "false") //debug mode bypasses maintenance
+  var debugMode = "false";
+  if(args) debugMode = args.debug;
+  if(debugMode == "false") //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }
@@ -1648,7 +1661,9 @@ handlers.requestInventory = function(args)
 };
 handlers.retrieveBlackMarket = function(args, context)
 {
-  if(args.debug == "false") //debug mode bypasses maintenance
+  var debugMode = "false";
+  if(args) debugMode = args.debug;
+  if(debugMode == "false") //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }
@@ -1745,7 +1760,9 @@ handlers.retrieveBlackMarket = function(args, context)
 handlers.startGame = function(args, context) {
   //let's see what subleague we are in and what win/loss ration we have
   //wlratio
-  if(args.debug == "false") //debug mode bypasses maintenance
+  var debugMode = "false";
+  if(args) debugMode = args.debug;
+  if(debugMode == "false") //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }
@@ -2205,7 +2222,9 @@ var sAlen = vrAidx;
 }
 handlers.updateCarCust = function(args, context)
 {
-  if(args.debug == "false") //debug mode bypasses maintenance
+  var debugMode = "false";
+  if(args) debugMode = args.debug;
+  if(debugMode == "false") //debug mode bypasses maintenance
   {
       if(CheckMaintenance() == "true") return generateMaintenanceObj();
   }
