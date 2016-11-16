@@ -1,11 +1,8 @@
 handlers.purchaseBMItem = function(args, context)
 {
-  var debugMode = false;
-  if(args != undefined) debugMode = args.debug;
-  if(debugMode == false) //debug mode bypasses maintenance
-  {
-      if(CheckMaintenance() == "true") return generateMaintenanceObj();
-  }
+  var mC = CheckMaintenanceAndVersion(args);
+  if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+  
   //log.debug("purchasing item " + args.itemId + " from black market");
   if((args.itemId < 0) || (args.itemId > 3)) return generateFailObj("invalid item index");
   var keysToGet = [];

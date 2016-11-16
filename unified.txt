@@ -97,23 +97,73 @@ function generateErrObj(mess)
   return retObj;
 }
 
-function CheckMaintenance()
-{
+function CheckMaintenanceAndVersion(args)
+{    
+    var debugMode = false;
+    var clientVersion = "A.0.0.1";
+
+    if(args != undefined) 
+    {
+      debugMode = args.debug;
+      clientVersion = args.cVersion;
+    }
+
+    if(clientVersion == undefined) return "update"; // user has earlier build that doesn't send version to server with each call
+
     var maintenanceData = server.GetTitleData(
     {
-      Key: ["Maintenance"]
+      Key: ["Maintenance", "MinimumGameVersionActual_IOS", "MinimumGameVersionActual"]
     }
     );
-    if(maintenanceData.Data["Maintenance"]) return maintenanceData.Data["Maintenance"];
-    else return "true";
+
+    var versionToCompareTo = maintenanceData.Data["MinimumGameVersionActual"];
+    var versionData = clientVersion.split(".");
+    if(versionData.length != 4) return "maintenance"; // version data exists but it's corrupted
+    if(versionData[0] == "ios") versionToCompareTo = maintenanceData.Data["MinimumGameVersionActual_IOS"];
+    if(versionToCompareTo == undefined) return "maintenance"; // the title data isn't there so it's safe to assume the server isn't safe and it is in maintenance mode
+    //needs update code
+    var needsUpdate = false;
+
+    var minGameVerSplit = versionToCompareTo.split('.');
+    for (var i = 0; i < 3; i++)
+    {
+          var currVer = 0;
+          if (clientVersion.Length > i + 1)
+                  currVer = Number(clientVersion[i + 1]);
+          var minVer = 0;
+          if (minGameVerSplit.Length > i)
+                  minVer = Number(minGameVerSplit[i]);
+
+          if (currVer < minVer)
+          {
+              needsUpdate = true;
+              break;
+          }    
+    }
+    // end needs update code
+    if(needsUpdate == true) return "update";
+    if(debugMode == true) return "OK"; // maintenance is bypassed by debug clients
+    if(maintenanceData.Data["Maintenance"]) 
+    {
+      if(maintenanceData.Data["Maintenance"] == "false") return "OK";
+      else return "maintenance";
+    }
+    else return "maintenance";
 }
 
-function generateMaintenanceObj()
+function generateMaintenanceOrUpdateObj(action)
 {
-  var retObj = {
-    Result: "Maintenance",
-    Message: "Servers are temporarily offline"
-  };
+  var retObj;
+  if(action == "maintenance")
+    retObj = {
+      Result: "Maintenance",
+      Message: "Servers are temporarily offline"
+    };
+  else
+      retObj = {
+      Result: "Update",
+      Message: "Game needs to be updated"
+    };
   return retObj;
 }
 
@@ -436,12 +486,8 @@ function calculateLeague(currentTrophies)
     }
 handlers.buyChest = function(args, context)
 {
-  var debugMode = false;
-  if(args != undefined) debugMode = args.debug;
-  if(debugMode == false) //debug mode bypasses maintenance
-  {
-      if(CheckMaintenance() == "true") return generateMaintenanceObj();
-  }
+  var mC = CheckMaintenanceAndVersion(args);
+  if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
 
   var userInventoryObject=server.GetUserInventory(
   {
@@ -469,13 +515,10 @@ handlers.buyChest = function(args, context)
   }
 };
 handlers.endGame = function(args, context) {
-  //let's recalculate the player's win/loss ratio
-  var debugMode = false;
-  if(args != undefined) debugMode = args.debug;
-  if(debugMode == false) //debug mode bypasses maintenance
-  {
-      if(CheckMaintenance() == "true") return generateMaintenanceObj();
-  }
+  
+  var mC = CheckMaintenanceAndVersion(args);
+  if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+
   var wlStat = "01";
   var wlStatInt = 0;
   var curWL = "0";
@@ -922,12 +965,9 @@ server.UpdateUserInventoryItemCustomData(
 };
 handlers.openChest = function(args, context)
 {
-  var debugMode = false;
-  if(args != undefined) debugMode = args.debug;
-  if(debugMode == false) //debug mode bypasses maintenance
-  {
-      if(CheckMaintenance() == "true") return generateMaintenanceObj();
-  }
+  var mC = CheckMaintenanceAndVersion(args);
+  if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+  
   //level reward mechanic
   //args.level == -1 if it's regular open chest operation
   //args.level >= 0 if it's a reward for leveing up to level args.level
@@ -1190,12 +1230,9 @@ handlers.openChest = function(args, context)
 };
 handlers.purchaseBMItem = function(args, context)
 {
-  var debugMode = false;
-  if(args != undefined) debugMode = args.debug;
-  if(debugMode == false) //debug mode bypasses maintenance
-  {
-      if(CheckMaintenance() == "true") return generateMaintenanceObj();
-  }
+  var mC = CheckMaintenanceAndVersion(args);
+  if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+  
   //log.debug("purchasing item " + args.itemId + " from black market");
   if((args.itemId < 0) || (args.itemId > 3)) return generateFailObj("invalid item index");
   var keysToGet = [];
@@ -1341,12 +1378,8 @@ handlers.purchaseBMItem = function(args, context)
 };
 handlers.purchaseItems = function(args, context)
 {
-  var debugMode = false;
-  if(args != undefined) debugMode = args.debug;
-  if(debugMode == false) //debug mode bypasses maintenance
-  {
-      if(CheckMaintenance() == "true") return generateMaintenanceObj();
-  }
+  var mC = CheckMaintenanceAndVersion(args);
+  if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
   //retrieve user inventory
   //log.debug("RETRIEVING USER INVENTORY");
   var userInventoryObject = server.GetUserInventory(
@@ -1556,12 +1589,8 @@ handlers.purchaseItems = function(args, context)
 };
 handlers.requestCurrency = function(args)
 {
-  var debugMode = false;
-  if(args != undefined) debugMode = args.debug;
-  if(debugMode == false) //debug mode bypasses maintenance
-  {
-      if(CheckMaintenance() == "true") return generateMaintenanceObj();
-  }
+  var mC = CheckMaintenanceAndVersion(args);
+  if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
   var userInventoryObject = server.GetUserInventory(
   {
     PlayFabId: currentPlayerId,
@@ -1575,12 +1604,8 @@ handlers.requestCurrency = function(args)
 };
 handlers.requestInventory = function(args)
 {
-  var debugMode = false;
-  if(args != undefined) debugMode = args.debug;
-  if(debugMode == false) //debug mode bypasses maintenance
-  {
-      if(CheckMaintenance() == "true") return generateMaintenanceObj();
-  }
+  var mC = CheckMaintenanceAndVersion(args);
+  if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
   var userInventoryObject = server.GetUserInventory(
   {
     PlayFabId: currentPlayerId,
@@ -1661,12 +1686,9 @@ handlers.requestInventory = function(args)
 };
 handlers.retrieveBlackMarket = function(args, context)
 {
-  var debugMode = false;
-  if(args != undefined) debugMode = args.debug;
-  if(debugMode == false) //debug mode bypasses maintenance
-  {
-      if(CheckMaintenance() == "true") return generateMaintenanceObj();
-  }
+  var mC = CheckMaintenanceAndVersion(args);
+  if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+
   //let's get last BM Time Call
   var keysToGet = [];
   keysToGet.push("BMTime");
@@ -1760,12 +1782,8 @@ handlers.retrieveBlackMarket = function(args, context)
 handlers.startGame = function(args, context) {
   //let's see what subleague we are in and what win/loss ration we have
   //wlratio
-  var debugMode = false;
-  if(args != undefined) debugMode = args.debug;
-  if(debugMode == false) //debug mode bypasses maintenance
-  {
-      if(CheckMaintenance() == "true") return generateMaintenanceObj();
-  }
+  var mC = CheckMaintenanceAndVersion(args);
+  if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
   var wlStat = "10"; // 50/50 for newtimers
   var wlStatInt = 0; // we change the bitwise representation to int32 and store it like that
   var winRatio = 50;
@@ -2234,12 +2252,8 @@ var sAlen = vrAidx;
 }
 handlers.updateCarCust = function(args, context)
 {
-  var debugMode = false;
-  if(args != undefined) debugMode = args.debug;
-  if(debugMode == false) //debug mode bypasses maintenance
-  {
-      if(CheckMaintenance() == "true") return generateMaintenanceObj();
-  }
+  var mC = CheckMaintenanceAndVersion(args);
+  if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
   var userInv = server.GetUserInventory(
   {
     PlayFabId : currentPlayerId,

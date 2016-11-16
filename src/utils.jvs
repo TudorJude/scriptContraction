@@ -97,23 +97,73 @@ function generateErrObj(mess)
   return retObj;
 }
 
-function CheckMaintenance()
-{
+function CheckMaintenanceAndVersion(args)
+{    
+    var debugMode = false;
+    var clientVersion = "A.0.0.1";
+
+    if(args != undefined) 
+    {
+      debugMode = args.debug;
+      clientVersion = args.cVersion;
+    }
+
+    if(clientVersion == undefined) return "update"; // user has earlier build that doesn't send version to server with each call
+
     var maintenanceData = server.GetTitleData(
     {
-      Key: ["Maintenance"]
+      Key: ["Maintenance", "MinimumGameVersionActual_IOS", "MinimumGameVersionActual"]
     }
     );
-    if(maintenanceData.Data["Maintenance"]) return maintenanceData.Data["Maintenance"];
-    else return "true";
+
+    var versionToCompareTo = maintenanceData.Data["MinimumGameVersionActual"];
+    var versionData = clientVersion.split(".");
+    if(versionData.length != 4) return "maintenance"; // version data exists but it's corrupted
+    if(versionData[0] == "ios") versionToCompareTo = maintenanceData.Data["MinimumGameVersionActual_IOS"];
+    if(versionToCompareTo == undefined) return "maintenance"; // the title data isn't there so it's safe to assume the server isn't safe and it is in maintenance mode
+    //needs update code
+    var needsUpdate = false;
+
+    var minGameVerSplit = versionToCompareTo.split('.');
+    for (var i = 0; i < 3; i++)
+    {
+          var currVer = 0;
+          if (clientVersion.Length > i + 1)
+                  currVer = Number(clientVersion[i + 1]);
+          var minVer = 0;
+          if (minGameVerSplit.Length > i)
+                  minVer = Number(minGameVerSplit[i]);
+
+          if (currVer < minVer)
+          {
+              needsUpdate = true;
+              break;
+          }    
+    }
+    // end needs update code
+    if(needsUpdate == true) return "update";
+    if(debugMode == true) return "OK"; // maintenance is bypassed by debug clients
+    if(maintenanceData.Data["Maintenance"]) 
+    {
+      if(maintenanceData.Data["Maintenance"] == "false") return "OK";
+      else return "maintenance";
+    }
+    else return "maintenance";
 }
 
-function generateMaintenanceObj()
+function generateMaintenanceOrUpdateObj(action)
 {
-  var retObj = {
-    Result: "Maintenance",
-    Message: "Servers are temporarily offline"
-  };
+  var retObj;
+  if(action == "maintenance")
+    retObj = {
+      Result: "Maintenance",
+      Message: "Servers are temporarily offline"
+    };
+  else
+      retObj = {
+      Result: "Update",
+      Message: "Game needs to be updated"
+    };
   return retObj;
 }
 
