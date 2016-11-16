@@ -128,7 +128,7 @@ function CheckMaintenanceAndVersion(args)
     for (var i = 0; i < 3; i++)
     {
           var currVer = 0;
-          if (clientVersion.length > i + 1)
+          if (versionData.length > i + 1)
                   currVer = Number(clientVersion[i + 1]);
           var minVer = 0;
           if (minGameVerSplit.length > i)
