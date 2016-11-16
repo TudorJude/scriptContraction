@@ -91,6 +91,7 @@ handlers.retrieveBlackMarket = function(args, context)
   if(d.getTime() - parseInt(getInternalDataResult.Data.BMTime.Value) > parseInt(tData.Data.BlackMarketResetMinutes) *60*1000) // minutes *60*1000
   {
     //log.debug("regenerating market");
+    if(mC != "OK") GetCurrentBlackMarket(currentPlayerId, getInternalDataResult);
     return GenerateBlackMarket(currentPlayerId);
   }
   //log.debug("get current market");
