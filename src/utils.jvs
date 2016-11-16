@@ -134,6 +134,8 @@ function CheckMaintenanceAndVersion(args)
           if (minGameVerSplit.Length > i)
                   minVer = Number(minGameVerSplit[i]);
 
+          log.debug("iteration: " + i + " currVer: " + currVer + " vs minVer: " + minVer);
+
           if (currVer < minVer)
           {
               needsUpdate = true;
