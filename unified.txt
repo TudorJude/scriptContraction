@@ -1606,8 +1606,8 @@ handlers.requestCurrency = function(args)
 };
 handlers.requestInventory = function(args)
 {
-  var mC = CheckMaintenanceAndVersion(args);
-  if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+  //var mC = CheckMaintenanceAndVersion(args);
+  //if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
   var userInventoryObject = server.GetUserInventory(
   {
     PlayFabId: currentPlayerId,
@@ -1688,8 +1688,11 @@ handlers.requestInventory = function(args)
 };
 handlers.retrieveBlackMarket = function(args, context)
 {
-  var mC = CheckMaintenanceAndVersion(args);
-  if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+	var mC = CheckMaintenanceAndVersion(args);
+	if(args.reset === true)
+	{ 		
+  		if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+	}
 
   //let's get last BM Time Call
   var keysToGet = [];
