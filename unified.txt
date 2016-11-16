@@ -128,10 +128,10 @@ function CheckMaintenanceAndVersion(args)
     for (var i = 0; i < 3; i++)
     {
           var currVer = 0;
-          if (clientVersion.Length > i + 1)
+          if (clientVersion.length > i + 1)
                   currVer = Number(clientVersion[i + 1]);
           var minVer = 0;
-          if (minGameVerSplit.Length > i)
+          if (minGameVerSplit.length > i)
                   minVer = Number(minGameVerSplit[i]);
 
           log.debug("iteration: " + i + " currVer: " + currVer + " vs minVer: " + minVer);
