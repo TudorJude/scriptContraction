@@ -134,7 +134,7 @@ function CheckMaintenanceAndVersion(args)
           if (minGameVerSplit.length > i)
                   minVer = Number(minGameVerSplit[i]);
 
-          log.debug("iteration: " + i + " currVer: " + currVer + " vs minVer: " + minVer);
+          //log.debug("iteration: " + i + " currVer: " + currVer + " vs minVer: " + minVer);
 
           if (currVer < minVer)
           {
