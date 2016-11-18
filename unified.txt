@@ -554,7 +554,7 @@ handlers.endGame = function(args, context) {
 	totalGames = wlStat.length;
   var winStreak = 0;
   var winStreakTemp = 0;
-	for(var i = 0; i < wlStat.length; i++)
+	for(var i = 1; i < wlStat.length; i++)
 	{
 		if(wlStat[i] == "1") 
       {
