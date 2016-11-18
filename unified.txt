@@ -559,12 +559,10 @@ handlers.endGame = function(args, context) {
 		if(wlStat[i] == "1") 
       {
         wins++;
-        log.debug("wins " + wins);
         winStreakTemp++;
       }
       else
       {
-        log.debug("winStreak " + winStreakTemp);
         if(winStreakTemp > winStreak)
         {
           winStreak = winStreakTemp;
@@ -1870,7 +1868,7 @@ handlers.startGame = function(args, context) {
       wlStatInt = ps.Statistics[0].Value.toString();
       wlStat = Number(wlStatInt).toString(2);
       totalGames = wlStat.length;
-      for(var i = 0; i < wlStat.length; i++)
+      for(var i = 1; i < wlStat.length; i++)
       {
         if(wlStat[i] == "1") wins++;
       }
@@ -1882,7 +1880,14 @@ handlers.startGame = function(args, context) {
   //log.debug("wlStatBeforeshift " + wlStat);
    if(wlStat.length > 20)
    {
-    wlStat = wlStat.slice(1);
+    var tempS = new Array(20);
+    wlStat = wlStat.slice(2);
+    tempS[0] = "1";
+    for(var i = 0; i < wlStat.length; i++)
+    {
+      tempS[i + 1] = wlStat[i];
+    }
+    wlStat = tempS;
    }
   // log.debug("wlStat " + wlStat);
   //trophy count and subleague distribution

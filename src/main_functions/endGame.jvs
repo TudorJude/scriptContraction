@@ -41,12 +41,10 @@ handlers.endGame = function(args, context) {
 		if(wlStat[i] == "1") 
       {
         wins++;
-        log.debug("wins " + wins);
         winStreakTemp++;
       }
       else
       {
-        log.debug("winStreak " + winStreakTemp);
         if(winStreakTemp > winStreak)
         {
           winStreak = winStreakTemp;
