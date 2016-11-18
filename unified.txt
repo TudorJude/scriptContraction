@@ -1895,7 +1895,7 @@ handlers.startGame = function(args, context) {
      PlayFabId: currentPlayerId,
      StatisticNames: ["TotalGames"]
   });
-  var totalGames = GetValueFromStatistics(ms, "TotalGames", 0);
+  var totalGames = GetValueFromStatistics(gss, "TotalGames", 0);
   totalGames = Number(totalGames) + 1;
   var tc=server.GetPlayerStatistics(
   {
