@@ -38,13 +38,13 @@ handlers.startGame = function(args, context) {
     {
       Key: ["LeagueSubdivisions","SubdivisionTrophyRanges","TrophyGainRange","TrophyLoseRange","SubdivisionPrRanges"]
     }
-    ).Statistics;
+    );
   //let's get the GamesStarted statistic
   var gss=server.GetPlayerStatistics(
   {
      PlayFabId: currentPlayerId,
      StatisticNames: ["TotalGames"]
-  });
+  }).Statistics;
   var totalGames = GetValueFromStatistics(gss, "TotalGames", 0);
   totalGames = Number(totalGames) + 1;
   var tc=server.GetPlayerStatistics(
