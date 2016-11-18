@@ -45,8 +45,8 @@ handlers.startGame = function(args, context) {
      PlayFabId: currentPlayerId,
      StatisticNames: ["TotalGames"]
   }).Statistics;
-  var totalGames = GetValueFromStatistics(gss, "TotalGames", 0);
-  totalGames = Number(totalGames) + 1;
+  var totalGamesStarted = GetValueFromStatistics(gss, "TotalGames", 0);
+  totalGamesStarted = Number(totalGamesStarted) + 1;
   var tc=server.GetPlayerStatistics(
   {
      PlayFabId: currentPlayerId,
@@ -253,7 +253,7 @@ if(isIncompleteSubDivision == true)
           suArray.push(sut);
           var sul = {StatisticName: "League", Version : "0", Value: cLeague};
           suArray.push(sul);
-          var sul = {StatisticName: "TotalGames", Version : "0", Value: totalGames};
+          var sul = {StatisticName: "TotalGames", Version : "0", Value: totalGamesStarted};
           suArray.push(sul);
           //log.debug("updatingStats: " + suArray);
           var updateRequest = server.UpdatePlayerStatistics(
@@ -443,7 +443,7 @@ var sAlen = vrAidx;
   suArray.push(sut);
   var sul = {StatisticName: "League", Version : "0", Value: cLeague};
   suArray.push(sul);
-  var sul = {StatisticName: "TotalGames", Version : "0", Value: totalGames};
+  var sul = {StatisticName: "TotalGames", Version : "0", Value: totalGamesStarted};
   suArray.push(sul);
  // log.debug("updatingStats: " + suArray);
   var updateRequest = server.UpdatePlayerStatistics(

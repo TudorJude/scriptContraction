@@ -41,10 +41,12 @@ handlers.endGame = function(args, context) {
 		if(wlStat[i] == "1") 
       {
         wins++;
+        log.debug("wins " + wins);
         winStreakTemp++;
       }
       else
       {
+        log.debug("winStreak " + winStreakTemp);
         if(winStreakTemp > winStreak)
         {
           winStreak = winStreakTemp;
@@ -99,8 +101,8 @@ handlers.endGame = function(args, context) {
      PlayFabId: currentPlayerId,
      StatisticNames: ["Wins", "TotalGamesCompleted","LongestWinStreak","BestDriftScore"]
   }).Statistics;
-  var totalGames = GetValueFromStatistics(ms, "TotalGamesCompleted", 0);
-  totalGames = Number(totalGames) + 1;
+  var totalGamesCompleted = GetValueFromStatistics(ms, "TotalGamesCompleted", 0);
+  totalGamesCompleted = Number(totalGamesCompleted) + 1;
   var totalWins = GetValueFromStatistics(ms, "Wins", 0);
   if(args.outcome == "rWin")
     totalWins = Number(totalWins) + 1;
@@ -128,7 +130,7 @@ handlers.endGame = function(args, context) {
   suArray.push(sut);
     var sut = {StatisticName : "Wins", Version : "0", Value: totalWins};
   suArray.push(sut);
-    var sut = {StatisticName : "TotalGamesCompleted", Version : "0", Value: totalGames};
+    var sut = {StatisticName : "TotalGamesCompleted", Version : "0", Value: totalGamesCompleted};
   suArray.push(sut);
     var sut = {StatisticName : "LongestWinStreak", Version : "0", Value: longestStreak};
   suArray.push(sut);
