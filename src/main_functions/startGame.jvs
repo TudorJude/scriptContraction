@@ -38,7 +38,7 @@ handlers.startGame = function(args, context) {
     {
       Key: ["LeagueSubdivisions","SubdivisionTrophyRanges","TrophyGainRange","TrophyLoseRange","SubdivisionPrRanges"]
     }
-    );
+    ).Statistics;
   //let's get the GamesStarted statistic
   var gss=server.GetPlayerStatistics(
   {

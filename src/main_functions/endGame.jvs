@@ -98,7 +98,7 @@ handlers.endGame = function(args, context) {
   {
      PlayFabId: currentPlayerId,
      StatisticNames: ["Wins", "TotalGamesCompleted","LongestWinStreak","BestDriftScore"]
-  });
+  }).Statistics;
   var totalGames = GetValueFromStatistics(ms, "TotalGamesCompleted", 0);
   totalGames = Number(totalGames) + 1;
   var totalWins = GetValueFromStatistics(ms, "Wins", 0);
