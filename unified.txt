@@ -552,9 +552,23 @@ handlers.endGame = function(args, context) {
   wlStat = tempString;
   //log.debug("wlStat " + wlStat);
 	totalGames = wlStat.length;
+  var winStreak = 0;
+  var winStreakTemp = 0;
 	for(var i = 0; i < wlStat.length; i++)
 	{
-		if(wlStat[i] == "1") wins++;
+		if(wlStat[i] == "1") 
+      {
+        wins++;
+        winStreakTemp++;
+      }
+      else
+      {
+        if(winStreakTemp > winStreak)
+        {
+          winStreak = winStreakTemp;
+        }
+        winStreakTemp = 0;
+      }
 	}
 	//log.debug("wlStatNew " + wlStat);
 
@@ -596,7 +610,25 @@ handlers.endGame = function(args, context) {
   {
   		trophyCount += refund;
   }
-  log.debug("trophies change: " + initTrophyCount + " => " + trophyCount);
+ var recHeader = JSON.parse(args.recordingHeader);
+//let's update the total wins/ total losses statistics
+  var ms=server.GetPlayerStatistics( //miscelanious statistics
+  {
+     PlayFabId: currentPlayerId,
+     StatisticNames: ["Wins", "TotalGamesCompleted","LongestWinStreak","BestDriftScore"]
+  });
+  var totalGames = GetValueFromStatistics(ms, "TotalGamesCompleted", 0);
+  totalGames = Number(totalGames) + 1;
+  var totalWins = GetValueFromStatistics(ms, "Wins", 0);
+  if(args.outcome == "rWin")
+    totalWins = Number(totalWins) + 1;
+  var longestStreak = GetValueFromStatistics(ms, "LongestWinStreak", 0);
+  if(winStreak > longestStreak)
+    longestStreak = winStreak;
+  var bestScore = GetValueFromStatistics(ms, "BestDriftScore", 0);
+  if(Number(recHeader.Score) > bestScore)
+    bestScore = Number(recHeader.Score);
+  //log.debug("trophies change: " + initTrophyCount + " => " + trophyCount);
   var cLeague = calculateLeague(trophyCount);
   wlStatInt = 0;
   for(var i = 0 ; i < wlStat.length; i++)
@@ -612,6 +644,14 @@ handlers.endGame = function(args, context) {
   suArray.push(sut);
   var sut = {StatisticName : "League", Version : "0", Value: cLeague};
   suArray.push(sut);
+    var sut = {StatisticName : "Wins", Version : "0", Value: totalWins};
+  suArray.push(sut);
+    var sut = {StatisticName : "TotalGamesCompleted", Version : "0", Value: totalGames};
+  suArray.push(sut);
+    var sut = {StatisticName : "LongestWinStreak", Version : "0", Value: longestStreak};
+  suArray.push(sut);
+    var sut = {StatisticName : "BestDriftScore", Version : "0", Value: bestScore};
+  suArray.push(sut);
   var updateRequest = server.UpdatePlayerStatistics(
   {
     PlayFabId: currentPlayerId,
@@ -620,7 +660,7 @@ handlers.endGame = function(args, context) {
   );
   //user ran out of time so we don't store recording
   //legacy code
-  var recHeader = JSON.parse(args.recordingHeader);
+  
   if(Number(recHeader.Score) <= 10)
     {
         var newPlayerStats =
@@ -630,9 +670,6 @@ handlers.endGame = function(args, context) {
         }
         return {Result : newPlayerStats};
     }
-    //if the user has a score of 0 we get out of this function
-    var recHeader = JSON.parse(args.recordingHeader);
-    log.debug("score: " + recHeader.Score)
   //let's see which Subdivision this player is in
   var sdval = titleDataRequest.Data["SubdivisionTrophyRanges"];
   var sdvalParsed = JSON.parse(sdval);
@@ -1785,6 +1822,32 @@ handlers.retrieveBlackMarket = function(args, context)
   //log.debug("get current market");
   return GetCurrentBlackMarket(currentPlayerId, getInternalDataResult);
 };
+handlers.rewardUsers = function(args, context) 
+{
+    var ps = server.GetPlayerStatistics({
+      PlayFabId: currentPlayerId,
+      StatisticNames: ["Experience","TrophyCount"]
+    }).Statistics;
+  var currentExprience = GetValueFromStatistics(ps, "Experience", 0); // 0 - 80000
+  var currentTrophies = GetValueFromStatistics(ps, "TrophyCount", 0); // 0 - 3000
+
+  var trophyDiff = 0;
+  var expToGive = 0;
+  if(currentExprience <= 0) 
+  {
+    trophyDiff = (Number(currentTrophies) / 3000);
+    expToGive = Number(Math.floor(trophyDiff * 800));
+  }
+  currentExprience = Number(currentExprience) + expToGive;
+
+  var updateRequest = server.UpdatePlayerStatistics(
+  {
+    PlayFabId: currentPlayerId,
+    Statistics: [{StatisticName: "Experience", Version : "0", Value: currentExprience}]
+  });
+  return currentExprience;
+}
+
 handlers.startGame = function(args, context) {
   //let's see what subleague we are in and what win/loss ration we have
   //wlratio
@@ -1826,6 +1889,14 @@ handlers.startGame = function(args, context) {
       Key: ["LeagueSubdivisions","SubdivisionTrophyRanges","TrophyGainRange","TrophyLoseRange","SubdivisionPrRanges"]
     }
     );
+  //let's get the GamesStarted statistic
+  var gss=server.GetPlayerStatistics(
+  {
+     PlayFabId: currentPlayerId,
+     StatisticNames: ["TotalGames"]
+  });
+  var totalGames = GetValueFromStatistics(ms, "TotalGames", 0);
+  totalGames = Number(totalGames) + 1;
   var tc=server.GetPlayerStatistics(
   {
      PlayFabId: currentPlayerId,
@@ -2032,6 +2103,8 @@ if(isIncompleteSubDivision == true)
           suArray.push(sut);
           var sul = {StatisticName: "League", Version : "0", Value: cLeague};
           suArray.push(sul);
+          var sul = {StatisticName: "TotalGames", Version : "0", Value: totalGames};
+          suArray.push(sul);
           //log.debug("updatingStats: " + suArray);
           var updateRequest = server.UpdatePlayerStatistics(
           {
@@ -2219,6 +2292,8 @@ var sAlen = vrAidx;
   var sut = {StatisticName: "TrophyCount", Version : "0", Value: trophyCount};
   suArray.push(sut);
   var sul = {StatisticName: "League", Version : "0", Value: cLeague};
+  suArray.push(sul);
+  var sul = {StatisticName: "TotalGames", Version : "0", Value: totalGames};
   suArray.push(sul);
  // log.debug("updatingStats: " + suArray);
   var updateRequest = server.UpdatePlayerStatistics(

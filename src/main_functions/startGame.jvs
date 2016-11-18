@@ -39,6 +39,14 @@ handlers.startGame = function(args, context) {
       Key: ["LeagueSubdivisions","SubdivisionTrophyRanges","TrophyGainRange","TrophyLoseRange","SubdivisionPrRanges"]
     }
     );
+  //let's get the GamesStarted statistic
+  var gss=server.GetPlayerStatistics(
+  {
+     PlayFabId: currentPlayerId,
+     StatisticNames: ["TotalGames"]
+  });
+  var totalGames = GetValueFromStatistics(ms, "TotalGames", 0);
+  totalGames = Number(totalGames) + 1;
   var tc=server.GetPlayerStatistics(
   {
      PlayFabId: currentPlayerId,
@@ -245,6 +253,8 @@ if(isIncompleteSubDivision == true)
           suArray.push(sut);
           var sul = {StatisticName: "League", Version : "0", Value: cLeague};
           suArray.push(sul);
+          var sul = {StatisticName: "TotalGames", Version : "0", Value: totalGames};
+          suArray.push(sul);
           //log.debug("updatingStats: " + suArray);
           var updateRequest = server.UpdatePlayerStatistics(
           {
@@ -432,6 +442,8 @@ var sAlen = vrAidx;
   var sut = {StatisticName: "TrophyCount", Version : "0", Value: trophyCount};
   suArray.push(sut);
   var sul = {StatisticName: "League", Version : "0", Value: cLeague};
+  suArray.push(sul);
+  var sul = {StatisticName: "TotalGames", Version : "0", Value: totalGames};
   suArray.push(sul);
  // log.debug("updatingStats: " + suArray);
   var updateRequest = server.UpdatePlayerStatistics(
