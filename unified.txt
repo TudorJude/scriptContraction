@@ -916,7 +916,7 @@ handlers.generateDaily = function(args, context)
 			DailyStatus = 1;
 
 		if(DailyStatus != 1)
-			return generateErrorObject("DailyStatus is: " + DailyStatus + ". Should be 1");
+			return generateErrObj("DailyStatus is: " + DailyStatus + ". Should be 1");
 	}
 
 	DailyStatus = 2; //we are now in ongoing mode
