@@ -895,6 +895,55 @@ function UpdateExperience(catalogId, itemId, xpArrayId, actionLevel, updateServe
   });
   return currentExprience;
 }
+handlers.generateDaily = function(args, context) 
+{
+	var DailyStatus = 1; //0 <- waiting for daily timer, 1 <- generate daily, 2 <- daily is ongoing
+	var DailyMissionClaimStatus = [0,0,0,0,0,0,0,0];
+	var d = new Date();
+
+	var dStatus = server.GetUserInternalData(
+	{
+	    PlayFabId: currentPlayerId,
+	    Keys: ["DailyMissionStatus"]
+	});
+
+	if(dStatus.Data.DailyMissionStatus != undefined)
+	{
+	    var parsedData = JSON.parse(dStatus.Data.DailyMissionStatus);
+		DailyStatus = Number(parsedData.DailyStatus);
+
+		if((DailyStatus == 0) && (d.getTime() - Number(parsedData.timeStamp) > Number(totalMinutes) *60*1000)) // we can only get to DailyStatus = 1 from status 0
+			DailyStatus = 1;
+
+		if(DailyStatus != 1)
+			return generateErrorObject("DailyStatus is: " + DailyStatus + ". Should be 1");
+	}
+
+	DailyStatus = 2; //we are now in ongoing mode
+	var timeStamp = d.getTime();
+	var dailyObject = 
+	{
+		"DailyStatus" : DailyStatus,
+		"dailyMissionClaimStatus" : DailyMissionClaimStatus,
+		"timeStamp" : timeStamp
+	};
+	var dailyObjectStringified = JSON.stringify(dailyObject);
+	var objectToUpdate = 
+	{
+		"DailyMissionStatus" : dailyObjectStringified
+	}
+	server.UpdateUserInternalData(
+       {
+          PlayFabId: currentPlayerId,
+          Data: objectToUpdate
+       });
+
+	var r = 
+	{
+    	"Result": "OK"
+  	};
+  	return r;
+}
 handlers.getDailyMissionStatus = function(args, context) {
 
   	//var mC = CheckMaintenanceAndVersion(args);
@@ -951,9 +1000,9 @@ handlers.getDailyMissionStatus = function(args, context) {
 	};
 	var r = 
 	{
-    	Result: "OK",
-    	Message: " ",
-    	DailyStatus:dStObj
+    	"Result": "OK",
+    	"Message": " ",
+    	"DailyStatus":dStObj
   	};
   	return r;
 }

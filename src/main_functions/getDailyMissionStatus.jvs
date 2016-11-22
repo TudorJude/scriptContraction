@@ -54,9 +54,9 @@ handlers.getDailyMissionStatus = function(args, context) {
 	};
 	var r = 
 	{
-    	Result: "OK",
-    	Message: " ",
-    	DailyStatus:dStObj
+    	"Result": "OK",
+    	"Message": " ",
+    	"DailyStatus":dStObj
   	};
   	return r;
 }
