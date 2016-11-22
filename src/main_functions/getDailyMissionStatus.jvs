@@ -1,7 +1,7 @@
 handlers.getDailyMissionStatus = function(args, context) {
 
-  	var mC = CheckMaintenanceAndVersion(args);
-  	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+  	//var mC = CheckMaintenanceAndVersion(args);
+  	//if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
 
 	var DailyStatus = 1; //0 <- waiting for daily timer, 1 <- generate daily, 2 <- daily is ongoing
 	var DailyMissionClaimStatus = [0,0,0,0,0,0,0,0];
