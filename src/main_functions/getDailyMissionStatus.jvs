@@ -14,7 +14,7 @@ handlers.getDailyMissionStatus = function(args, context) {
 
 	if(dStatus.Data.DailyMissionStatus != undefined)
 	{
-		var parsedData = JSON.parse(dStatus.Data.DailyMissionStatus);
+		var parsedData = JSON.parse(dStatus.Data.DailyMissionStatus.Value);
 		DailyStatus = Number(parsedData.DailyStatus);	
 		var tempLength = DailyMissionClaimStatus.length;
 		if(tempLength > parsedData.dailyMissionClaimStatus.length) tempLength = parsedData.dailyMissionClaimStatus.length;

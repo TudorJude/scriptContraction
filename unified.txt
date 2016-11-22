@@ -909,7 +909,7 @@ handlers.generateDaily = function(args, context)
 
 	if(dStatus.Data.DailyMissionStatus != undefined)
 	{
-	    var parsedData = JSON.parse(dStatus.Data.DailyMissionStatus);
+	    var parsedData = JSON.parse(dStatus.Data.DailyMissionStatus.Value);
 		DailyStatus = Number(parsedData.DailyStatus);
 
 		if((DailyStatus == 0) && (d.getTime() - Number(parsedData.timeStamp) > Number(totalMinutes) *60*1000)) // we can only get to DailyStatus = 1 from status 0
@@ -960,7 +960,7 @@ handlers.getDailyMissionStatus = function(args, context) {
 
 	if(dStatus.Data.DailyMissionStatus != undefined)
 	{
-		var parsedData = JSON.parse(dStatus.Data.DailyMissionStatus);
+		var parsedData = JSON.parse(dStatus.Data.DailyMissionStatus.Value);
 		DailyStatus = Number(parsedData.DailyStatus);	
 		var tempLength = DailyMissionClaimStatus.length;
 		if(tempLength > parsedData.dailyMissionClaimStatus.length) tempLength = parsedData.dailyMissionClaimStatus.length;
