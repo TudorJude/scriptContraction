@@ -912,8 +912,24 @@ handlers.generateDaily = function(args, context)
 	    var parsedData = JSON.parse(dStatus.Data.DailyMissionStatus.Value);
 		DailyStatus = Number(parsedData.DailyStatus);
 
-		if((DailyStatus == 0) && (d.getTime() - Number(parsedData.timeStamp) > Number(totalMinutes) *60*1000)) // we can only get to DailyStatus = 1 from status 0
-			DailyStatus = 1;
+		if(DailyStatus == 0) // we only check if status should be 1 from status 0
+		{
+	      var tData = server.GetTitleData(
+	        {
+	          PlayFabId : currentPlayerId,
+	          Keys : ["DailyMissionData"]
+	        }
+	      );
+	      var totalMinutes = 600;
+	      tParsed = JSON.parse(tData.Data.DailyMissionData);
+	      totalMinutes = Number(tParsed.minutesToRefresh);
+
+	      var d = new Date();
+	      if(d.getTime() - Number(parsedData.timeStamp) > Number(totalMinutes) *60*1000) // minutes *60*1000
+	      {
+	      	DailyStatus = 1; // time's up we have to tell the client that it is time to generate a new daily
+	      }
+	  	}
 
 		if(DailyStatus != 1)
 			return generateErrObj("DailyStatus is: " + DailyStatus + ". Should be 1");
