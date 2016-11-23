@@ -1268,7 +1268,7 @@ handlers.getDailyMissionStatus = function(args, context) {
   	//var mC = CheckMaintenanceAndVersion(args);
   	//if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
 
-	var DailyStatus = 1; //0 <- waiting for daily timer, 1 <- generate daily, 2 <- daily is ongoing
+	var DailyStatus = 2; //0 <- waiting for daily timer, 1 <- generate daily, 2 <- daily is ongoing
 	var DailyMissionClaimStatus = [0,0,0,0,0,0,0,0];
 	var TimeRemaining = -1;
 	var dStatus = server.GetUserInternalData(
@@ -1306,7 +1306,7 @@ handlers.getDailyMissionStatus = function(args, context) {
 	      	DailyStatus = 2; // time's up we have to  generate a new daily
 	      	DailyMissionClaimStatus = [0,0,0,0,0,0,0,0];
 	      	var timeStamp = d.getTime();
-	      	
+
 			var dailyObject = 
 			{
 				"DailyStatus" : DailyStatus,
@@ -1329,6 +1329,27 @@ handlers.getDailyMissionStatus = function(args, context) {
 	      	TimeRemaining = (Number(totalMinutes) *60) - (Math.floor((d.getTime() - Number(parsedData.timeStamp)/1000))); // time remaining till next quest in seconds
 	      }
 		}
+	}
+	else
+	{
+		DailyStatus = 2; //we are now in ongoing mode
+		var timeStamp = d.getTime();
+		var dailyObject = 
+		{
+			"DailyStatus" : DailyStatus,
+			"dailyMissionClaimStatus" : DailyMissionClaimStatus,
+			"timeStamp" : timeStamp
+		};
+		var dailyObjectStringified = JSON.stringify(dailyObject);
+		var objectToUpdate = 
+		{
+			"DailyMissionStatus" : dailyObjectStringified
+		}
+		server.UpdateUserInternalData(
+	       {
+	          PlayFabId: currentPlayerId,
+	          Data: objectToUpdate
+	       });
 	}
 	var dStObj = 
 	{
