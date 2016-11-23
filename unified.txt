@@ -1333,6 +1333,7 @@ handlers.getDailyMissionStatus = function(args, context) {
 	else
 	{
 		DailyStatus = 2; //we are now in ongoing mode
+		var d = new Date();
 		var timeStamp = d.getTime();
 		var dailyObject = 
 		{
