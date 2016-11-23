@@ -603,6 +603,7 @@ handlers.endDaily = function(args, context)
 	var parsedData = JSON.parse(dStatus.Data.DailyMissionStatus.Value);
 	var DailyMissionClaimStatus = parsedData.dailyMissionClaimStatus;
   	var DailyStatus = Number(parsedData.DailyStatus);
+  	var TimeRemaining = -1;
 	for(var i = 0; i < parsedData.dailyMissionClaimStatus.length; i++)
 	{
 		if(DailyMissionClaimStatus[idx] == 0) return generateErrObj("Not all missions were claimed");
@@ -630,6 +631,7 @@ handlers.endDaily = function(args, context)
 	else
 	{
 		DailyStatus = 0;
+		TimeRemaining = (Number(totalMinutes) *60) - (Math.floor((d.getTime() - Number(parsedData.timeStamp)/1000))); // time remaining till next quest in seconds
 	}
 
 			var dailyObject = 
@@ -801,8 +803,20 @@ handlers.endDaily = function(args, context)
 	  }
 
 	  var outInventory = server.GetUserInventory({PlayFabId: currentPlayerId});
+		var dStObj = 
+		{
+			status : DailyStatus,
+			claimStatus : DailyMissionClaimStatus,
+			timeRemaining : TimeRemaining
+		};
 
-	  return generateInventoryChange("InventoryUpdated", outInventory);
+	    var r = {
+    		Result: "OK",
+    		Message: "DailyCompleted",
+    		InventoryChange:inventory,
+    		"DailyStatus":dStObj
+  			};
+  	return r;
 }
 
 handlers.endGame = function(args, context) {
