@@ -2741,8 +2741,8 @@ var sAlen = vrAidx;
             }
           }
           //let's also check if the opponent's Pr is in the appropriate range
-          log.debug("Opponent's PR is TOO DAMN HIGH! " + opponentHeader.Pr + " vs " + Number(sdprValParsed.subdivisions[lsValParsed.leagues[cLeague - 1] + 1]) + ". You are in subdivision: " + lsValParsed.leagues[cLeague - 1] + 1);
-          if(opponentHeader.Pr > Number(sdprValParsed.subdivisions[lsValParsed.leagues[cLeague - 1] + 1]))
+          log.debug("Opponent's PR is TOO DAMN HIGH! " + opponentHeader.Pr + " vs " + Number(sdprValParsed.subdivisions[lsValParsed.leagues[cLeague - 1] + 1]) + ". You are in subdivision: " + Number(lsValParsed.leagues[cLeague - 1]) + 1);
+          if(opponentHeader.Pr > Number(sdprValParsed.subdivisions[Number(lsValParsed.leagues[cLeague - 1]) + 1]))
           {
             //log.debug("Opponent's PR is TOO DAMN HIGH! " + opponentHeader.Pr + " vs " + Number(sdprValParsed.subdivisions[lsValParsed.leagues[cLeague - 1] + 1]) + ". You are in subdivision: " + lsValParsed.leagues[cLeague - 1] + 1);
             trophiesToTake = Math.floor((lMin + lMax)/2) - 1 + Math.floor(Math.random() * 3);
