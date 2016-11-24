@@ -813,7 +813,7 @@ handlers.endDaily = function(args, context)
 	    var r = {
     		Result: "OK",
     		Message: "DailyCompleted",
-    		InventoryChange:inventory,
+    		InventoryChange:outInventory,
     		"DailyStatus":dStObj
   			};
   	return r;
