@@ -406,18 +406,18 @@ var sAlen = vrAidx;
           }
           else
           {
-            if(Number(Math.abs(userTrophies - oppTrophies)) > Number(subDivisionRange))
-            {
-              trophiesToTake = Math.floor((lMin + lMax)/2) - 1 + Math.floor(Math.random() * 3);
-              trophiesToGive = Math.floor((rMax + rMin)/2) - 1 + Math.floor(Math.random() * 3);
-              recTypeSent = "MobyDick"; // the difference in trophies is too damn high. Tell the client to generate a more appropriate opponent
-            }
-            else
-            {
+            //if(Number(Math.abs(userTrophies - oppTrophies)) > Number(subDivisionRange))
+            //{
+            //  trophiesToTake = Math.floor((lMin + lMax)/2) - 1 + Math.floor(Math.random() * 3);
+            //  trophiesToGive = Math.floor((rMax + rMin)/2) - 1 + Math.floor(Math.random() * 3);
+            //  recTypeSent = "MobyDick"; // the difference in trophies is too damn high. Tell the client to generate a more appropriate opponent
+            //}
+            //else
+            //{
             //  log.debug("rMin: " + rMin + " userTrophies: " + userTrophies + " oppTrophies " + oppTrophies + " maxLeagueT " + maxLeagueT + " minLeagueT " + minLeagueT + " rMax: " + rMax);
               trophiesToTake = lMin + Math.floor((((userTrophies - oppTrophies)/(maxLeagueT - minLeagueT)) + 1) * ((lMax - lMin)/2));
               trophiesToGive = rMin + Math.floor((((oppTrophies - userTrophies)/(maxLeagueT - minLeagueT)) + 1) * ((rMax - rMin)/2));
-            }
+           // }
           }
           //let's also check if the opponent's Pr is in the appropriate range
           if(opponentHeader.Pr > Number(sdprValParsed.subdivisions[lsValParsed.leagues[cLeague - 1]]))
