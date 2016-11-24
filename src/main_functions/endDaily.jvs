@@ -15,7 +15,7 @@ handlers.endDaily = function(args, context)
   	var TimeRemaining = -1;
 	for(var i = 0; i < parsedData.dailyMissionClaimStatus.length; i++)
 	{
-		if(DailyMissionClaimStatus[idx] == 0) return generateErrObj("Not all missions were claimed!");
+		if(DailyMissionClaimStatus[i] == 0) return generateErrObj("Not all missions were claimed!");
 	}
   //all missions claimed so let's give the player what they are due and set the daily mission status
 
