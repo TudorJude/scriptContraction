@@ -631,7 +631,7 @@ handlers.endDaily = function(args, context)
 	else
 	{
 		DailyStatus = 0;
-		TimeRemaining = (Number(totalMinutes) *60) - (Math.floor((d.getTime() - Number(parsedData.timeStamp)/1000))); // time remaining till next quest in seconds
+		TimeRemaining = (Number(totalMinutes) *60) - (Math.floor((d.getTime() - Number(parsedData.timeStamp))/1000)); // time remaining till next quest in seconds
 	}
 
 			var dailyObject = 
@@ -1326,7 +1326,7 @@ handlers.getDailyMissionStatus = function(args, context) {
 	      }
 	      else
 	      {
-	      	TimeRemaining = (Number(totalMinutes) *60) - (Math.floor((d.getTime() - Number(parsedData.timeStamp)/1000))); // time remaining till next quest in seconds
+	      	TimeRemaining = (Number(totalMinutes) *60) - (Math.floor((d.getTime() - Number(parsedData.timeStamp))/1000)); // time remaining till next quest in seconds
 	      }
 		}
 	}
