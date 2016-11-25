@@ -32,15 +32,17 @@ handlers.endDaily = function(args, context)
 	 totalMinutes = Number(tParsed.minutesToRefresh);
 
   	var d = new Date();
+  	var timeStamp;
 	if(d.getTime() - Number(parsedData.timeStamp) > Number(totalMinutes) *60*1000) // minutes *60*1000
 	{ // we need to generate a new daily mission for the user in this case
 		DailyStatus = 2; //0 <- waiting for daily timer, 1 <- generate daily, 2 <- daily is ongoing
-		var timeStamp = d.getTime();
+		timeStamp = d.getTime();
 	}
 	else
 	{
 		DailyStatus = 0;
 		TimeRemaining = (Number(totalMinutes) *60) - (Math.floor((d.getTime() - Number(parsedData.timeStamp))/1000)); // time remaining till next quest in seconds
+		timeStamp = parsedData.timeStamp;
 	}
 
 			var dailyObject = 
