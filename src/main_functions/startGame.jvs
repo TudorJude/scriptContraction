@@ -208,7 +208,7 @@ else
   }
 //log.debug("isIncompleteSubDivision: " + isIncompleteSubDivision);
 //let's give default recording if necessary
-if(isIncompleteSubDivision == true)
+if(isIncompleteSubDivision != true)
 {
   var envToGet = 0;
   var courseToGet = 0;
