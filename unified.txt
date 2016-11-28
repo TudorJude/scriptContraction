@@ -2643,19 +2643,18 @@ var searchArray = validRecArray;
 var sAlen = vrAidx;
   if(lrAidx > 0){sAlen = lrAidx; searchArray = likelyRecArray}
   if(mlrAidx > 0){sAlen = mlrAidx; searchArray = moreLikelyRecArray}
-
-  var pivot = sAlen - 1; //in case your WLRatio is the highest in the pool
-  for(var i = 0; i < sAlen; i++) // write winstreak/losestreak code
-  {
-    if(searchArray[i].wl > winRatio) //let's find the pivot; we'll move it later based on WL ratio
-    {
-      pivot = i;
-      break;
-      //opponentId = recArray[i].uId;
-      //env = recArray[i].e;
-      //course = recArray[i].c;
-    }
-  }
+  var pivot = Math.floor(Math.random() * sAlen); //urhereson
+  if(pivot >= sAlen) pivot = sAlen - 1; //i'm not fully sure Math.random can't give a value of 1 DON'T JUDGE ME
+//legacy WINLOSS RATIO mathcmaking
+  //var pivot = sAlen - 1; //in case your WLRatio is the highest in the pool
+  //for(var i = 0; i < sAlen; i++) // write winstreak/losestreak code
+  //{
+  //  if(searchArray[i].wl > winRatio) //let's find the pivot; we'll move it later based on WL ratio
+  //  {
+  //    pivot = i;
+  //    break;
+   // }
+  //}
  // log.debug("pivot is: " + pivot);
   var finalRecArraySize = Math.min(sAlen, 3); // for now 3 is the max number of recordings in the random final pool
  // log.debug("finalRecArraySize: " + finalRecArraySize);
