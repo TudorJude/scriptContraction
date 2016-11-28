@@ -2750,7 +2750,12 @@ var sAlen = vrAidx;
           {
             if(Number(Math.abs(userTrophies - oppTrophies)) >= trophyMaxDifference)
             {
+              if(args.debug == true) log.debug("generating new trophies. Reason: user trophies: " + userTrophies + " vs opponent trophies: " + oppTrophies);
               oppTrophies = userTrophies - trophyReadjustRange + Math.floor(Math.random() * trophyReadjustRange * 2);
+              opponentHeader.Trophies = oppTrophies;
+              if(args.debug == true) log.debug("performing stringify on recordingData header");
+              recordingData.Data[env + "_" + course + "_RecHeader"].Value = JSON.stringify(opponentHeader); //hope this works
+
             }
           }
           //end trophy adjustments
