@@ -196,7 +196,6 @@ function checkBalance(currType, cost, userSCBalance, userHCBalance)
 
 function calculateLeague(currentTrophies)
 {
-	log.debug("calculatingLeague");
   var league = 1;
   var td = server.GetTitleData(
     {
@@ -211,12 +210,10 @@ function calculateLeague(currentTrophies)
 
     for(var i = 0; i < leaguesSubdivisionsParsed.length; i++)
     {
-    	log.debug("at i = " + i);
       if(Number(currentTrophies) > Number(sdvtrParsed[leaguesSubdivisionsParsed[i]]))
       continue;
       return i;
     }
-    log.debug("we shouldn't be here but yet here we are!");
     return leaguesSubdivisionsParsed.length - 1;
   }
 
@@ -2535,7 +2532,7 @@ else
   }
 //log.debug("isIncompleteSubDivision: " + isIncompleteSubDivision);
 //let's give default recording if necessary
-if(isIncompleteSubDivision != true)
+if(isIncompleteSubDivision == true)
 {
   var envToGet = 0;
   var courseToGet = 0;
@@ -2811,10 +2808,6 @@ var sAlen = vrAidx;
   wlStatInt = parseInt(wlStat, 2);
  // log.debug("updating WL to:  " + wlStatInt);
   //update stats on server
-  if(args.debug == true) log.debug("updating TotalGames TO: " + totalGamesStarted)
-  if(args.debug == true) log.debug("updating TrophyCount TO: " + trophyCount)
-    if(args.debug == true) log.debug("updating cLeague TO: " + cLeague)
-      if(args.debug == true) log.debug("updating wlStatInt TO: " + wlStatInt)
   var suArray = [];
   var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
   suArray.push(su);
