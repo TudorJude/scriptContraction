@@ -156,7 +156,7 @@ handlers.endGame = function(args, context) {
   var sdval = titleDataRequest.Data["SubdivisionTrophyRanges"];
   var sdvalParsed = JSON.parse(sdval);
   //log.debug("SubdivisionTrophyRanges " + sdvalParsed);
-  var subDivision;
+  var subDivision = 43;
   for(var i = 0; i < sdvalParsed.subdivisions.length; i++)
   {
   	if(initTrophyCount<sdvalParsed.subdivisions[i])

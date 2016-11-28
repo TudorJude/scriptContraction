@@ -297,7 +297,7 @@ if(isIncompleteSubDivision == true)
             HeaderData: defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"].Value,
             TrophyLose: lMin,
             TrophyWin : rMax,
-            Opp: "Mniezo"
+            Opp: "TheStig"
                  };
         }
       }

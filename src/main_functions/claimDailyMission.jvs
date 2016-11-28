@@ -17,7 +17,7 @@ handlers.claimDailyMission = function(args, context)
 	{
 		return generateErrObj("Unlock index is out of bounds of playerData claim mission status array");
 	}
-	if(DailyMissionClaimStatus[idx] == 1) return generateErrObj("Mission already claimed");
+	if(DailyMissionClaimStatus[idx] == 1) return generateFailObj("Mission already claimed");
 	DailyMissionClaimStatus[idx] = 1;
 
 	var dailyObject = 
