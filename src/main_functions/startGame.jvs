@@ -408,16 +408,16 @@ var sAlen = vrAidx;
           oppTrophies = Number(oppTrophies);
           var trophyAdjustmentRequired = true;
           //let's adjust said trophies if needed and modify the header
-          if(args.debug == "true") log.debug("Adjusting trophies");
+          if(args.debug == true) log.debug("Adjusting trophies");
 
           if(excludedSubdivisionsFromTrophyAdjustment != undefined) 
           {
-            if(args.debug == "true") log.debug("excludedSubdivisionsFromTrophyAdjustment: " + excludedSubdivisionsFromTrophyAdjustment);
+            if(args.debug == true) log.debug("excludedSubdivisionsFromTrophyAdjustment: " + excludedSubdivisionsFromTrophyAdjustment);
             for(var i = 0; i < excludedSubdivisionsFromTrophyAdjustment.length; i++)
             {
               if(subDivision == Number(excludedSubdivisionsFromTrophyAdjustment[i])) 
                 {
-                  if(args.debug == "true") log.debug("in excluded subdivision: " + subDivision);
+                  if(args.debug == true) log.debug("in excluded subdivision: " + subDivision);
                   trophyAdjustmentRequired = false;
                   break;
                 }
@@ -427,10 +427,10 @@ var sAlen = vrAidx;
           {
             if(Number(Math.abs(userTrophies - oppTrophies)) >= trophyMaxDifference)
             {
-              if(args.debug == "true") log.debug("generating new trophies. Reason: user trophies: " + userTrophies + " vs opponent trophies: " + oppTrophies);
+              if(args.debug == true) log.debug("generating new trophies. Reason: user trophies: " + userTrophies + " vs opponent trophies: " + oppTrophies);
               oppTrophies = userTrophies - trophyReadjustRange + Math.floor(Math.random() * trophyReadjustRange * 2);
               opponentHeader.Trophies = oppTrophies;
-              if(args.debug == "true") log.debug("performing stringify on recordingData header");
+              if(args.debug == true) log.debug("performing stringify on recordingData header");
               recordingData.Data[env + "_" + course + "_RecHeader"].Value = JSON.stringify(opponentHeader); //hope this works
 
             }
@@ -464,7 +464,7 @@ var sAlen = vrAidx;
             //log.debug("Opponent's PR is TOO DAMN HIGH! " + opponentHeader.Pr + " vs " + Number(sdprValParsed.subdivisions[lsValParsed.leagues[cLeague - 1] + 1]) + ". You are in subdivision: " + lsValParsed.leagues[cLeague - 1] + 1);
             trophiesToTake = Math.floor((lMin + lMax)/2) - 1 + Math.floor(Math.random() * 3);
             trophiesToGive = Math.floor((rMax + rMin)/2) - 1 + Math.floor(Math.random() * 3);
-            recTypeSent = "MobyDick"; // the difference in Pr is too damn high. Tell the client to generate a more appropriate opponent
+            //recTypeSent = "MobyDick"; // the difference in Pr is too damn high. Tell the client to generate a more appropriate opponent
           }
   var updateTrophiesToGiveTake = true;
   if(trophyCount == 0)

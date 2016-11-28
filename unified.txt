@@ -2787,7 +2787,7 @@ var sAlen = vrAidx;
             //log.debug("Opponent's PR is TOO DAMN HIGH! " + opponentHeader.Pr + " vs " + Number(sdprValParsed.subdivisions[lsValParsed.leagues[cLeague - 1] + 1]) + ". You are in subdivision: " + lsValParsed.leagues[cLeague - 1] + 1);
             trophiesToTake = Math.floor((lMin + lMax)/2) - 1 + Math.floor(Math.random() * 3);
             trophiesToGive = Math.floor((rMax + rMin)/2) - 1 + Math.floor(Math.random() * 3);
-            recTypeSent = "MobyDick"; // the difference in Pr is too damn high. Tell the client to generate a more appropriate opponent
+            //recTypeSent = "MobyDick"; // the difference in Pr is too damn high. Tell the client to generate a more appropriate opponent
           }
   var updateTrophiesToGiveTake = true;
   if(trophyCount == 0)
