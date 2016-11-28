@@ -2781,7 +2781,7 @@ var sAlen = vrAidx;
             }
           }
           //let's also check if the opponent's Pr is in the appropriate range
-          if(args.debug == true) log.debug("Opponent's PR is TOO DAMN HIGH! " + opponentHeader.Pr + " vs " + Number(sdprValParsed.subdivisions[lsValParsed.leagues[cLeague - 1] + 1]) + ". You are in subdivision: " + Number(lsValParsed.leagues[cLeague - 1]) + 1);
+          if(args.debug == true) log.debug("Opponent's PR is TOO DAMN HIGH! " + opponentHeader.Pr + " vs " + Number(sdprValParsed.subdivisions[Number(lsValParsed.leagues[cLeague - 1]) + 1]) + ". You are in subdivision: " + Number((lsValParsed.leagues[cLeague - 1]) + 1));
           if(opponentHeader.Pr > Number(sdprValParsed.subdivisions[Number(lsValParsed.leagues[cLeague - 1]) + 1]))
           {
             //log.debug("Opponent's PR is TOO DAMN HIGH! " + opponentHeader.Pr + " vs " + Number(sdprValParsed.subdivisions[lsValParsed.leagues[cLeague - 1] + 1]) + ". You are in subdivision: " + lsValParsed.leagues[cLeague - 1] + 1);
