@@ -259,6 +259,7 @@ if(isIncompleteSubDivision != true)
           }
           if(trophyCount <= 1) trophyCount = 1;
           wlStatInt = parseInt(wlStat, 2);
+          if(args.debug == true) log.debug("updating TotalGames TO: " + totalGamesStarted)
           //log.debug("updating WL to:  " + wlStatInt);
           //update stats on server
           var suArray = [];
