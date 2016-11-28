@@ -2722,8 +2722,9 @@ var sAlen = vrAidx;
             maxLeagueT = Number(sdvalParsed.subdivisions[lsValParsed.leagues[cLeague]]);
 
 //log.debug("maxLT " + maxLeagueT + " minLeagueT " + minLeagueT);
-
+          if(args.debug == true) log.debug("I bet it will crash after this");
           var opponentHeader = JSON.parse(recordingData.Data[env + "_" + course + "_RecHeader"].Value);
+          if(args.debug == true) log.debug("or not");
           if(opponentHeader != undefined)
           {
             oppTrophies = opponentHeader.Trophies;
