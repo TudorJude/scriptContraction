@@ -54,6 +54,7 @@ handlers.startGame = function(args, context) {
   }).Statistics;
   var totalGamesStarted = GetValueFromStatistics(gss, "TotalGames", 0);
   totalGamesStarted = Number(totalGamesStarted) + 1;
+  if(args.debug == true) log.debug("totalGamesStartedIs: " + totalGamesStarted);
   var tc=server.GetPlayerStatistics(
   {
      PlayFabId: currentPlayerId,
