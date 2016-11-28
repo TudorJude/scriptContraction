@@ -2808,6 +2808,9 @@ var sAlen = vrAidx;
  // log.debug("updating WL to:  " + wlStatInt);
   //update stats on server
   if(args.debug == true) log.debug("updating TotalGames TO: " + totalGamesStarted)
+  if(args.debug == true) log.debug("updating TrophyCount TO: " + trophyCount)
+    if(args.debug == true) log.debug("updating cLeague TO: " + cLeague)
+      if(args.debug == true) log.debug("updating wlStatInt TO: " + wlStatInt)
   var suArray = [];
   var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
   suArray.push(su);
