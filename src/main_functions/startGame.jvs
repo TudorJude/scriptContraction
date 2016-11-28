@@ -43,7 +43,7 @@ handlers.startGame = function(args, context) {
   //trophy count and subleague distribution
   var leagueTitleDataRequest = server.GetTitleData(
     {
-      Key: ["LeagueSubdivisions","SubdivisionTrophyRanges","TrophyGainRange","TrophyLoseRange","SubdivisionPrRanges"]
+      Key: ["LeagueSubdivisions","SubdivisionTrophyRanges","TrophyGainRange","TrophyLoseRange","SubdivisionPrRanges", "TrophyDifferenceLimit"]
     }
     );
   //let's get the GamesStarted statistic
@@ -71,6 +71,13 @@ handlers.startGame = function(args, context) {
   var lsValParsed = JSON.parse(lsVal);
   var sdprVal = leagueTitleDataRequest.Data["SubdivisionPrRanges"];
   var sdprValParsed = JSON.parse(sdprVal);
+
+  //trophyAdjustment data
+  var tdlVal = leagueTitleDataRequest.Data["TrophyDifferenceLimit"]; //u are here
+  var tdlValParsed = JSON.parse(tdlVal);
+  var trophyReadjustRange = Number(tdlValParsed.trophyReadjustRange);
+  var trophyMaxDifference = Number(tdlValParsed.maxDifference);
+  var excludedSubdivisionsFromTrophyAdjustment = tdlValParsed.subDivisionsToExclude;
   //log.debug("SubdivisionTrophyRanges " + sdvalParsed);
   var subDivision = 43;
   var nextSubDivision = 43;
@@ -399,6 +406,32 @@ var sAlen = vrAidx;
             oppTrophies = opponentHeader.Trophies;
           }
           oppTrophies = Number(oppTrophies);
+          var trophyAdjustmentRequired = true;
+          //let's adjust said trophies if needed and modify the header
+          if(args.debug == true) log.debug("Adjusting trophies");
+
+          if(excludedSubdivisionsFromTrophyAdjustment != undefined) 
+          {
+            if(args.debug == true) log.debug("excludedSubdivisionsFromTrophyAdjustment: " + excludedSubdivisionsFromTrophyAdjustment);
+            for(var i = 0; i < excludedSubdivisionsFromTrophyAdjustment.length; i++)
+            {
+              if(subDivision == Number(excludedSubdivisionsFromTrophyAdjustment[i])) 
+                {
+                  if(args.debug == true) log.debug("in excluded subdivision: " + subDivision);
+                  trophyAdjustmentRequired = false;
+                  break;
+                }
+            }
+          }
+          if(trophyAdjustmentRequired == true)
+          {
+            if(Number(Math.abs(userTrophies - oppTrophies)) >= trophyMaxDifference)
+            {
+              oppTrophies = userTrophies - trophyReadjustRange + Math.floor(Math.random() * trophyReadjustRange * 2);
+            }
+          }
+          //end trophy adjustments
+
           if(maxLeagueT - minLeagueT <= 0)
           {
               trophiesToTake = lMax;
@@ -420,7 +453,7 @@ var sAlen = vrAidx;
             }
           }
           //let's also check if the opponent's Pr is in the appropriate range
-          log.debug("Opponent's PR is TOO DAMN HIGH! " + opponentHeader.Pr + " vs " + Number(sdprValParsed.subdivisions[lsValParsed.leagues[cLeague - 1] + 1]) + ". You are in subdivision: " + Number(lsValParsed.leagues[cLeague - 1]) + 1);
+          if(args.debug == true) log.debug("Opponent's PR is TOO DAMN HIGH! " + opponentHeader.Pr + " vs " + Number(sdprValParsed.subdivisions[lsValParsed.leagues[cLeague - 1] + 1]) + ". You are in subdivision: " + Number(lsValParsed.leagues[cLeague - 1]) + 1);
           if(opponentHeader.Pr > Number(sdprValParsed.subdivisions[Number(lsValParsed.leagues[cLeague - 1]) + 1]))
           {
             //log.debug("Opponent's PR is TOO DAMN HIGH! " + opponentHeader.Pr + " vs " + Number(sdprValParsed.subdivisions[lsValParsed.leagues[cLeague - 1] + 1]) + ". You are in subdivision: " + lsValParsed.leagues[cLeague - 1] + 1);
