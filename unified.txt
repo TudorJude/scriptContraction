@@ -196,6 +196,7 @@ function checkBalance(currType, cost, userSCBalance, userHCBalance)
 
 function calculateLeague(currentTrophies)
 {
+	log.debug("calculatingLeague");
   var league = 1;
   var td = server.GetTitleData(
     {
@@ -210,10 +211,13 @@ function calculateLeague(currentTrophies)
 
     for(var i = 0; i < leaguesSubdivisionsParsed.length; i++)
     {
+    	log.debug("at i = " + i);
       if(Number(currentTrophies) > Number(sdvtrParsed[leaguesSubdivisionsParsed[i]]))
       continue;
       return i;
     }
+    log.debug("we shouldn't be here but yet here we are!");
+    return leaguesSubdivisionsParsed.length - 1;
   }
 
   function recalculateCarPr(CarData, carId, _carCardsCatalog, _partsCardCatalog)
