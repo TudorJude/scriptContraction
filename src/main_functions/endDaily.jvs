@@ -1,5 +1,8 @@
 handlers.endDaily = function(args, context) 
 {
+	var mC = CheckMaintenanceAndVersion(args);
+  	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+  	
 	var dStatus = server.GetUserInternalData(
 	{
 	    PlayFabId: currentPlayerId,

@@ -1,5 +1,8 @@
 handlers.claimDailyMission = function(args, context) 
 {
+	var mC = CheckMaintenanceAndVersion(args);
+  	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+  	
 	var idx = Number(args.mIdx);
 	var dStatus = server.GetUserInternalData(
 	{

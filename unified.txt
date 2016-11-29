@@ -134,7 +134,7 @@ function CheckMaintenanceAndVersion(args)
           if (minGameVerSplit.length > i)
                   minVer = Number(minGameVerSplit[i]);
 
-          log.debug("iteration: " + i + " currVer: " + currVer + " vs minVer: " + minVer);
+          //log.debug("iteration: " + i + " currVer: " + currVer + " vs minVer: " + minVer);
 
           if (currVer < minVer)
           {
@@ -519,6 +519,9 @@ handlers.buyChest = function(args, context)
 };
 handlers.claimDailyMission = function(args, context) 
 {
+	var mC = CheckMaintenanceAndVersion(args);
+  	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+  	
 	var idx = Number(args.mIdx);
 	var dStatus = server.GetUserInternalData(
 	{
@@ -592,6 +595,9 @@ handlers.claimDailyMission = function(args, context)
 }
 handlers.endDaily = function(args, context) 
 {
+	var mC = CheckMaintenanceAndVersion(args);
+  	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+  	
 	var dStatus = server.GetUserInternalData(
 	{
 	    PlayFabId: currentPlayerId,
@@ -1270,7 +1276,9 @@ handlers.getDailyMissionStatus = function(args, context) {
 
   	//var mC = CheckMaintenanceAndVersion(args);
   	//if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
-
+  	var mC = CheckMaintenanceAndVersion(args);
+  	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+  	
 	var DailyStatus = 2; //0 <- waiting for daily timer, 1 <- generate daily, 2 <- daily is ongoing
 	var DailyMissionClaimStatus = [0,0,0,0,0,0,0,0];
 	var TimeRemaining = -1;
