@@ -864,58 +864,58 @@ handlers.endGame = function(args, context) {
   var mC = CheckMaintenanceAndVersion(args);
   if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
 
-  var wlStat = "01";
-  var wlStatInt = 0;
-  var curWL = "0";
-  if(args.outcome == "rWin")curWL="1";
-  var ps=server.GetPlayerStatistics(
-  {
-     PlayFabId: currentPlayerId,
-     StatisticNames: ["WinLoss"]
-  });
-  if(ps.Statistics.length != 0)
-  {
-      wlStatInt = ps.Statistics[0].Value.toString();
-      //log.debug("wlStatInt " + wlStatInt);
-      wlStat = Number(wlStatInt).toString(2);
-      //log.debug("wlStat " + wlStat);
-  }
-  var wins = 0;
-  var totalGames = 2;
-  var winRatio = 0;
-  //log.debug("wlStat.length " + wlStat.length);
-  var tempString = new Array(wlStat.length);
-  //log.debug("tempString.length " + tempString.length);
-  for(var i = 0 ; i < tempString.length - 1; i++)
-  {
-    tempString[i] = wlStat[i];
-  }
-	tempString[tempString.length-1] = curWL;
-  //log.debug("tempString " + tempString);
-  wlStat = tempString;
-  //log.debug("wlStat " + wlStat);
-	totalGames = wlStat.length;
-  var winStreak = 0;
-  var winStreakTemp = 0;
-	for(var i = 1; i < wlStat.length; i++)
-	{
-		if(wlStat[i] == "1") 
-      {
-        wins++;
-        winStreakTemp++;
-      }
-      else
-      {
-        if(winStreakTemp > winStreak)
-        {
-          winStreak = winStreakTemp;
-        }
-        winStreakTemp = 0;
-      }
-	}
+  //var wlStat = "01";
+  //var wlStatInt = 0;
+  //var curWL = "0";
+  //if(args.outcome == "rWin")curWL="1";
+  //var ps=server.GetPlayerStatistics(
+  //{
+//     PlayFabId: currentPlayerId,
+//     StatisticNames: ["WinLoss"]
+//  });
+//  if(ps.Statistics.length != 0)
+//  {
+//      wlStatInt = ps.Statistics[0].Value.toString();
+//      //log.debug("wlStatInt " + wlStatInt);
+//      wlStat = Number(wlStatInt).toString(2);
+//      //log.debug("wlStat " + wlStat);
+//  }
+//  var wins = 0;
+//  var totalGames = 2;
+//  var winRatio = 0;
+//  //log.debug("wlStat.length " + wlStat.length);
+//  var tempString = new Array(wlStat.length);
+//  //log.debug("tempString.length " + tempString.length);
+//  for(var i = 0 ; i < tempString.length - 1; i++)
+//  {
+//    tempString[i] = wlStat[i];
+//  }
+//	tempString[tempString.length-1] = curWL;
+//  //log.debug("tempString " + tempString);
+//  wlStat = tempString;
+//  //log.debug("wlStat " + wlStat);
+//	totalGames = wlStat.length;
+//  var winStreak = 0;
+//  var winStreakTemp = 0;
+//	for(var i = 1; i < wlStat.length; i++)
+//	{
+//		if(wlStat[i] == "1") 
+//      {
+//        wins++;
+//        winStreakTemp++;
+//      }
+//      else
+//      {
+//        if(winStreakTemp > winStreak)
+//        {
+//          winStreak = winStreakTemp;
+//        }
+//        winStreakTemp = 0;
+//      }
+//	}
 	//log.debug("wlStatNew " + wlStat);
 
-  winRatio = Math.round( 100* (wins/totalGames));
+//  winRatio = Math.round( 100* (wins/totalGames));
   //log.debug("winRatio " + winRatio);
   //let's get some relevant title wide data
     var titleDataRequest = server.GetTitleData(
@@ -934,7 +934,7 @@ handlers.endGame = function(args, context) {
   if(tc.Statistics.length != 0)
   {
     trophyCount = tc.Statistics[0].Value;
-    log.debug("getting trophy count " + tc.Statistics[0].Value);
+    if(args.debug == true) log.debug("getting trophy count " + tc.Statistics[0].Value);
   }
   trophyCount = Number(trophyCount);
   initTrophyCount = trophyCount;
@@ -966,23 +966,22 @@ handlers.endGame = function(args, context) {
   if(args.outcome == "rWin")
     totalWins = Number(totalWins) + 1;
   var longestStreak = GetValueFromStatistics(ms, "LongestWinStreak", 0);
-  if(winStreak > longestStreak)
-    longestStreak = winStreak;
+//TODO Write code that calculates currentStreak and longest winStreak
   var bestScore = GetValueFromStatistics(ms, "BestDriftScore", 0);
   if(Number(recHeader.Score) > bestScore)
     bestScore = Number(recHeader.Score);
   //log.debug("trophies change: " + initTrophyCount + " => " + trophyCount);
   var cLeague = calculateLeague(trophyCount);
-  wlStatInt = 0;
-  for(var i = 0 ; i < wlStat.length; i++)
-  {
-    if(wlStat[i] == "1")
-      wlStatInt += Math.pow(2,i);
-  }
+  //wlStatInt = 0;
+  //for(var i = 0 ; i < wlStat.length; i++)
+  //{
+  //  if(wlStat[i] == "1")
+  //    wlStatInt += Math.pow(2,i);
+  //}
   //update stats on server
   var suArray = [];
-  var su = {StatisticName : "WinLoss", Version : "0", Value: wlStatInt};
-  suArray.push(su);
+  //var su = {StatisticName : "WinLoss", Version : "0", Value: wlStatInt};
+  //suArray.push(su);
   var sut = {StatisticName : "TrophyCount", Version : "0", Value: trophyCount};
   suArray.push(sut);
   var sut = {StatisticName : "League", Version : "0", Value: cLeague};
@@ -1004,7 +1003,7 @@ handlers.endGame = function(args, context) {
   //user ran out of time so we don't store recording
   //legacy code
   
-  if(Number(recHeader.Score) <= 10)
+  if(Number(recHeader.Score) <= 100)
     {
         var newPlayerStats =
         {
@@ -1064,7 +1063,6 @@ handlers.endGame = function(args, context) {
   	recArray = [];
   	var recObj =
   	{
-  		"wl": winRatio,
   		"e": args.envIndex,
   		"c": args.courseIndex,
   		"uId": currentPlayerId
@@ -1079,7 +1077,6 @@ handlers.endGame = function(args, context) {
   	//log.debug("recArray: " + recArray);
   	var recObj =
   	{
-  		"wl": winRatio,
   		"e": args.envIndex,
   		"c": args.courseIndex,
   		"uId": currentPlayerId
@@ -1106,61 +1103,64 @@ handlers.endGame = function(args, context) {
   	{
   		if((recArray[i].e == args.envIndex)&&(recArray[i].c == args.courseIndex))
   		{
-			uniqueKeyExists = true;
-			recArray[i] = recObj;
-			if(recArray.length == 1) break; //if it's the only recording there is no use to sort anymore
-			if(i > 0) // if not first
-			{
-				if(recArray[i].wl > recArray[i-1].wl) // if bigger than left we start comparing to elements to the right
-				{
-					if(i == recArray.length-1) break; // there are no more elements to the right so no more sorting required
-					for(var j = i + 1; j < recArray.length; j++) // we check elements i+1 to length-1
-					{
-						if(recArray[j - 1].wl > recArray[j].wl) // if wl of element j - 1 is greater than that of element j we swap them
-						{
-							var aux = recArray[j];
-							recArray[j] = recArray[j - 1];
-							recArray[j - 1] = aux;
-						}
-						else // the element stays where it is
-						{
-							break;
-						}
-					}
-				}
-				else // not bigger than the left let's start comparing with elements to the left
-				{
-					for(var j = i - 1; j >= 0; j--) // we check elements i-1 to 0
-					{
-						if(recArray[j + 1].wl < recArray[j].wl) // if wl of element j + 1 is smaller than that of element j we swap them
-						{
-							var aux = recArray[j];
-							recArray[j] = recArray[j + 1];
-							recArray[j + 1] = aux;
-						}
-						else // the element stays where it is
-						{
-							break;
-						}
-					}
-				}
-		    } // if(i > 0)
-		    else
-		    {
-					for(var j = i + 1; j < recArray.length; j++) // we check elements i+1 to length-1
-					{
-						if(recArray[j - 1].wl > recArray[j].wl) // if wl of element j - 1 is greater than that of element j we swap them
-						{
-							var aux = recArray[j];
-							recArray[j] = recArray[j - 1];
-							recArray[j - 1] = aux;
-						}
-						else // the element stays where it is
-						{
-							break;
-						}
-					}
-		    }
+			 uniqueKeyExists = true;
+			 recArray[i] = recObj;
+       /*
+       //LEGACY WL RATIO SORT
+            if(recArray.length == 1) break; //if it's the only recording there is no use to sort anymore
+      if(i > 0) // if not first
+      {
+        if(recArray[i].wl > recArray[i-1].wl) // if bigger than left we start comparing to elements to the right
+        {
+          if(i == recArray.length-1) break; // there are no more elements to the right so no more sorting required
+          for(var j = i + 1; j < recArray.length; j++) // we check elements i+1 to length-1
+          {
+            if(recArray[j - 1].wl > recArray[j].wl) // if wl of element j - 1 is greater than that of element j we swap them
+            {
+              var aux = recArray[j];
+              recArray[j] = recArray[j - 1];
+              recArray[j - 1] = aux;
+            }
+            else // the element stays where it is
+            {
+              break;
+            }
+          }
+        }
+        else // not bigger than the left let's start comparing with elements to the left
+        {
+          for(var j = i - 1; j >= 0; j--) // we check elements i-1 to 0
+          {
+            if(recArray[j + 1].wl < recArray[j].wl) // if wl of element j + 1 is smaller than that of element j we swap them
+            {
+              var aux = recArray[j];
+              recArray[j] = recArray[j + 1];
+              recArray[j + 1] = aux;
+            }
+            else // the element stays where it is
+            {
+              break;
+            }
+          }
+        }
+        } // if(i > 0)
+        else
+        {
+          for(var j = i + 1; j < recArray.length; j++) // we check elements i+1 to length-1
+          {
+            if(recArray[j - 1].wl > recArray[j].wl) // if wl of element j - 1 is greater than that of element j we swap them
+            {
+              var aux = recArray[j];
+              recArray[j] = recArray[j - 1];
+              recArray[j - 1] = aux;
+            }
+            else // the element stays where it is
+            {
+              break;
+            }
+          }
+        }
+       */
   		}
   	}
   	if(uniqueKeyExists == false)
