@@ -1,0 +1,4 @@
+handlers.iapMade = function(args, context)
+{
+	//this code will fire whenever a IAP is succesfully validated
+}
