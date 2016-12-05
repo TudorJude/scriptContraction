@@ -1382,6 +1382,10 @@ handlers.getServerTime = function(args, context)
 	var t = new Date();
 	return { time: t};
 }
+handlers.iapMade = function(args, context)
+{
+	//this code will fire whenever a IAP is succesfully validated
+}
 handlers.initServerData = function(args)
 {
 //create trophy statistic
@@ -2132,6 +2136,24 @@ handlers.requestInventory = function(args)
     PlayFabId: currentPlayerId,
   }
   );
+  //let's update the user's current currency statistics
+  var sc = Number(userInventoryObject.VirtualCurrency.SC);
+  if(isNaN(sc) || sc < 0) sc = 0;
+
+  var hc = Number(userInventoryObject.VirtualCurrency.HC);
+  if(isNaN(hc) || hc < 0) hc = 0;
+
+  var suArray = [];
+  var sum = {StatisticName: "CurrentMoney", Version : "0", Value: sc};
+  suArray.push(sum);
+  var sug = {StatisticName: "CurrentGold", Version : "0", Value: hc};
+  suArray.push(sug);
+   var updateRequest = server.UpdatePlayerStatistics(
+      {
+         PlayFabId: currentPlayerId,
+         Statistics: suArray
+      }
+      );
   //get catalog data for pr calculation
     var carCardsCatalog = server.GetCatalogItems(
          {
