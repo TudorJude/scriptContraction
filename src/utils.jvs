@@ -179,6 +179,36 @@ function generateInventoryChange(mess, inventory)
   return r;
 }
 
+function updateCurrencySpentStatistic(currType, amount)
+{
+  var suArray = [];
+  var statName;
+  var currValue = 0;
+  var changeValue = Number(amount);
+  if(isNaN(changeValue) || changeValue <= 0) return;
+  if(currType == "SC") statName = "MoneySpent";
+  if(currType == "HC") statName = "GoldSpent";
+  if(statName == undefined) return;
+    var ps=server.GetPlayerStatistics(
+    {
+       PlayFabId: currentPlayerId,
+       StatisticNames: [statName]
+    });
+    if(ps.Statistics.length > 0)
+    {
+        currValue = Number(ps.Statistics[0].Value);
+    }  
+    currValue += changeValue;
+    var su = {StatisticName: statName, Version : "0", Value: currValue};
+    suArray.push(su);
+    var updateRequest = server.UpdatePlayerStatistics(
+      {
+         PlayFabId: currentPlayerId,
+         Statistics: suArray
+      }
+      );
+}
+
 function checkBalance(currType, cost, userSCBalance, userHCBalance)
 {
   if(currType == "SC")

@@ -154,6 +154,7 @@ function upgradePart(args, userInventoryObject, playerSC, playerHC)
         Amount: currCost
       }
     );
+    updateCurrencySpentStatistic(cardInfo.currType, currCost);
   }
   var newPr = recalculateCarPr(car.CustomData, car.ItemId, undefined, partsCatalog);
   CarDataToBeUpdated.Pr = newPr;

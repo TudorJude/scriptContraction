@@ -19,6 +19,7 @@ handlers.buyChest = function(args, context)
       Amount: args.cost
     }
     );
+    updateCurrencySpentStatistic(args.curr, args.cost);
     var cU = {};
     cU[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
     return generateInventoryChange("ChestBought", {VirtualCurrency: cU});

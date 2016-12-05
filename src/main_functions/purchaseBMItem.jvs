@@ -113,6 +113,7 @@ handlers.purchaseBMItem = function(args, context)
         Amount: price
       }
       );
+    updateCurrencySpentStatistic(userArray[1], price);
     var itemVal = userArray[0] + "_" + userArray[1] + "_" + userArray[2] + "_"  + (parseInt(userArray[3]) + 1) + "_" +  userArray[4];
     //log.debug("generatedArray: " + itemVal);
     var dataToUpdate = {};

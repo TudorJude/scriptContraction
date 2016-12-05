@@ -129,7 +129,7 @@ handlers.purchaseItems = function(args, context)
           Amount: custPrice
         }
       );
-
+      updateCurrencySpentStatistic(custCurr, custPrice);
       var currencyUpdated = {};
       currencyUpdated[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
       i =
@@ -187,7 +187,7 @@ handlers.purchaseItems = function(args, context)
         Amount: packPrice
       }
     );
-
+    updateCurrencySpentStatistic("HC", packPrice);
     var addUserCurrencyResult = server.AddUserVirtualCurrency(
       {
         PlayFabId: currentPlayerId,

@@ -136,9 +136,10 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
           Amount: currCost
         }
       );
+      updateCurrencySpentStatistic(cardInfo.currType, currCost);
     }
     // log.debug("Upgrade Complete!");
-
+    
     var objectsUpdated =
     [
       {
@@ -269,6 +270,7 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
           Amount: cardInfo.currCostPerLvl[1]
         }
       );
+      updateCurrencySpentStatistic(cardInfo.currType, cardInfo.currCostPerLvl[1]);
     }
 
     var CarData = {

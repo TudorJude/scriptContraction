@@ -105,6 +105,7 @@ handlers.openChest = function(args, context)
         Amount: args.currCost
       }
     );
+    updateCurrencySpentStatistic(args.currType, args.currCost);
   }
   //currency
   var addUserCurrencyResult;

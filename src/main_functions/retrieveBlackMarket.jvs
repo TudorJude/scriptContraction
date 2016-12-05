@@ -73,6 +73,7 @@ handlers.retrieveBlackMarket = function(args, context)
           Amount: cost
         }
         );
+      updateCurrencySpentStatistic(curr, cost);
       var marketObject = GenerateBlackMarket(currentPlayerId);
       ////////////////
       var currencyUpdated = {};
