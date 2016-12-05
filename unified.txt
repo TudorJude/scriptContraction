@@ -179,6 +179,36 @@ function generateInventoryChange(mess, inventory)
   return r;
 }
 
+function updateCurrencySpentStatistic(currType, amount)
+{
+  var suArray = [];
+  var statName;
+  var currValue = 0;
+  var changeValue = Number(amount);
+  if(isNaN(changeValue) || changeValue <= 0) return;
+  if(currType == "SC") statName = "MoneySpent";
+  if(currType == "HC") statName = "GoldSpent";
+  if(statName == undefined) return;
+    var ps=server.GetPlayerStatistics(
+    {
+       PlayFabId: currentPlayerId,
+       StatisticNames: [statName]
+    });
+    if(ps.Statistics.length > 0)
+    {
+        currValue = Number(ps.Statistics[0].Value);
+    }  
+    currValue += changeValue;
+    var su = {StatisticName: statName, Version : "0", Value: currValue};
+    suArray.push(su);
+    var updateRequest = server.UpdatePlayerStatistics(
+      {
+         PlayFabId: currentPlayerId,
+         Statistics: suArray
+      }
+      );
+}
+
 function checkBalance(currType, cost, userSCBalance, userHCBalance)
 {
   if(currType == "SC")
@@ -508,6 +538,7 @@ handlers.buyChest = function(args, context)
       Amount: args.cost
     }
     );
+    updateCurrencySpentStatistic(args.curr, args.cost);
     var cU = {};
     cU[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
     return generateInventoryChange("ChestBought", {VirtualCurrency: cU});
@@ -1595,6 +1626,7 @@ handlers.openChest = function(args, context)
         Amount: args.currCost
       }
     );
+    updateCurrencySpentStatistic(args.currType, args.currCost);
   }
   //currency
   var addUserCurrencyResult;
@@ -1868,6 +1900,7 @@ handlers.purchaseBMItem = function(args, context)
         Amount: price
       }
       );
+    updateCurrencySpentStatistic(userArray[1], price);
     var itemVal = userArray[0] + "_" + userArray[1] + "_" + userArray[2] + "_"  + (parseInt(userArray[3]) + 1) + "_" +  userArray[4];
     //log.debug("generatedArray: " + itemVal);
     var dataToUpdate = {};
@@ -2032,7 +2065,7 @@ handlers.purchaseItems = function(args, context)
           Amount: custPrice
         }
       );
-
+      updateCurrencySpentStatistic(custCurr, custPrice);
       var currencyUpdated = {};
       currencyUpdated[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
       i =
@@ -2090,7 +2123,7 @@ handlers.purchaseItems = function(args, context)
         Amount: packPrice
       }
     );
-
+    updateCurrencySpentStatistic("HC", packPrice);
     var addUserCurrencyResult = server.AddUserVirtualCurrency(
       {
         PlayFabId: currentPlayerId,
@@ -2302,6 +2335,7 @@ handlers.retrieveBlackMarket = function(args, context)
           Amount: cost
         }
         );
+      updateCurrencySpentStatistic(curr, cost);
       var marketObject = GenerateBlackMarket(currentPlayerId);
       ////////////////
       var currencyUpdated = {};
@@ -3129,9 +3163,10 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
           Amount: currCost
         }
       );
+      updateCurrencySpentStatistic(cardInfo.currType, currCost);
     }
     // log.debug("Upgrade Complete!");
-
+    
     var objectsUpdated =
     [
       {
@@ -3262,6 +3297,7 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
           Amount: cardInfo.currCostPerLvl[1]
         }
       );
+      updateCurrencySpentStatistic(cardInfo.currType, cardInfo.currCostPerLvl[1]);
     }
 
     var CarData = {
@@ -3587,6 +3623,7 @@ function upgradePart(args, userInventoryObject, playerSC, playerHC)
         Amount: currCost
       }
     );
+    updateCurrencySpentStatistic(cardInfo.currType, currCost);
   }
   var newPr = recalculateCarPr(car.CustomData, car.ItemId, undefined, partsCatalog);
   CarDataToBeUpdated.Pr = newPr;
