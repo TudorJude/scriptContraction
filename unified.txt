@@ -2391,42 +2391,41 @@ handlers.startGame = function(args, context) {
   //wlratio
   var mC = CheckMaintenanceAndVersion(args);
   if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
-  var wlStat = "10"; // 50/50 for newtimers
-  var wlStatInt = 0; // we change the bitwise representation to int32 and store it like that
-  var winRatio = 50;
-  var totalGames = 2;
-  var wins = 0;
-  var ps=server.GetPlayerStatistics(
-  {
-     PlayFabId: currentPlayerId,
-     StatisticNames: ["WinLoss"]
-  });
-  if(ps.Statistics.length != 0)
-  {
-      wlStatInt = ps.Statistics[0].Value.toString();
-      wlStat = Number(wlStatInt).toString(2);
-      totalGames = wlStat.length;
-      for(var i = 1; i < wlStat.length; i++)
-      {
-        if(wlStat[i] == "1") wins++;
-      }
-      winRatio = Math.round( 100* (wins/totalGames));
-  }
+  //var wlStat = "10"; // 50/50 for newtimers
+  //var wlStatInt = 0; // we change the bitwise representation to int32 and store it like that
+  //var winRatio = 50;
+  //var totalGames = 2;
+  //var wins = 0;
+  //vvar ps=server.GetPlayerStatistics(
+  //{
+  //   PlayFabId: currentPlayerId,
+  //   StatisticNames: ["WinLoss"]
+  //});
+  //if(ps.Statistics.length != 0)
+  //{
+  //    wlStatInt = ps.Statistics[0].Value.toString();
+  //    wlStat = Number(wlStatInt).toString(2);
+  //    totalGames = wlStat.length;
+  //    for(var i = 1; i < wlStat.length; i++)
+  //    {
+  //      if(wlStat[i] == "1") wins++;
+  //    }
+  //    winRatio = Math.round( 100* (wins/totalGames));
+  //}
   //start game so we assume it'sa lose until it's a win
-  //log.debug("wlStatBeforeshiftandAdd " + wlStat);
-  wlStat += "0";
+  //wlStat += "0";
   //log.debug("wlStatBeforeshift " + wlStat);
-   if(wlStat.length > 20)
-   {
-    var tempS = new Array(20);
-    wlStat = wlStat.slice(2);
-    tempS[0] = "1";
-    for(var i = 0; i < wlStat.length; i++)
-    {
-      tempS[i + 1] = wlStat[i];
-    }
-    wlStat = tempS;
-   }
+   //if(wlStat.length > 20)
+   //{
+   // var tempS = new Array(20);
+   // wlStat = wlStat.slice(2);
+  //  tempS[0] = "1";
+   // for(var i = 0; i < wlStat.length; i++)
+   // {
+  //    tempS[i + 1] = wlStat[i];
+   // }
+  //  wlStat = tempS;
+  // }
   // log.debug("wlStat " + wlStat);
   //trophy count and subleague distribution
   var leagueTitleDataRequest = server.GetTitleData(
@@ -2646,13 +2645,13 @@ if(isIncompleteSubDivision == true)
             trophyCount -= lMin;
           }
           if(trophyCount <= 1) trophyCount = 1;
-          wlStatInt = parseInt(wlStat, 2);
+          //wlStatInt = parseInt(wlStat, 2);
 
           //log.debug("updating WL to:  " + wlStatInt);
           //update stats on server
           var suArray = [];
-          var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
-          suArray.push(su);
+          //var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
+          //suArray.push(su);
           var sut = {StatisticName: "TrophyCount", Version : "0", Value: trophyCount};
           suArray.push(sut);
           var sul = {StatisticName: "League", Version : "0", Value: cLeague};
@@ -2710,7 +2709,7 @@ var searchArray = validRecArray;
 var sAlen = vrAidx;
   if(lrAidx > 0){sAlen = lrAidx; searchArray = likelyRecArray}
   if(mlrAidx > 0){sAlen = mlrAidx; searchArray = moreLikelyRecArray}
-  var pivot = Math.floor(Math.random() * sAlen); //urhereson
+  var pivot = Math.floor(Math.random() * sAlen);
   if(pivot >= sAlen) pivot = sAlen - 1; //i'm not fully sure Math.random can't give a value of 1 DON'T JUDGE ME
 //legacy WINLOSS RATIO mathcmaking
   //var pivot = sAlen - 1; //in case your WLRatio is the highest in the pool
@@ -2869,12 +2868,12 @@ var sAlen = vrAidx;
   }
   //log.debug("trophiesToTake:  " + trophiesToTake);
  // log.debug("trophiesToGive:  " + trophiesToGive);
-  wlStatInt = parseInt(wlStat, 2);
+  //wlStatInt = parseInt(wlStat, 2);
  // log.debug("updating WL to:  " + wlStatInt);
   //update stats on server
   var suArray = [];
-  var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
-  suArray.push(su);
+  //var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
+  //suArray.push(su);
   var sut = {StatisticName: "TrophyCount", Version : "0", Value: trophyCount};
   suArray.push(sut);
   var sul = {StatisticName: "League", Version : "0", Value: cLeague};
