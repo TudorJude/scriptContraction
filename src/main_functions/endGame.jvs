@@ -80,7 +80,7 @@ handlers.endGame = function(args, context) {
   var pDat = server.GetUserInternalData(
   {
     PlayFabId: currentPlayerId,
-    Keys: ["trophyLose","trophyWin"]
+    Keys: ["trophyLose","trophyWin","LastGameOutcome", "LatestStreak"]
   });
   var refund;
   //log.debug("pDat.Data[trophyLose] " + pDat.Data["trophyLose"].Value);
@@ -90,6 +90,10 @@ handlers.endGame = function(args, context) {
   //log.debug("refund: " + refund);
 
 //previous game data
+  var latestStreak = Number(pDat.Data["LatestStreak"].Value);
+  var lastMatchOutcome = pDat.Data["LatestStreak"].Value;
+  if(lastMatchOutcome == undefined) lastMatchOutcome = "Loss";
+  if(isNaN(latestStreak) == true) latestStreak = 0;
   var dataToUpdate = 
   {
      "quitLastGame" : "false",
@@ -100,6 +104,8 @@ handlers.endGame = function(args, context) {
   {
   		trophyCount += refund;
       dataToUpdate["LastGameOutcome"] = "Win";
+      if(lastMatchOutcome == "Loss") latestStreak = 1;
+      else latestStreak ++;
   }
 
   server.UpdateUserInternalData(
@@ -121,7 +127,7 @@ handlers.endGame = function(args, context) {
   if(args.outcome == "rWin")
     totalWins = Number(totalWins) + 1;
   var longestStreak = GetValueFromStatistics(ms, "LongestWinStreak", 0);
-//TODO Write code that calculates currentStreak and longest winStreak
+  if(Number(longestStreak) < latestStreak) longestStreak = latestStreak;
   var bestScore = GetValueFromStatistics(ms, "BestDriftScore", 0);
   if(Number(recHeader.Score) > bestScore)
     bestScore = Number(recHeader.Score);
