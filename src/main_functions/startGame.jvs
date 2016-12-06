@@ -118,16 +118,24 @@ handlers.startGame = function(args, context) {
   var env;
   var course;
 
-//previous opponents
+//previous opponents + win status
 var oppPrev = "noop"; // ultimu
 var oppPrevPrev = "noop";// penultimu
 var oppArray;
 var oppDat = server.GetUserInternalData(
 {
     PlayFabId: currentPlayerId,
-    Keys: ["lastOpp"]
+    Keys: ["lastOpp", "quitLastGame"]
 });
 
+var didQuitLastGame = oppDat.Data.quitLastGame;
+var setLastGameToLossFlag = false;
+if(didQuitLastGame == undefined) didQuitLastGame = "false";
+if(didQuitLastGame == "true") 
+{
+  //user quit so we have to set his last game to a loss
+  setLastGameToLossFlag = true; //urhereson
+}
 if((oppDat.Data == undefined) || (oppDat.Data.lastOpp == undefined))
 {
   //log.debug("opp data is undefined");
@@ -283,13 +291,18 @@ if(isIncompleteSubDivision == true)
 
           var dataToUpdate = {
             "trophyWin" : trophiesOnWin,
-            "trophyLose": trophiesOnLose
+            "trophyLose": trophiesOnLose,
+            "quitLastGame" : "true",
           }
 
           if(updateTrophyInternal == false)
           {
             dataToUpdate["trophyWin"] = 0;
             dataToUpdate["trophyLose"] = 0;
+          }
+          if(setLastGameToLossFlag == true)//urhere
+          {
+            dataToUpdate["LastGameOutcome"] = "Loss";
           }
           server.UpdateUserInternalData(
           {
@@ -503,13 +516,18 @@ var sAlen = vrAidx;
             var dataToUpdate = {
             "trophyWin" : trophiesToGive,
             "trophyLose": trophiesToTake,
-            "lastOpp" : lastOppVal
+            "lastOpp" : lastOppVal,
+            "quitLastGame" : "true",
           }
   if(updateTrophiesToGiveTake == false)
   {
           dataToUpdate["trophyWin"] = 0;
           dataToUpdate["trophyLose"] = 0;
   }
+  if(setLastGameToLossFlag == true)//urhere
+      {
+          dataToUpdate["LastGameOutcome"] = "Loss";
+      }
           server.UpdateUserInternalData(
           {
             PlayFabId: currentPlayerId,
