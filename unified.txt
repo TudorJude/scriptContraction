@@ -2532,8 +2532,8 @@ var oppDat = server.GetUserInternalData(
     Keys: ["lastOpp", "quitLastGame"]
 });
 
-var didQuitLastGame = oppDat.Data.quitLastGame;
-if(args.debug == true) log.debug("didQuitLastGame: " + didQuitLastGame);
+var didQuitLastGame = oppDat.Data.quitLastGame.Value;
+if(args.debug == true) log.debug("didQuitLastGame: " + didQuitLastGame.Value);
 var setLastGameToLossFlag = false;
 if(didQuitLastGame == undefined) didQuitLastGame = "false";
 if(didQuitLastGame == "true") 
