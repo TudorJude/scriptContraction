@@ -259,7 +259,26 @@ handlers.openChest = function(args, context)
   //if no chest id is provided, it means that this function is used for inventory update
   if((args.chestId) && (args.levelUpRewardIndex <= 0)){
     var totalXp = UpdateExperience("Chests", args.chestId, "xpGain", 0, true);
-      outInventory.Experience = totalXp;
+
+    var totalChestsOpened = 0;
+    var sv=server.GetPlayerStatistics(
+    {
+      PlayFabId: currentPlayerId,
+      StatisticNames: ["ChestsOpened"]
+    }).Statistics;
+    totalChestsOpened = Number(GetValueFromStatistics(sv, "ChestsOpened", 0));
+    totalChestsOpened++;
+    var suArray = [];
+    var sut = {StatisticName : "ChestsOpened", Value: totalChestsOpened};
+    suArray.push(sut);
+    var updateRequest = server.UpdatePlayerStatistics(
+    {
+      PlayFabId: currentPlayerId,
+      Statistics: suArray
+    }
+    );
+
+    outInventory.Experience = totalXp;
   }
 
   return generateInventoryChange("InventoryUpdated", outInventory);
