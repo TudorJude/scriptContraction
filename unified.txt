@@ -475,13 +475,32 @@ function calculateLeague(currentTrophies)
       for (var i = 0; i < statisticsArray.length; i++)
       if(statisticsArray[i].StatisticName === statisticsName)
       stat = statisticsArray[i];
-  		log.debug("Stat with name statisticsName: " + statisticsName + " is " + stat);
+  		//log.debug("Stat with name statisticsName: " + statisticsName + " is " + stat);
       if(stat === undefined)
       return defaultValue !== undefined ? defaultValue : 0;
       else
       return Number(stat.Value);
     }
 
+    /**
+    * Returns the statistics version from the provided statistics array
+    * @param {array} statisticsArray containing statistics objects
+    * @param {string} statisticsName id of the searched statistic
+    * @param {value} statisticsName (optional) default value returned if statistic is not found
+    */
+    function GetVersionFromStatistics(statisticsArray, statisticsName, defaultValue)
+    {
+      var stat;
+      //find statistic with given name
+      for (var i = 0; i < statisticsArray.length; i++)
+      if(statisticsArray[i].StatisticName === statisticsName)
+      stat = statisticsArray[i];
+      //log.debug("Stat with name statisticsName: " + statisticsName + " is " + stat);
+      if(stat === undefined)
+      return defaultValue !== undefined ? defaultValue : 0;
+      else
+      return Number(stat.Version);
+    }
     /**
     * Returns catalog item or undifined
     * @param {string} catalogId the catalog id of the requested item
@@ -993,6 +1012,7 @@ handlers.endGame = function(args, context) {
   if(args.outcome == "rWin")
     totalWins = Number(totalWins) + 1;
   var longestStreak = GetValueFromStatistics(ms, "LongestWinStreak", 0);
+  var longestStreakVersion = GetVersionFromStatistics(ms, "LongestWinStreak", 0);
   if(Number(longestStreak) < latestStreak) longestStreak = latestStreak;
   var bestScore = GetValueFromStatistics(ms, "BestDriftScore", 0);
   if(Number(recHeader.Score) > bestScore)
@@ -1017,7 +1037,7 @@ handlers.endGame = function(args, context) {
   suArray.push(sut);
     var sut = {StatisticName : "TotalGamesCompleted", Version : "0", Value: totalGamesCompleted};
   suArray.push(sut);
-    var sut = {StatisticName : "LongestWinStreak", Version : "0", Value: longestStreak};
+    var sut = {StatisticName : "LongestWinStreak", Version : longestStreakVersion, Value: longestStreak};
   suArray.push(sut);
     var sut = {StatisticName : "BestDriftScore", Version : "0", Value: bestScore};
   suArray.push(sut);
