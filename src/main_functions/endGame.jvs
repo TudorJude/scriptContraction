@@ -157,7 +157,7 @@ handlers.endGame = function(args, context) {
   suArray.push(sut);
     var sut = {StatisticName : "TotalGamesCompleted", Version : "0", Value: totalGamesCompleted};
   suArray.push(sut);
-    var sut = {StatisticName : "LongestWinStreak", Version : longestStreakVersion, Value: longestStreak};
+    var sut = {StatisticName : "LongestWinStreak", Value: longestStreak};
   suArray.push(sut);
     var sut = {StatisticName : "BestDriftScore", Version : "0", Value: bestScore};
   suArray.push(sut);
