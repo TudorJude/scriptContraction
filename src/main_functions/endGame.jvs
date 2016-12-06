@@ -88,10 +88,26 @@ handlers.endGame = function(args, context) {
   if((pDat.Data["trophyLose"] == undefined) || (pDat.Data["trophyWin"] == undefined)) refund = 45;
   else refund = Number(pDat.Data["trophyLose"].Value) + Number(pDat.Data["trophyWin"].Value);
   //log.debug("refund: " + refund);
+
+//previous game data
+  var dataToUpdate = 
+  {
+     "quitLastGame" : "false",
+     "LastGameOutcome" : "Loss"
+  }
+
   if(args.outcome == "rWin")
   {
   		trophyCount += refund;
+      dataToUpdate["LastGameOutcome"] = "Win";
   }
+
+  server.UpdateUserInternalData(
+      {
+          PlayFabId: currentPlayerId,
+          Data: dataToUpdate
+      });
+
  var recHeader = JSON.parse(args.recordingHeader);
 //let's update the total wins/ total losses statistics
   var ms=server.GetPlayerStatistics( //miscelanious statistics
