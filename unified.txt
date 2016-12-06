@@ -2533,7 +2533,7 @@ var oppDat = server.GetUserInternalData(
 });
 
 var didQuitLastGame = oppDat.Data.quitLastGame.Value;
-if(args.debug == true) log.debug("didQuitLastGame: " + didQuitLastGame.Value);
+if(args.debug == true) log.debug("didQuitLastGame: " + didQuitLastGame);
 var setLastGameToLossFlag = false;
 if(didQuitLastGame == undefined) didQuitLastGame = "false";
 if(didQuitLastGame == "true") 
