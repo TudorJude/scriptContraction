@@ -90,10 +90,13 @@ handlers.endGame = function(args, context) {
   //log.debug("refund: " + refund);
 
 //previous game data
-  var latestStreak = Number(pDat.Data["LatestStreak"].Value);
-  var lastMatchOutcome = pDat.Data["LatestStreak"].Value;
-  if(lastMatchOutcome == undefined) lastMatchOutcome = "Loss";
+  var latestStreak = 0;
+  var lastMatchOutcome = "Loss";
+  if(pDat.Data["LatestStreak"] != undefined) latestStreak = Number(pDat.Data["LatestStreak"].Value);
   if(isNaN(latestStreak) == true) latestStreak = 0;
+  if(pDat.Data["LatestStreak"] != undefined) lastMatchOutcome = pDat.Data["LastGameOutcome"].Value;
+  if(lastMatchOutcome == undefined) lastMatchOutcome = "Loss";
+  
   var dataToUpdate = 
   {
      "quitLastGame" : "false",
