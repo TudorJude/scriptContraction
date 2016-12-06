@@ -2542,8 +2542,9 @@ var oppDat = server.GetUserInternalData(
     PlayFabId: currentPlayerId,
     Keys: ["lastOpp", "quitLastGame"]
 });
-
-var didQuitLastGame = oppDat.Data.quitLastGame.Value;
+var didQuitLastGame = "false;"
+if(oppDat.Data.quitLastGame != undefined)
+  didQuitLastGame = oppDat.Data.quitLastGame.Value;
 if(args.debug == true) log.debug("didQuitLastGame: " + didQuitLastGame);
 var setLastGameToLossFlag = false;
 if(didQuitLastGame == undefined) didQuitLastGame = "false";
