@@ -1462,7 +1462,48 @@ handlers.getServerTime = function(args, context)
 }
 handlers.iapMade = function(args, context)
 {
+  	var ps=server.GetPlayerStatistics(
+  	{
+     	PlayFabId: currentPlayerId,
+     	StatisticNames: ["IAPValue"]
+  	});
+  	var iapVal = Number(GetValueFromStatistics(ps, "IAPValue", 0));
 	//this code will fire whenever a IAP is succesfully validated
+	switch(args.bundle)
+	{
+		case "co.tamatem.downshiftdrift.gold01":
+		iapVal += 99;
+		break;
+		case "co.tamatem.downshiftdrift.gold02":
+		iapVal += 499;
+		break;
+		case "co.tamatem.downshiftdrift.gold03":
+		iapVal += 999;
+		break;
+		case "co.tamatem.downshiftdrift.gold04":
+		iapVal += 1999;
+		break;
+		case "co.tamatem.downshiftdrift.gold05":
+		iapVal += 4999;
+		break;
+		case "co.tamatem.downshiftdrift.gold06":
+		iapVal += 9999;
+		break;
+		default:
+		if(args.debug == true) log.debug("InvalidPurchaseParameter");
+		break;
+	}
+
+	var suArray = [];
+	var su = {StatisticName : "IAPValue", Value: iapVal};
+	suArray.push(su);
+
+	var updateRequest = server.UpdatePlayerStatistics(
+	  {
+	    PlayFabId: currentPlayerId,
+	    Statistics: suArray
+	  }
+	  );
 }
 handlers.initServerData = function(args)
 {
