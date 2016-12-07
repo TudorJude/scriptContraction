@@ -4,7 +4,7 @@ handlers.iapMade = function(args, context)
   	{
      	PlayFabId: currentPlayerId,
      	StatisticNames: ["IAPValue"]
-  	});
+  	}).Statistics;
   	var iapVal = Number(GetValueFromStatistics(ps, "IAPValue", 0));
   	if(args.debug == true) log.debug("iapVal: " + iapVal);
   	if(args.debug == true) log.debug("iapValVer: " + GetVersionFromStatistics(ps, "IAPValue", 0));

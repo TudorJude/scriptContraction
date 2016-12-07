@@ -475,7 +475,6 @@ function calculateLeague(currentTrophies)
       for (var i = 0; i < statisticsArray.length; i++)
       if(statisticsArray[i].StatisticName === statisticsName)
       stat = statisticsArray[i];
-  		log.debug("Stat with name statisticsName: " + statisticsName + " is " + stat + " ,version: " + stat.Version);
       if(stat === undefined)
       return defaultValue !== undefined ? defaultValue : 0;
       else
@@ -1466,7 +1465,7 @@ handlers.iapMade = function(args, context)
   	{
      	PlayFabId: currentPlayerId,
      	StatisticNames: ["IAPValue"]
-  	});
+  	}).Statistics;
   	var iapVal = Number(GetValueFromStatistics(ps, "IAPValue", 0));
   	if(args.debug == true) log.debug("iapVal: " + iapVal);
   	if(args.debug == true) log.debug("iapValVer: " + GetVersionFromStatistics(ps, "IAPValue", 0));

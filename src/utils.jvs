@@ -475,7 +475,6 @@ function calculateLeague(currentTrophies)
       for (var i = 0; i < statisticsArray.length; i++)
       if(statisticsArray[i].StatisticName === statisticsName)
       stat = statisticsArray[i];
-  		log.debug("Stat with name statisticsName: " + statisticsName + " is " + stat + " ,version: " + stat.Version);
       if(stat === undefined)
       return defaultValue !== undefined ? defaultValue : 0;
       else
