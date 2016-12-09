@@ -57,7 +57,7 @@ handlers.openChest = function(args, context)
         currLvl = i; break;
       }
 
-      if(Number(args.levelUpRewardIndex) <= Number(lastLvlReward)) generateFailObj("already got reward for level: " + lastLvlReward);
+      if(Number(args.levelUpRewardIndex) <= Number(lastLvlReward)) return generateFailObj("already got reward for level: " + lastLvlReward);
 
       if(Number(args.levelUpRewardIndex) <= Number(currLvl))
       {        
