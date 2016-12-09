@@ -57,8 +57,10 @@ handlers.openChest = function(args, context)
         currLvl = i; break;
       }
 
+      if(Number(args.levelUpRewardIndex) <= Number(lastLvlReward)) generateFailObj("already got reward for level: " + lastLvlReward);
+
       if(Number(args.levelUpRewardIndex) <= Number(currLvl))
-      {
+      {        
         lastLvlReward = Number(args.levelUpRewardIndex);
         levelItemDataToUpdate["LastLevelReward"] = lastLvlReward;
         server.UpdateUserReadOnlyData(
@@ -80,7 +82,7 @@ handlers.openChest = function(args, context)
         }
           );      
         }
-        else return generateFailObj("already got reward for level: " + lastLvlReward);
+        else return generateFailObj("You haven't reached this level yet");
 
   }
   var objectsUpdated = [];

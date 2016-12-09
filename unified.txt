@@ -1461,15 +1461,15 @@ handlers.getServerTime = function(args, context)
 }
 handlers.iapMade = function(args, context)
 {
+		//this code will fire whenever a IAP is succesfully validated
   	var ps=server.GetPlayerStatistics(
   	{
      	PlayFabId: currentPlayerId,
      	StatisticNames: ["IAPValue"]
   	}).Statistics;
+
   	var iapVal = Number(GetValueFromStatistics(ps, "IAPValue", 0));
-  	if(args.debug == true) log.debug("iapVal: " + iapVal);
-  	if(args.debug == true) log.debug("iapValVer: " + GetVersionFromStatistics(ps, "IAPValue", 0));
-	//this code will fire whenever a IAP is succesfully validated
+
 	switch(args.bundle)
 	{
 		case "co.tamatem.downshiftdrift.gold01":
@@ -1489,6 +1489,9 @@ handlers.iapMade = function(args, context)
 		break;
 		case "co.tamatem.downshiftdrift.gold06":
 		iapVal += 9999;
+		break;
+		case "co.tamatem.downshiftdrift.bundle01":
+		iapVal += 599;
 		break;
 		default:
 		if(args.debug == true) log.debug("InvalidPurchaseParameter");
@@ -1667,8 +1670,10 @@ handlers.openChest = function(args, context)
         currLvl = i; break;
       }
 
+      if(Number(args.levelUpRewardIndex) <= Number(lastLvlReward)) generateFailObj("already got reward for level: " + lastLvlReward);
+
       if(Number(args.levelUpRewardIndex) <= Number(currLvl))
-      {
+      {        
         lastLvlReward = Number(args.levelUpRewardIndex);
         levelItemDataToUpdate["LastLevelReward"] = lastLvlReward;
         server.UpdateUserReadOnlyData(
@@ -1690,7 +1695,7 @@ handlers.openChest = function(args, context)
         }
           );      
         }
-        else return generateFailObj("already got reward for level: " + lastLvlReward);
+        else return generateFailObj("You haven't reached this level yet");
 
   }
   var objectsUpdated = [];
