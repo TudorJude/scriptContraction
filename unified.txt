@@ -1506,7 +1506,7 @@ handlers.iapMade = function(args, context)
 		  }
 		  );
 
-		  var catalogData = server.GetCatalogItems(
+		  var custCatalog = server.GetCatalogItems(
 		  {
 		  	CatalogVersion: "BMBundleInfo"
 		  });
