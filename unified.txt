@@ -1003,7 +1003,7 @@ handlers.endGame = function(args, context) {
   var ms=server.GetPlayerStatistics( //miscelanious statistics
   {
      PlayFabId: currentPlayerId,
-     StatisticNames: ["Wins", "TotalGamesCompleted","LongestWinStreak","BestDriftScore"]
+     StatisticNames: ["Wins", "TotalGamesCompleted","LongestWinStreak","BestDriftScore", "HighestLeagueReached"]
   }).Statistics;
   var totalGamesCompleted = GetValueFromStatistics(ms, "TotalGamesCompleted", 0);
   totalGamesCompleted = Number(totalGamesCompleted) + 1;
@@ -1018,6 +1018,9 @@ handlers.endGame = function(args, context) {
     bestScore = Number(recHeader.Score);
   //log.debug("trophies change: " + initTrophyCount + " => " + trophyCount);
   var cLeague = calculateLeague(trophyCount);
+
+  var highestLeague = GetValueFromStatistics(ms, "HighestLeagueReached", 1);
+  if(cLeague > highestLeague) highestLeague = cLeague;
   //wlStatInt = 0;
   //for(var i = 0 ; i < wlStat.length; i++)
   //{
@@ -1028,18 +1031,20 @@ handlers.endGame = function(args, context) {
   var suArray = [];
   //var su = {StatisticName : "WinLoss", Version : "0", Value: wlStatInt};
   //suArray.push(su);
-  var sut = {StatisticName : "TrophyCount", Version : "0", Value: trophyCount};
+  var sut = {StatisticName : "TrophyCount", Value: trophyCount};
   suArray.push(sut);
-  var sut = {StatisticName : "League", Version : "0", Value: cLeague};
-  suArray.push(sut);
-    var sut = {StatisticName : "Wins", Version : "0", Value: totalWins};
-  suArray.push(sut);
-    var sut = {StatisticName : "TotalGamesCompleted", Version : "0", Value: totalGamesCompleted};
-  suArray.push(sut);
-    var sut = {StatisticName : "LongestWinStreak", Value: longestStreak};
-  suArray.push(sut);
-    var sut = {StatisticName : "BestDriftScore", Version : "0", Value: bestScore};
-  suArray.push(sut);
+  var sul = {StatisticName : "League", Value: cLeague};
+  suArray.push(sul);
+    var suw = {StatisticName : "Wins", Value: totalWins};
+  suArray.push(suw);
+    var sutg = {StatisticName : "TotalGamesCompleted", Value: totalGamesCompleted};
+  suArray.push(sutg);
+    var sulws = {StatisticName : "LongestWinStreak", Value: longestStreak};
+  suArray.push(sulws);
+    var subds = {StatisticName : "BestDriftScore", Value: bestScore};
+  suArray.push(subds);
+    var subhlr = {StatisticName : "HighestLeagueReached", Value: highestLeague};
+  suArray.push(subhlr);
   var updateRequest = server.UpdatePlayerStatistics(
   {
     PlayFabId: currentPlayerId,
@@ -1470,6 +1475,8 @@ handlers.iapMade = function(args, context)
 
   	var iapVal = Number(GetValueFromStatistics(ps, "IAPValue", 0));
 
+  	//BMBundleInfo
+
 	switch(args.bundle)
 	{
 		case "co.tamatem.downshiftdrift.gold01":
@@ -1492,6 +1499,35 @@ handlers.iapMade = function(args, context)
 		break;
 		case "co.tamatem.downshiftdrift.bundle01":
 		iapVal += 599;
+
+		  var userInventoryObject = server.GetUserInventory(
+		  {
+		    PlayFabId: currentPlayerId,
+		  }
+		  );
+
+		  var catalogData = server.GetCatalogItems(
+		  {
+		  	CatalogVersion: "BMBundleInfo"
+		  });
+
+		  for(var i = 0; i < userInventoryObject.Inventory.length; i++)
+		  {
+		  	if(userInventoryObject.Inventory[i].ItemId == args.bundle)
+		  	{
+		  		server.ConsumeItem(
+		  		{
+		  			PlayFabId: currentPlayerId,
+		  			ItemInstanceId : userInventoryObject.Inventory[i].ItemInstanceId, // why the fuck is this green?
+		  			ConsumeCount : 1
+		  		});
+
+		  	}
+
+
+
+		  }
+
 		break;
 		default:
 		if(args.debug == true) log.debug("InvalidPurchaseParameter");

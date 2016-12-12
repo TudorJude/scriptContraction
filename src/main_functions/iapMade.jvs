@@ -9,6 +9,8 @@ handlers.iapMade = function(args, context)
 
   	var iapVal = Number(GetValueFromStatistics(ps, "IAPValue", 0));
 
+  	//BMBundleInfo
+
 	switch(args.bundle)
 	{
 		case "co.tamatem.downshiftdrift.gold01":
@@ -31,6 +33,35 @@ handlers.iapMade = function(args, context)
 		break;
 		case "co.tamatem.downshiftdrift.bundle01":
 		iapVal += 599;
+
+		  var userInventoryObject = server.GetUserInventory(
+		  {
+		    PlayFabId: currentPlayerId,
+		  }
+		  );
+
+		  var catalogData = server.GetCatalogItems(
+		  {
+		  	CatalogVersion: "BMBundleInfo"
+		  });
+
+		  for(var i = 0; i < userInventoryObject.Inventory.length; i++)
+		  {
+		  	if(userInventoryObject.Inventory[i].ItemId == args.bundle)
+		  	{
+		  		server.ConsumeItem(
+		  		{
+		  			PlayFabId: currentPlayerId,
+		  			ItemInstanceId : userInventoryObject.Inventory[i].ItemInstanceId, // why the fuck is this green?
+		  			ConsumeCount : 1
+		  		});
+
+		  	}
+
+
+
+		  }
+
 		break;
 		default:
 		if(args.debug == true) log.debug("InvalidPurchaseParameter");
