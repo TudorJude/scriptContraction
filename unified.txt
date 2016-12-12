@@ -1510,22 +1510,118 @@ handlers.iapMade = function(args, context)
 		  {
 		  	CatalogVersion: "BMBundleInfo"
 		  });
+		  var ps=server.GetPlayerStatistics(
+		  {
+		     	PlayFabId: currentPlayerId,
+		     	StatisticNames: ["HighestLeagueReached"]
+		  }).Statistics;
 
+		  var hlr = Number(GetValueFromStatistics(ps, "HighestLeagueReached", 1));
+		  var bundleName = "bundle01league";
+		  if(hlr < 10) bundleName = bundleName + "0" + hlr;
+		  else bundleName += hlr;
+		  if(args.debug == true) log.debug("consuming: " + bundleName);
+
+
+		  var bundleInfo;
+		  for(var i = 0; i < custCatalog.Catalog.length; i++)
+		  {
+		      if(custCatalog.Catalog[i].ItemId == bundleName)
+		      {
+		      	bundleInfo = JSON.parse(custCatalog.Catalog[i].CustomData)
+		      	break;
+		      }
+		  }
+
+		  if(bundleInfo == undefined) return generateErrObj("Catalog item: " + bundleName + " not found");
 		  for(var i = 0; i < userInventoryObject.Inventory.length; i++)
 		  {
 		  	if(userInventoryObject.Inventory[i].ItemId == args.bundle)
 		  	{
-		  		server.ConsumeItem(
+		  		//consume item
+		  		try
 		  		{
-		  			PlayFabId: currentPlayerId,
-		  			ItemInstanceId : userInventoryObject.Inventory[i].ItemInstanceId, // why the fuck is this green?
-		  			ConsumeCount : 1
-		  		});
+			  		var cons = server.ConsumeItem(
+			  		{
+			  			PlayFabId: currentPlayerId,
+			  			ItemInstanceId : userInventoryObject.Inventory[i].ItemInstanceId, // why the fuck is this green?
+			  			ConsumeCount : 1
+			  		});
+		  		}
+		  		catch(err)
+		  		{
+		  			return generateErrObj("err");
+		  		}
+		  		//check if consumption was succesfull
 
+
+				  //we now have to parse the bundleinfo to get it's contents
+				  //HC
+				  if(bundleInfo.HCRange != undefined)
+				  {
+			  		if(args.debug == true) log.debug("found HCRange: " + bundleInfo.HCRange);
+				  }
+
+				  //SC
+				  if(bundleInfo.SCRange != undefined)
+				  {
+			  		if(args.debug == true) log.debug("found SCRange: " + bundleInfo.SCRange);
+				  }
+
+				  //Engine
+				  if(bundleInfo.Engine != undefined)
+				  {
+			  		if(args.debug == true) log.debug("found Engine: " + bundleInfo.Engine);
+				  }
+
+				  //Exhaust
+				  if(bundleInfo.Exhaust != undefined)
+				  {
+			  		if(args.debug == true) log.debug("found Exhaust: " + bundleInfo.Exhaust);
+				  }
+
+				  //Gearbox
+				  if(bundleInfo.Gearbox != undefined)
+				  {
+			  		if(args.debug == true) log.debug("found Gearbox: " + bundleInfo.Gearbox);
+				  }
+
+				  //Suspension
+				  if(bundleInfo.Suspension != undefined)
+				  {
+			  		if(args.debug == true) log.debug("found Suspension: " + bundleInfo.Suspension);
+				  }
+
+				  //Tires
+				  if(bundleInfo.Tires != undefined)
+				  {
+			  		if(args.debug == true) log.debug("found Tires: " + bundleInfo.Tires);
+				  }
+
+				  //Turbo
+				  if(bundleInfo.Turbo != undefined)
+				  {
+			  		if(args.debug == true) log.debug("found Turbo: " + bundleInfo.Turbo);
+				  }
+
+				  //CarCard
+				  if(bundleInfo.CarCard != undefined)
+				  {
+			  		if(args.debug == true) log.debug("found CarCard: " + bundleInfo.CarCard);
+				  }
+
+				  //CarCardAmount
+				  if(bundleInfo.CarCardAmount != undefined)
+				  {
+			  		if(args.debug == true) log.debug("found CarCardAmount: " + bundleInfo.CarCardAmount);
+				  }
+
+				  //ChestModel
+				  if(bundleInfo.ChestModel != undefined)
+				  {
+			  		if(args.debug == true) log.debug("found ChestModel: " + bundleInfo.ChestModel);
+				  }
 		  	}
-
-
-
 		  }
 
 		break;
