@@ -1536,6 +1536,7 @@ handlers.iapMade = function(args, context)
 		  if(bundleInfo == undefined) return generateErrObj("Catalog item: " + bundleName + " not found");
 		  for(var i = 0; i < userInventoryObject.Inventory.length; i++)
 		  {
+		  	if(args.debug == true) log.debug("ItemId: " + userInventoryObject.Inventory[i].ItemId + " , ItemInstanceId: " + userInventoryObject.Inventory[i].ItemInstanceId);
 		  	if(userInventoryObject.Inventory[i].ItemId == args.bundle)
 		  	{
 		  		//consume item
@@ -1544,13 +1545,13 @@ handlers.iapMade = function(args, context)
 			  		var cons = server.ConsumeItem(
 			  		{
 			  			PlayFabId: currentPlayerId,
-			  			ItemInstanceId : userInventoryObject.Inventory[i].ItemInstanceId, // why the fuck is this green?
+			  			ItemInstanceId : userInventoryObject.Inventory[i].ItemInstanceId,
 			  			ConsumeCount : 1
 			  		});
 		  		}
 		  		catch(err)
 		  		{
-		  			return generateErrObj("err");
+		  			return generateErrObj("err: " + err);
 		  		}
 		  		//check if consumption was succesfull
 
