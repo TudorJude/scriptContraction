@@ -184,7 +184,7 @@ handlers.iapMade = function(args, context)
 				  if(bundleInfo.Exhaust != undefined)
 				  {
 			  		if(args.debug == true) log.debug("found Exhaust: " + bundleInfo.Exhaust);
-			  		var splitInfo = bundleInfo.Engine.split(",");
+			  		var splitInfo = bundleInfo.Exhaust.split(",");
 			  		if(splitInfo.length >= 2)
 			  		{
 			  			var res = GiveUserPart("Exhaust", splitInfo[0], splitInfo[1], userInventoryObject);
@@ -198,7 +198,7 @@ handlers.iapMade = function(args, context)
 				  if(bundleInfo.Gearbox != undefined)
 				  {
 			  		if(args.debug == true) log.debug("found Gearbox: " + bundleInfo.Gearbox);
-			  		var splitInfo = bundleInfo.Engine.split(",");
+			  		var splitInfo = bundleInfo.Gearbox.split(",");
 			  		if(splitInfo.length >= 2)
 			  		{
 			  			var res = GiveUserPart("Gearbox", splitInfo[0], splitInfo[1], userInventoryObject);
@@ -212,7 +212,7 @@ handlers.iapMade = function(args, context)
 				  if(bundleInfo.Suspension != undefined)
 				  {
 			  		if(args.debug == true) log.debug("found Suspension: " + bundleInfo.Suspension);
-			  		var splitInfo = bundleInfo.Engine.split(",");
+			  		var splitInfo = bundleInfo.Suspension.split(",");
 			  		if(splitInfo.length >= 2)
 			  		{
 			  			var res = GiveUserPart("Suspension", splitInfo[0], splitInfo[1], userInventoryObject);
@@ -226,7 +226,7 @@ handlers.iapMade = function(args, context)
 				  if(bundleInfo.Tires != undefined)
 				  {
 			  		if(args.debug == true) log.debug("found Tires: " + bundleInfo.Tires);
-			  		var splitInfo = bundleInfo.Engine.split(",");
+			  		var splitInfo = bundleInfo.Tires.split(",");
 			  		if(splitInfo.length >= 2)
 			  		{
 			  			var res = GiveUserPart("Tires", splitInfo[0], splitInfo[1], userInventoryObject);
@@ -240,7 +240,7 @@ handlers.iapMade = function(args, context)
 				  if(bundleInfo.Turbo != undefined)
 				  {
 			  		if(args.debug == true) log.debug("found Turbo: " + bundleInfo.Turbo);
-			  		var splitInfo = bundleInfo.Engine.split(",");
+			  		var splitInfo = bundleInfo.Turbo.split(",");
 			  		if(splitInfo.length >= 2)
 			  		{
 			  			var res = GiveUserPart("Turbo", splitInfo[0], splitInfo[1], userInventoryObject);

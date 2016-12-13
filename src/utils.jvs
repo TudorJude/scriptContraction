@@ -594,6 +594,7 @@ function calculateLeague(currentTrophies)
 
       if(cardInstance == undefined)
       {
+        newAmount = cardsAmount;
         var itemsToGive = [];
         itemsToGive.push(cardName);
         var grantRequest = server.GrantItemsToUser(
