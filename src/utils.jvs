@@ -566,13 +566,13 @@ function calculateLeague(currentTrophies)
       {
         cardsAmount = Number(amount0);
       }
-      var cardFound = false;
+      var cardInstance;
       var newAmount;
       for(var i = 0; i < inventoryObject.Inventory.length; i++)
       {
         if((inventoryObject.Inventory[i].ItemId == cardName) && (inventoryObject.Inventory[i].CatalogVersion == catalogName)) // user has part so only change the Amount Custom Data field
         {
-          cardFound = true;
+          cardInstance = inventoryObject.Inventory[i].ItemInstanceId;
           if(inventoryObject.Inventory[i].CustomData == undefined) 
           {
             newAmount = cardsAmount;
@@ -592,9 +592,20 @@ function calculateLeague(currentTrophies)
         }
       } // end for
 
-      if(cardFound == false)
+      if(cardInstance == undefined)
       {
-        newAmount = cardsAmount;
+        var itemsToGive = [];
+        itemsToGive.push(cardName);
+        var grantRequest = server.GrantItemsToUser(
+          {
+            CatalogVersion : catalogName,
+            PlayFabId: currentPlayerId,
+            ItemIds : itemsToGive
+          }
+          );
+        cardInstance = grantRequest.ItemGrantResults[0].ItemInstanceId;
+        if(cardInstance === undefined)
+          return generateErrObj("grantRequest denied");
       }
 
       var itemData = {"Amount" : newAmount};
@@ -602,7 +613,7 @@ function calculateLeague(currentTrophies)
       server.UpdateUserInventoryItemCustomData(
         {
           PlayFabId: inventoryObject.PlayFabId,
-          ItemInstanceId: inventoryObject.Inventory[i].ItemInstanceId,
+          ItemInstanceId: cardInstance,
           Data: itemData
         }
         );
