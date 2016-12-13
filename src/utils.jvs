@@ -547,12 +547,12 @@ function calculateLeague(currentTrophies)
     */
     function GiveUserPart(partName, amount0, amount1, inventoryObject)
     {
-      GiveUserItem(partName, "PartsCards", amount0, amount1, inventoryObject);
+      GiveUserCard(partName, "PartsCards", amount0, amount1, inventoryObject);
     }
 
     function GiveUserCarCard(cardName, amount0, amount1, inventoryObject)
     {
-      GiveUserItem(cardName, "CarCards", amount0, amount1, inventoryObject);
+      GiveUserCard(cardName, "CarCards", amount0, amount1, inventoryObject);
     }
 
     function GiveUserCard(cardName, catalogName, amount0, amount1, inventoryObject)
