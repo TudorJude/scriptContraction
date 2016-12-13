@@ -89,75 +89,218 @@ handlers.iapMade = function(args, context)
 		  		}
 		  		//check if consumption was succesfull
 
-
+		  		//prepare object to send to client for inventory refresh purposes
+		  		var invData;
+		  		var objectUpdated = [];
+		  		var currencyUpdated = {};
 				  //we now have to parse the bundleinfo to get it's contents
 				  //HC
 				  if(bundleInfo.HCRange != undefined)
 				  {
 			  		if(args.debug == true) log.debug("found HCRange: " + bundleInfo.HCRange);
+			  		var splitInfo = bundleInfo.HCRange.split(",");
+			  		var hcAmount = 1;
+			  		if(splitInfo.length >= 2)
+			  		{
+				  		if(Number(splitInfo[0]) < Number(splitInfo[1]))
+				  		{
+							hcAmount = Number(splitInfo[0]) + Math.floor(Math.random() * (Number(splitInfo[1]) - Number(splitInfo[0])));
+				  		}
+				  		else
+				  		{
+				  			hcAmount = Number(splitInfo[0]);
+				  		}
+			  		}
+			  		else
+			  		{
+			  			return generateErrObj("Catalog data corrupt");
+			  		}
+
+			  		if(hcAmount > 0)
+			  		{
+					    addUserCurrencyResult = server.AddUserVirtualCurrency(
+					      {
+					        PlayFabId: currentPlayerId,
+					        VirtualCurrency : "HC",
+					        Amount: hcAmount
+					      }
+					    );
+
+					    currencyUpdated[addUserCurrencyResult.VirtualCurrency] = addUserCurrencyResult.Balance;
+					}
 				  }
 
 				  //SC
 				  if(bundleInfo.SCRange != undefined)
 				  {
 			  		if(args.debug == true) log.debug("found SCRange: " + bundleInfo.SCRange);
+
+			  		var splitInfo = bundleInfo.SCRange.split(",");
+			  		var scAmount = 1;
+			  		if(splitInfo.length >= 2)
+			  		{
+				  		if(Number(splitInfo[0]) < Number(splitInfo[1]))
+				  		{
+							scAmount = Number(splitInfo[0]) + Math.floor(Math.random() * (Number(splitInfo[1]) - Number(splitInfo[0])));
+				  		}
+				  		else
+				  		{
+				  			scAmount = Number(splitInfo[0]);
+				  		}
+			  		}
+			  		else
+			  		{
+			  			return generateErrObj("Catalog data corrupt");
+			  		}
+
+			  		if(scAmount > 0)
+			  		{
+					    addUserCurrencyResult = server.AddUserVirtualCurrency(
+					      {
+					        PlayFabId: currentPlayerId,
+					        VirtualCurrency : "SC",
+					        Amount: scAmount
+					      }
+					    );
+					    currencyUpdated[addUserCurrencyResult.VirtualCurrency] = addUserCurrencyResult.Balance;
+					}
 				  }
 
 				  //Engine
 				  if(bundleInfo.Engine != undefined)
 				  {
 			  		if(args.debug == true) log.debug("found Engine: " + bundleInfo.Engine);
+			  		var splitInfo = bundleInfo.Engine.split(",");
+			  		if(splitInfo.length >= 2)
+			  		{
+			  			var res = GiveUserPart("Engine", splitInfo[0], splitInfo[1], userInventoryObject);
+			  			objectsUpdated.push(res);
+			  		}
+			  		else
+			  			return generateErrObj("Catalog data corrupt");
 				  }
 
 				  //Exhaust
 				  if(bundleInfo.Exhaust != undefined)
 				  {
 			  		if(args.debug == true) log.debug("found Exhaust: " + bundleInfo.Exhaust);
+			  		var splitInfo = bundleInfo.Engine.split(",");
+			  		if(splitInfo.length >= 2)
+			  		{
+			  			var res = GiveUserPart("Exhaust", splitInfo[0], splitInfo[1], userInventoryObject);
+			  			objectsUpdated.push(res);
+			  		}
+			  		else
+			  			return generateErrObj("Catalog data corrupt");
 				  }
 
 				  //Gearbox
 				  if(bundleInfo.Gearbox != undefined)
 				  {
 			  		if(args.debug == true) log.debug("found Gearbox: " + bundleInfo.Gearbox);
+			  		var splitInfo = bundleInfo.Engine.split(",");
+			  		if(splitInfo.length >= 2)
+			  		{
+			  			var res = GiveUserPart("Gearbox", splitInfo[0], splitInfo[1], userInventoryObject);
+			  			objectsUpdated.push(res);
+			  		}
+			  		else
+			  			return generateErrObj("Catalog data corrupt");
 				  }
 
 				  //Suspension
 				  if(bundleInfo.Suspension != undefined)
 				  {
 			  		if(args.debug == true) log.debug("found Suspension: " + bundleInfo.Suspension);
+			  		var splitInfo = bundleInfo.Engine.split(",");
+			  		if(splitInfo.length >= 2)
+			  		{
+			  			var res = GiveUserPart("Suspension", splitInfo[0], splitInfo[1], userInventoryObject);
+			  			objectsUpdated.push(res);
+			  		}
+			  		else
+			  			return generateErrObj("Catalog data corrupt");
 				  }
 
 				  //Tires
 				  if(bundleInfo.Tires != undefined)
 				  {
 			  		if(args.debug == true) log.debug("found Tires: " + bundleInfo.Tires);
+			  		var splitInfo = bundleInfo.Engine.split(",");
+			  		if(splitInfo.length >= 2)
+			  		{
+			  			var res = GiveUserPart("Tires", splitInfo[0], splitInfo[1], userInventoryObject);
+			  			objectsUpdated.push(res);
+			  		}
+			  		else
+			  			return generateErrObj("Catalog data corrupt");
 				  }
 
 				  //Turbo
 				  if(bundleInfo.Turbo != undefined)
 				  {
 			  		if(args.debug == true) log.debug("found Turbo: " + bundleInfo.Turbo);
+			  		var splitInfo = bundleInfo.Engine.split(",");
+			  		if(splitInfo.length >= 2)
+			  		{
+			  			var res = GiveUserPart("Turbo", splitInfo[0], splitInfo[1], userInventoryObject);
+			  			objectsUpdated.push(res);
+			  		}
+			  		else
+			  			return generateErrObj("Catalog data corrupt");
 				  }
 
 				  //CarCard
 				  if(bundleInfo.CarCard != undefined)
 				  {
 			  		if(args.debug == true) log.debug("found CarCard: " + bundleInfo.CarCard);
-				  }
 
-				  //CarCardAmount
-				  if(bundleInfo.CarCardAmount != undefined)
-				  {
-			  		if(args.debug == true) log.debug("found CarCardAmount: " + bundleInfo.CarCardAmount);
-				  }
+					  //CarCardAmount
+					  if(bundleInfo.CarCardAmount != undefined)
+					  {
+				  		if(args.debug == true) log.debug("found CarCardAmount: " + bundleInfo.CarCardAmount);
 
+				  		var splitInfo = bundleInfo.CarCardAmount.split(",");
+				  		if(splitInfo.length >= 2)
+				  		{
+				  			var res = GiveUserCarCard(bundleInfo.CarCard, splitInfo[0], splitInfo[1], userInventoryObject);
+				  			objectsUpdated.push(res);
+				  		}
+				  		else
+				  			return generateErrObj("Catalog data corrupt");
+
+					  }
+				  }
+				  var chestModel = "DiamonChest";
 				  //ChestModel
 				  if(bundleInfo.ChestModel != undefined)
 				  {
 			  		if(args.debug == true) log.debug("found ChestModel: " + bundleInfo.ChestModel);
+			  		chestModel = bundleInfo.ChestModel;
 				  }
 		  	}
 		  }
+
+		var suArray = [];
+		var su = {StatisticName : "IAPValue", Value: iapVal};
+		suArray.push(su);
+
+		var updateRequest = server.UpdatePlayerStatistics(
+		  {
+		    PlayFabId: currentPlayerId,
+		    Statistics: suArray
+		  }
+		  );
+		 invData = 
+		 {
+		 	Inventory: objectsUpdated,
+            VirtualCurrency: currencyUpdated
+		 };
+		 var returnObj = {
+		        Result: "OK",
+		        Message: "InventoryUpdate",
+		        InventoryChange:invData
+		      };
 
 		break;
 		default:

@@ -535,3 +535,84 @@ function calculateLeague(currentTrophies)
       if(level >= ln) level = ln - 1;
       return Number(holdingObject[itemId][level]) || defaultValue;
     }
+
+
+    /**
+    * Gives user part $partName in the range amount of amount0-amount1
+    * @param  {partName} part to give
+    * @param  {amount0} min amount
+    * @param  {amount1} max amount
+    * @param  {inventoryObject} user's inventory object
+    * @return {value}, "OK" or "Error"
+    */
+    function GiveUserPart(partName, amount0, amount1, inventoryObject)
+    {
+      GiveUserItem(partName, "PartsCards", amount0, amount1, inventoryObject);
+    }
+
+    function GiveUserCarCard(cardName, amount0, amount1, inventoryObject)
+    {
+      GiveUserItem(cardName, "CarCards", amount0, amount1, inventoryObject);
+    }
+
+    function GiveUserCard(cardName, catalogName, amount0, amount1, inventoryObject)
+    {
+      var cardsAmount;
+      if(Number(amount0) < Number(amount1))
+      {
+        cardsAmount = Number(amount0) + Math.floor(Math.random() * (Number(amount1) - Number(amount0)));
+      }
+      else
+      {
+        cardsAmount = Number(amount0);
+      }
+      var cardFound = false;
+      var newAmount;
+      for(var i = 0; i < inventoryObject.Inventory.length; i++)
+      {
+        if((inventoryObject.Inventory[i].ItemId == cardName) && (inventoryObject.Inventory[i].CatalogVersion == catalogName)) // user has part so only change the Amount Custom Data field
+        {
+          cardFound = true;
+          if(inventoryObject.Inventory[i].CustomData == undefined) 
+          {
+            newAmount = cardsAmount;
+          }
+          else 
+          {
+            if(inventoryObject.Inventory[i].CustomData.Amount == undefined)
+              newAmount = inventoryObject.Inventory[i].CustomData.Amount;
+            else
+              if(isNaN(Number(inventoryObject.Inventory[i].CustomData.Amount)))
+                newAmount = cardsAmount;
+              else
+                newAmount = Number(inventoryObject.Inventory[i].CustomData.Amount) + Number(newAmount); // this is the nothing went wrong branch
+          }
+
+          break; // for break
+        }
+      } // end for
+
+      if(cardFound == false)
+      {
+        newAmount = cardsAmount;
+      }
+
+      var itemData = {"Amount" : newAmount};
+
+      server.UpdateUserInventoryItemCustomData(
+        {
+          PlayFabId: inventoryObject.PlayFabId,
+          ItemInstanceId: inventoryObject.Inventory[i].ItemInstanceId,
+          Data: itemData
+        }
+        );
+
+      var dataChanged =         
+        {
+          ItemId : cardName,
+          CatalogVersion: catalogName,
+          CustomData: itemData
+        }
+
+      return dataChanged;
+    }
