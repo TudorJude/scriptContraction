@@ -91,7 +91,7 @@ handlers.iapMade = function(args, context)
 
 		  		//prepare object to send to client for inventory refresh purposes
 		  		var invData;
-		  		var objectUpdated = [];
+		  		var objectsUpdated = [];
 		  		var currencyUpdated = {};
 				  //we now have to parse the bundleinfo to get it's contents
 				  //HC
