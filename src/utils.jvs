@@ -135,12 +135,16 @@ function CheckMaintenanceAndVersion(args)
                   minVer = Number(minGameVerSplit[i]);
 
           //log.debug("iteration: " + i + " currVer: " + currVer + " vs minVer: " + minVer);
-
+          if (currVer == minVer) continue;
           if (currVer < minVer)
           {
               needsUpdate = true;
               break;
-          }    
+          } 
+          else
+          {
+            break;
+          }   
     }
     // end needs update code
     if(needsUpdate == true) return "update";
@@ -610,7 +614,7 @@ function calculateLeague(currentTrophies)
       }
 
       var itemData = {"Amount" : newAmount};
-
+      log.debug("new amount is: " + newAmount);
       server.UpdateUserInventoryItemCustomData(
         {
           PlayFabId: inventoryObject.PlayFabId,

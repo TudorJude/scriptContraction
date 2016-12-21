@@ -20,10 +20,10 @@ handlers.iapMade = function(args, context)
 		iapVal += 499;
 		break;
 		case "co.tamatem.downshiftdrift.gold03":
-		iapVal += 999;
+		iapVal += 2499;
 		break;
 		case "co.tamatem.downshiftdrift.gold04":
-		iapVal += 1999;
+		iapVal += 2499;
 		break;
 		case "co.tamatem.downshiftdrift.gold05":
 		iapVal += 4999;
