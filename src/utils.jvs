@@ -605,7 +605,7 @@ function calculateLeague(currentTrophies)
         var grantRequest = server.GrantItemsToUser(
           {
             CatalogVersion : catalogName,
-            PlayFabId: currentPlayerId,
+            PlayFabId: inventoryObject.PlayFabId,
             ItemIds : itemsToGive
           }
           );
