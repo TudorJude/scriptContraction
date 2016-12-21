@@ -570,6 +570,7 @@ function calculateLeague(currentTrophies)
       {
         cardsAmount = Number(amount0);
       }
+      log.debug("cardsAmount: " + cardsAmount);
       var cardInstance;
       var newAmount;
       for(var i = 0; i < inventoryObject.Inventory.length; i++)
@@ -584,7 +585,7 @@ function calculateLeague(currentTrophies)
           else 
           {
             if(inventoryObject.Inventory[i].CustomData.Amount == undefined)
-              newAmount = inventoryObject.Inventory[i].CustomData.Amount;
+              newAmount = cardsAmount;
             else
               if(isNaN(Number(inventoryObject.Inventory[i].CustomData.Amount)))
                 newAmount = cardsAmount;
