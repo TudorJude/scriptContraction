@@ -301,6 +301,8 @@ handlers.iapMade = function(args, context)
 		        InventoryChange:invData
 		      };
 
+		return returnObj;
+
 		break;
 		default:
 		if(args.debug == true) log.debug("InvalidPurchaseParameter");
