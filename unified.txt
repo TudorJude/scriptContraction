@@ -679,6 +679,17 @@ handlers.claimDailyMission = function(args, context)
 	{
 		return generateErrObj("No daily mission data found on server");
 	}
+
+	var tData = server.GetTitleData(
+	    {
+	        PlayFabId : currentPlayerId,
+	        Keys : ["DailyMissionData"]
+	    }
+	      );
+
+	var tParsed = JSON.parse(tData.Data.DailyMissionData);
+	var dataArr = tParsed.missionData[idx].split("_");
+	
 	var parsedData = JSON.parse(dStatus.Data.DailyMissionStatus.Value);
 	var DailyMissionClaimStatus = parsedData.dailyMissionClaimStatus;
 
@@ -706,22 +717,13 @@ handlers.claimDailyMission = function(args, context)
           Data: objectToUpdate
        });
 
-	var tData = server.GetTitleData(
-	    {
-	        PlayFabId : currentPlayerId,
-	        Keys : ["DailyMissionData"]
-	    }
-	      );
-
-	var tParsed = JSON.parse(tData.Data.DailyMissionData);
-
 	var rewardCurrency;
 	var rewardAmount;
 	if(idx >= tParsed.missionData.length)
 	{
 		return generateErrObj("Unlock index is out of bounds of titleData claim mission reward array");
 	}
-	var dataArr = tParsed.missionData[idx].split("_");
+	
 	rewardCurrency = dataArr[1];
 	rewardAmount = Number(dataArr[2]);
 
@@ -754,18 +756,7 @@ handlers.endDaily = function(args, context)
 	{
 		return generateErrObj("No daily mission data found on server");
 	}
-	var parsedData = JSON.parse(dStatus.Data.DailyMissionStatus.Value);
-	var DailyMissionClaimStatus = parsedData.dailyMissionClaimStatus;
-  	var DailyStatus = Number(parsedData.DailyStatus);
-  	var TimeRemaining = -1;
-	for(var i = 0; i < parsedData.dailyMissionClaimStatus.length; i++)
-	{
-		if(DailyMissionClaimStatus[i] == 0) return generateErrObj("Not all missions were claimed!");
-	}
-  //all missions claimed so let's give the player what they are due and set the daily mission status
 
-  	DailyMissionClaimStatus = [0,0,0,0,0,0,0,0];
-	
 	 var tData = server.GetTitleData(
 	      {
 	        PlayFabId : currentPlayerId,
@@ -775,6 +766,30 @@ handlers.endDaily = function(args, context)
 	 var totalMinutes = 600;
 	 tParsed = JSON.parse(tData.Data.DailyMissionData);
 	 totalMinutes = Number(tParsed.minutesToRefresh);
+
+	var parsedData = JSON.parse(dStatus.Data.DailyMissionStatus.Value);
+	var DailyMissionClaimStatus = parsedData.dailyMissionClaimStatus;
+  	var DailyStatus = Number(parsedData.DailyStatus);
+  	var TimeRemaining = -1;
+
+
+	var dataArr;
+	for(var i = 0; i < tParsed.missionData.length; i++)
+	{
+		dataArr = tParsed.missionData[i].split("_");
+		if(dataArr.length < 4) generateErrObj("Title data is invalid!");
+		if(dataArr[3] == "ON") DailyMissionClaimStatus[i] = -1;
+	}
+
+
+	for(var i = 0; i < parsedData.dailyMissionClaimStatus.length; i++)
+	{
+		if(DailyMissionClaimStatus[i] == -1) continue; //we don't care aboot these missions anymore
+		if(DailyMissionClaimStatus[i] == 0) return generateErrObj("Not all missions were claimed!");
+	}
+  //all missions claimed so let's give the player what they are due and set the daily mission status
+
+  	DailyMissionClaimStatus = [0,0,0,0,0,0,0,0];
 
   	var d = new Date();
   	var timeStamp;
