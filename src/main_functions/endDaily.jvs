@@ -34,7 +34,7 @@ handlers.endDaily = function(args, context)
 	{
 		dataArr = tParsed.missionData[i].split("_");
 		if(dataArr.length < 4) generateErrObj("Title data is invalid!");
-		if(dataArr[3] == "ON") DailyMissionClaimStatus[i] = -1;
+		if(dataArr[3] == "OFF") DailyMissionClaimStatus[i] = -1;
 	}
 
 
