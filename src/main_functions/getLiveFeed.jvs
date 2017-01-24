@@ -11,10 +11,11 @@ handlers.getLiveFeed = function(args, context)
     );
     if(titleData == undefined) return generateErrObj("No LivefeedFound");
     if(titleData.Data["LiveFeed"] == undefined) return generateErrObj("No LivefeedFound");
+    var parsedData = JSON.parse(titleData.Data["LiveFeed"]);
       var r = 
       {
     	Result :"OK",
-    	Feed:titleData.Data["LiveFeed"]
+    	Feed:parsedData
       }
       return r;
 }
