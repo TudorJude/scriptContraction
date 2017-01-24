@@ -1590,6 +1590,7 @@ handlers.getLiveFeed = function(args, context)
     	Result :"OK",
     	Feed:titleData.Data["LiveFeed"]
       }
+      return r;
 }
 handlers.getServerTime = function(args, context)
 {
