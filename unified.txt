@@ -1572,6 +1572,25 @@ handlers.getDailyMissionStatus = function(args, context) {
   	};
   	return r;
 }
+handlers.getLiveFeed = function(args, context)
+{
+	var mC = CheckMaintenanceAndVersion(args);
+  	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+
+  	//give live feed as object
+  	var titleData = server.GetTitleInternalData(
+    {
+      Keys : "LiveFeed"
+    }
+    );
+    if(titleData == undefined) return generateErrObj("No LivefeedFound");
+    if(titleData.Data["LiveFeed"] == undefined) return generateErrObj("No LivefeedFound");
+      var r = 
+      {
+    	Result :"OK",
+    	Feed:titleData.Data["LiveFeed"]
+      }
+}
 handlers.getServerTime = function(args, context)
 {
 	var t = new Date();
@@ -3021,7 +3040,7 @@ var oppDat = server.GetUserInternalData(
 var didQuitLastGame = "false;"
 if(oppDat.Data.quitLastGame != undefined)
   didQuitLastGame = oppDat.Data.quitLastGame.Value;
-if(args.debug == true) log.debug("didQuitLastGame: " + didQuitLastGame);
+//if(args.debug == true) log.debug("didQuitLastGame: " + didQuitLastGame);
 var setLastGameToLossFlag = false;
 if(didQuitLastGame == undefined) didQuitLastGame = "false";
 if(didQuitLastGame == "true") 
