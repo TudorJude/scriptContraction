@@ -350,6 +350,8 @@ log.debug("9");
             newFeed[i] = feedObject;
           }
         }
+        if(found == false)
+          newFeed[newFeed.length - 1] = feedObject;
       }
     else 
     {//add feed object
