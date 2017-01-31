@@ -2513,7 +2513,8 @@ handlers.openChest = function(args, context)
 
     outInventory.Experience = totalXp;
   }
-  publishToLiveFeed(currentPlayerId, "unlockedChest", args.chestId);
+  if((args.chestId))
+    publishToLiveFeed(currentPlayerId, "unlockedChest", args.chestId);
   return generateInventoryChange("InventoryUpdated", outInventory);
 };
 handlers.purchaseBMItem = function(args, context)
