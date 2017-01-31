@@ -366,9 +366,9 @@ log.debug("9");
             {
               newFeed[j + 1] = liveFeedArray[j];
               log.debug("newFeed[" +j+ "]: " +  newFeed[j]);
-            }            
+            } 
+            break;           
           }
-          break;
         }
       }
       log.debug("newFeed after: " + newFeed);
