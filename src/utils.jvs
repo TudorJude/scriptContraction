@@ -339,11 +339,14 @@ log.debug("9");
     {// replace with one
       log.debug("13");
       newFeed = new Array(liveFeedArray.length);
+      var found = false;
         for(var i = 0; i < liveFeedArray.length; i++)
         {
           newFeed[i] = liveFeedArray[i];
+          if(found == true) continue;
           if(liveFeedArray[i].currentHealth < damage)
           {
+            found = true;
             newFeed[i] = feedObject;
           }
         }
