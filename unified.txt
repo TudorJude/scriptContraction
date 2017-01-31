@@ -349,6 +349,8 @@ log.debug("9");
     else 
     {//add feed object
       log.debug("14");
+      log.debug("liveFeedArray.length: " + liveFeedArray.length);
+      log.debug("liveFeedArray before: " + liveFeedArray);
         for(var i = 0; i < liveFeedArray.length; i++)
         {
           if(liveFeedArray[i].currentHealth < damage)
@@ -363,6 +365,7 @@ log.debug("9");
           break;
         }
       }
+      log.debug("liveFeedArray after: " + liveFeedArray);
   }
   catch(err)
   {
@@ -371,6 +374,7 @@ log.debug("9");
   }
 
 var dataToUpdate = JSON.stringify(liveFeedArray);
+log.debug("liveFeedArray toupdate: " + dataToUpdate);
 var updateFeed = server.SetTitleInternalData(
     {
       Key: "LiveFeed", //Recording_0_0
