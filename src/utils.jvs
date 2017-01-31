@@ -331,7 +331,7 @@ log.debug("9");
   log.debug("11");
   if(liveFeed.Data["LiveFeed"] == undefined) return; 
   log.debug("12");
-  var liveFeedArray = JSON.parse(livefeed.Data.LiveFeed);
+  var liveFeedArray = JSON.parse(liveFeed.Data.LiveFeed);
   try
   {
     if(Number(maxFeedLength) <= Number(liveFeedArray.length)) 
