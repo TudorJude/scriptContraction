@@ -278,7 +278,7 @@ log.debug("7");
   //let's compute chance, health and damage the directObject adds
   try
   {
-    if(feedDataParsed.ActionsData[action] != undefined)
+    if(feedDataParsed.DirectObjectData[directObject] != undefined)
     {
       chance += Number(feedDataParsed.DirectObjectData[directObject].chance);
       health += Number(feedDataParsed.DirectObjectData[directObject].health);
