@@ -183,6 +183,172 @@ function generateInventoryChange(mess, inventory)
   return r;
 }
 
+    /**
+    * Function that handles publishing to "LiveFeed" Internal Title Data key
+    * @param {actor} user playfabId
+    * @param {action} action performed as described in "LiveFeedDictionary" Titledata key ("unlockedChest","promotedArena" etc)
+    * @param {directObject} object of action as described in "LiveFeedDictionary" Titledata key
+    */
+
+function publishToLiveFeed(actor, action, directObject)
+{
+  //let's get live feed parameters
+  var feedData = server.GetTitleData(
+  {
+    Keys : ["LiveFeedDictionary"]
+  });
+  if(feedData.Data["LiveFeedDictionary"] == undefined) return; 
+
+  var feedDataParsed = JSON.parse(feedData.Data.LiveFeedDictionary);
+  var chance = 0;
+  var health = 0;
+  var damage = 0;
+
+  var decayVal = 0;
+  var maxFeedLength = 0;
+
+  //feedobject
+  var feedObject = {};
+  var d = new Date();
+  feedObject["ts"] = d.getTime();
+  //let's get feed metadata
+  try
+  {
+    decayVal = Number(feedDataParsed.MetaData.HealthDecayPerMinute);
+    maxFeedLength = Number(feedDataParsed.MetaData.MaxFeedHistory);
+  }
+  catch(err)
+  {
+    log.debug("invalid metadata");
+    return;
+  }
+  //let's compute chance, health and damage the actor adds
+  try
+  {
+    //base
+    chance += Number(feedDataParsed.ActorData.Base.chance);
+    health += Number(feedDataParsed.ActorData.Base.health);
+    damage += Number(feedDataParsed.ActorData.Base.damage);
+
+    //actor specific stats
+    var ps=server.GetPlayerStatistics(
+    {
+      PlayFabId: actor,
+      StatisticNames: ["IAPValue", "Trophies"] //this need to coincide with ActorData object's base properties other than Base from the LiveFeedDictionary data
+    }).Statistics;
+    var iapVal = Number(GetValueFromStatistics(ps, "IAPValue", 0));
+    var trophies = Number(GetValueFromStatistics(ps, "Trophies", 0));
+
+    chance += Number(feedDataParsed.ActorData["IAPValue"].chance) * iapVal;
+    health += Number(feedDataParsed.ActorData["IAPValue"].health) * iapVal;
+    damage += Number(feedDataParsed.ActorData["IAPValue"].damage) * iapVal;
+
+    chance += Number(feedDataParsed.ActorData["Trophies"].chance) * trophies;
+    health += Number(feedDataParsed.ActorData["Trophies"].health) * trophies;
+    damage += Number(feedDataParsed.ActorData["Trophies"].damage) * trophies;
+  }
+  catch(err)
+  {
+    log.debug("error at liveFeed actor: " + err);
+    return;
+  }
+  //let's compute chance, health and damage the action adds
+  try
+  {
+    if(feedDataParsed.ActionsData[action] != undefined)
+    {
+      chance += Number(feedDataParsed.ActionsData[action].chance);
+      health += Number(feedDataParsed.ActionsData[action].health);
+      damage += Number(feedDataParsed.ActionsData[action].damage);
+    }
+  }
+  catch(err)
+  {
+    log.debug("error at liveFeed action: " + err);
+    return;
+  }
+
+  //let's compute chance, health and damage the directObject adds
+  try
+  {
+    if(feedDataParsed.ActionsData[action] != undefined)
+    {
+      chance += Number(feedDataParsed.DirectObjectData[directObject].chance);
+      health += Number(feedDataParsed.DirectObjectData[directObject].health);
+      damage += Number(feedDataParsed.DirectObjectData[directObject].damage);
+    }
+  }
+  catch(err)
+  {
+    log.debug("error at liveFeed object: " + err);
+    return;
+  }
+  var chanceInt = Math.floor(chance);
+  if(Math.floor(Math.random() * 10000) >= chanceInt) return; // the feed didn't go through
+
+  //we need the user displayname
+  var playerInfo = server.GetPlayerCombinedInfo(
+  {
+    PlayFabId : actor,
+    InfoRequestParameters: {"GetUserAccountInfo": true}
+  });
+  var username;
+  try
+  {
+    username = playerInfo.InfoResultPayload.AccountInfo.TitleInfo.DisplayName
+  }
+  catch(err)
+  {
+    log.debug("error at liveFeed nameget: " + err);
+    return;
+  }
+  feedObject["health"] = health;
+  feedObject["currentHealth"] = health;
+  feedObject["UserId"] = actor;
+  feedObject["UserName"] = username;
+  feedObject["Action"] = feedDataParsed.ActionsData[action].id;
+  feedObject["Object"] = feedDataParsed.DirectObjectData[directObject].id;
+
+  //let's get the livefeed data
+  var liveFeed = server.GetTitleInternalData(
+  {
+    Keys : ["LiveFeed"]
+  });
+  if(liveFeed.Data["LiveFeed"] == undefined) return; 
+  var liveFeedArray = JSON.parse(livefeed.Data.LiveFeed);
+  try
+  {
+  if(Number(maxFeedLength) <= Number(liveFeedArray.length)) // replace with one
+      for(var i = 0; i < liveFeedArray.length; i++)
+      {
+        if(liveFeedArray[i].currentHealth < damage)
+        {
+          liveFeed[i] = feedObject;
+          break;
+        }
+      }
+  else //add feed object
+      for(var i = 0; i < liveFeedArray.length; i++)
+      {
+        if(liveFeedArray[i].currentHealth < damage)
+        {
+          liveFeedArray.push(liveFeedArray[liveFeedArray.length - 1]);
+          for(var j = i; j < liveFeedArray.length; j++)
+          {
+            liveFeedArray[j + 1] = livefeed[j];
+          }
+          liveFeedArray[i] = feedObject;
+        }
+        break;
+      }
+  }
+  catch(err)
+  {
+    log.debug("found error at feed replace/add: " + err);
+    return;
+  }
+}
+
 function updateCurrencySpentStatistic(currType, amount)
 {
   var suArray = [];
@@ -2306,7 +2472,7 @@ handlers.openChest = function(args, context)
 
     outInventory.Experience = totalXp;
   }
-
+  publishToLiveFeed(currentPlayerId, unlockedChest, args.chestId);
   return generateInventoryChange("InventoryUpdated", outInventory);
 };
 handlers.purchaseBMItem = function(args, context)
