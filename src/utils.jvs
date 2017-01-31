@@ -354,6 +354,7 @@ log.debug("9");
       log.debug("liveFeedArray.length: " + liveFeedArray.length);
       log.debug("liveFeedArray before: " + liveFeedArray);
       newFeed = new Array(liveFeedArray.length + 1);
+      newFeed[liveFeedArray.length] = feedObject;
         for(var i = 0; i < liveFeedArray.length; i++)
         {
           newFeed[i] = liveFeedArray[i];
