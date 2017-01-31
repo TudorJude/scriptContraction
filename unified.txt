@@ -206,6 +206,9 @@ function publishToLiveFeed(actor, action, directObject)
   var health = 0;
   var damage = 0;
 
+  var actionId = action;
+  var objectId = directObject;
+
   var decayVal = 0;
   var maxFeedLength = 0;
 
@@ -266,6 +269,7 @@ function publishToLiveFeed(actor, action, directObject)
       chance += Number(feedDataParsed.ActionsData[action].chance);
       health += Number(feedDataParsed.ActionsData[action].health);
       damage += Number(feedDataParsed.ActionsData[action].damage);
+      actionId = feedDataParsed.ActionsData[action].id;
     }
   }
   catch(err)
@@ -283,6 +287,7 @@ log.debug("7");
       chance += Number(feedDataParsed.DirectObjectData[directObject].chance);
       health += Number(feedDataParsed.DirectObjectData[directObject].health);
       damage += Number(feedDataParsed.DirectObjectData[directObject].damage);
+      objectId = feedDataParsed.DirectObjectData[directObject].id;
     }
   }
   catch(err)
@@ -315,8 +320,8 @@ log.debug("9");
   feedObject["currentHealth"] = health;
   feedObject["UserId"] = actor;
   feedObject["UserName"] = username;
-  feedObject["Action"] = feedDataParsed.ActionsData[action].id;
-  feedObject["Object"] = feedDataParsed.DirectObjectData[directObject].id;
+  feedObject["Action"] = objectId;
+  feedObject["Object"] = actionId;
 
   //let's get the livefeed data
   var liveFeed = server.GetTitleInternalData(
