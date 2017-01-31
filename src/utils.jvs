@@ -338,7 +338,7 @@ log.debug("9");
     if(Number(maxFeedLength) <= Number(liveFeedArray.length)) 
     {// replace with one
       log.debug("13");
-      newFeed = new Array[liveFeedArray.length];
+      newFeed = new Array(liveFeedArray.length);
         for(var i = 0; i < liveFeedArray.length; i++)
         {
           newFeed[i] = liveFeedArray[i];
@@ -353,7 +353,7 @@ log.debug("9");
       log.debug("14");
       log.debug("liveFeedArray.length: " + liveFeedArray.length);
       log.debug("liveFeedArray before: " + liveFeedArray);
-      newFeed = new Array[liveFeedArray.length + 1];
+      newFeed = new Array(liveFeedArray.length + 1);
         for(var i = 0; i < liveFeedArray.length; i++)
         {
           newFeed[i] = liveFeedArray[i];
