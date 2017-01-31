@@ -282,6 +282,6 @@ handlers.openChest = function(args, context)
 
     outInventory.Experience = totalXp;
   }
-  publishToLiveFeed(currentPlayerId, unlockedChest, args.chestId);
+  publishToLiveFeed(currentPlayerId, "unlockedChest", args.chestId);
   return generateInventoryChange("InventoryUpdated", outInventory);
 };
