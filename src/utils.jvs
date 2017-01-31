@@ -320,8 +320,8 @@ log.debug("9");
   feedObject["currentHealth"] = health;
   feedObject["UserId"] = actor;
   feedObject["UserName"] = username;
-  feedObject["Action"] = objectId;
-  feedObject["Object"] = actionId;
+  feedObject["Action"] = actionId;
+  feedObject["Object"] = objectId;
 
   //let's get the livefeed data
   var liveFeed = server.GetTitleInternalData(
