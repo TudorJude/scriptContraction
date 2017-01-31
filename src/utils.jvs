@@ -332,6 +332,7 @@ log.debug("9");
   if(liveFeed.Data["LiveFeed"] == undefined) return; 
   log.debug("12");
   var liveFeedArray = JSON.parse(liveFeed.Data.LiveFeed);
+  var newFeed;
   try
   {
     if(Number(maxFeedLength) <= Number(liveFeedArray.length)) 
@@ -339,10 +340,10 @@ log.debug("9");
       log.debug("13");
         for(var i = 0; i < liveFeedArray.length; i++)
         {
+          newFeed[i] = liveFeedArray[i];
           if(liveFeedArray[i].currentHealth < damage)
           {
-            liveFeed[i] = feedObject;
-            break;
+            newFeed[i] = feedObject;
           }
         }
       }
@@ -351,21 +352,22 @@ log.debug("9");
       log.debug("14");
       log.debug("liveFeedArray.length: " + liveFeedArray.length);
       log.debug("liveFeedArray before: " + liveFeedArray);
+      newFeed = new Array[liveFeedArray.length + 1];
         for(var i = 0; i < liveFeedArray.length; i++)
         {
+          newFeed[i] = liveFeedArray[i];
           if(liveFeedArray[i].currentHealth < damage)
           {
-            liveFeedArray.push(liveFeedArray[liveFeedArray.length - 1]);
             for(var j = i; j < liveFeedArray.length; j++)
             {
-              liveFeedArray[j + 1] = livefeed[j];
+              newFeed[j + 1] = liveFeedArray[j];
             }
-            liveFeedArray[i] = feedObject;
+            newFeed[i] = feedObject;
           }
           break;
         }
       }
-      log.debug("liveFeedArray after: " + liveFeedArray);
+      log.debug("newFeed after: " + newFeed);
   }
   catch(err)
   {
@@ -373,8 +375,8 @@ log.debug("9");
     return;
   }
 
-var dataToUpdate = JSON.stringify(liveFeedArray);
-log.debug("liveFeedArray toupdate: " + dataToUpdate);
+var dataToUpdate = JSON.stringify(newFeed);
+log.debug("newFeed toupdate: " + dataToUpdate);
 var updateFeed = server.SetTitleInternalData(
     {
       Key: "LiveFeed", //Recording_0_0
