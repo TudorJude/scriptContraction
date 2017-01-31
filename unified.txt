@@ -369,6 +369,14 @@ log.debug("9");
     log.debug("found error at feed replace/add: " + err);
     return;
   }
+
+var dataToUpdate = JSON.stringify(liveFeedArray);
+var updateFeed = server.SetTitleInternalData(
+    {
+      Key: "LiveFeed", //Recording_0_0
+      Value: dataToUpdate
+    }
+    );
 }
 
 function updateCurrencySpentStatistic(currType, amount)
