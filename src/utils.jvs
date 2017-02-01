@@ -410,16 +410,10 @@ function ApplyDamageOverTimeToFeed(feedList, DoT)
   {
     try
     {
-      log.debug("fListTs: " + Number(feedList[i].ts));
-      log.debug("currentTimeStamp: " + Number(currentTimeStamp));
-      log.debug("DoT: " + Number(DoT));
-      dotDamage = (Number(feedList[i].ts) - Number(currentTimeStamp)) * Number(DoT);
-      log.debug("dotDamage: " + dotDamage);
+      dotDamage = Math.abs((Number(feedList[i].ts) - Number(currentTimeStamp))) * Number(DoT);
       dotDamage = dotDamage / 60000; //it's damage per minute
-      log.debug("dotDamage: " + dotDamage);
       dotDamage = Math.floor(dotDamage);
-      log.debug("dotDamage: " + dotDamage);
-      feedList[i].currentHealth = Math.max((Number(feedList[i].Health) - Number(dotDamage)), 0);
+      feedList[i].currentHealth = Math.max((Number(feedList[i].health) - Number(dotDamage)), 0);
     }
     catch(err)
     {
