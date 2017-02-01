@@ -296,6 +296,7 @@ log.debug("7");
     return;
   }
   log.debug("8");
+  //chance to hit
   var chanceInt = Math.floor(chance);
   //if(Math.floor(Math.random() * 10000) >= chanceInt) return; // the feed didn't go through
 log.debug("9");
@@ -332,6 +333,11 @@ log.debug("9");
   if(liveFeed.Data["LiveFeed"] == undefined) return; 
   log.debug("12");
   var liveFeedArray = JSON.parse(liveFeed.Data.LiveFeed);
+
+  //let's apply DecayOverTime to each livefeed item
+  log.debug("liveFeed[0] current health: " + liveFeedArray[0].currentHealth);
+  if(ApplyDamageOverTimeToFeed(liveFeedArray, decayVal) != "OK") return;
+  log.debug("liveFeed[0] current health: " + liveFeedArray[0].currentHealth);
   var newFeed;
   try
   {
@@ -356,8 +362,6 @@ log.debug("9");
     else 
     {//add feed object
       log.debug("14");
-      log.debug("liveFeedArray.length: " + liveFeedArray.length);
-      log.debug("liveFeedArray before: " + liveFeedArray);
       newFeed = new Array(liveFeedArray.length + 1);
       newFeed[liveFeedArray.length] = feedObject;
         for(var i = 0; i < liveFeedArray.length; i++)
@@ -389,10 +393,34 @@ var dataToUpdate = JSON.stringify(newFeed);
 log.debug("newFeed toupdate: " + dataToUpdate);
 var updateFeed = server.SetTitleInternalData(
     {
-      Key: "LiveFeed", //Recording_0_0
+      Key: "LiveFeed", 
       Value: dataToUpdate
     }
     );
+}
+
+function ApplyDamageOverTimeToFeed(feedList, DoT)
+{
+  //let's check the feed array integrity first
+  if(feedList.length == undefined) return "Error";
+  var d = new Date();
+  var currentTimeStamp = d.getTime();
+  var dotDamage = 0;
+  for(var i = 0; i < feedList.length; i++)
+  {
+    try
+    {
+      dotDamage = (Number(feedList[i].ts) - Number(currentTimeStamp)) * Number(DoT);
+      dotDamage /=60000; //it's damage per minute
+      dotDamage = Math.floor(dotDamage);
+      feedList[i].currentHealth = Math.max((Number(feedList[i].Health) - Number(dotDamage)), 0);
+    }
+    catch(err)
+    {
+      feedList.splice(i,1);
+    }
+  }
+  return "OK";
 }
 
 function updateCurrencySpentStatistic(currType, amount)
