@@ -1,7 +1,7 @@
 handlers.setMainCar = function(args, context)
 {
-	var mC = CheckMaintenanceAndVersion(args);
-  	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+	//var mC = CheckMaintenanceAndVersion(args);
+  //	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
 
   	var userInventoryObject = server.GetUserInventory(
     {
