@@ -438,6 +438,33 @@ function ApplyDamageOverTimeToFeed(feedList, DoT)
   return "OK";
 }
 
+function updateUserProfileInfo(userId, carInfo)
+{
+  var profileInfoObj;
+  //var userPorfileObject = server.GetUserReadOnlyData(
+  //    {
+  //      PlayFabId: userId,
+  //      Keys: ["UserProfileInfo"]
+  //    }
+  //    );
+  //if(userProfileInfo.Data.UserProfileInfo == undefined)
+  profileInfoObj[carInfo] = carInfo;
+
+  var dict = [];
+    dict.push({
+        Key:"UserProfileInfo",
+        Value: profileInfoObj
+    });
+
+    var playerData = server.UpdateUserReadOnlyData(
+    {
+      PlayFabId: userId,
+      Data:dict,
+      Permission: "Public"
+    }
+  );
+}
+
 function updateCurrencySpentStatistic(currType, amount)
 {
   var suArray = [];

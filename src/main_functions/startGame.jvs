@@ -1,44 +1,8 @@
 handlers.startGame = function(args, context) {
-  //let's see what subleague we are in and what win/loss ration we have
-  //wlratio
+
   var mC = CheckMaintenanceAndVersion(args);
   if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
-  //var wlStat = "10"; // 50/50 for newtimers
-  //var wlStatInt = 0; // we change the bitwise representation to int32 and store it like that
-  //var winRatio = 50;
-  //var totalGames = 2;
-  //var wins = 0;
-  //vvar ps=server.GetPlayerStatistics(
-  //{
-  //   PlayFabId: currentPlayerId,
-  //   StatisticNames: ["WinLoss"]
-  //});
-  //if(ps.Statistics.length != 0)
-  //{
-  //    wlStatInt = ps.Statistics[0].Value.toString();
-  //    wlStat = Number(wlStatInt).toString(2);
-  //    totalGames = wlStat.length;
-  //    for(var i = 1; i < wlStat.length; i++)
-  //    {
-  //      if(wlStat[i] == "1") wins++;
-  //    }
-  //    winRatio = Math.round( 100* (wins/totalGames));
-  //}
-  //start game so we assume it'sa lose until it's a win
-  //wlStat += "0";
-  //log.debug("wlStatBeforeshift " + wlStat);
-   //if(wlStat.length > 20)
-   //{
-   // var tempS = new Array(20);
-   // wlStat = wlStat.slice(2);
-  //  tempS[0] = "1";
-   // for(var i = 0; i < wlStat.length; i++)
-   // {
-  //    tempS[i + 1] = wlStat[i];
-   // }
-  //  wlStat = tempS;
-  // }
-  // log.debug("wlStat " + wlStat);
+
   //trophy count and subleague distribution
   var leagueTitleDataRequest = server.GetTitleData(
     {
@@ -82,12 +46,12 @@ handlers.startGame = function(args, context) {
   var subDivision = 43;
   var nextSubDivision = 43;
   var subDivisionRange = 200;
-          var rminmaxarr = leagueTitleDataRequest.Data["TrophyGainRange"].split("_");
-          var lminmaxarr = leagueTitleDataRequest.Data["TrophyLoseRange"].split("_");
-          var rMin = Number(rminmaxarr[0]);
-          var rMax = Number(rminmaxarr[1]);
-          var lMin = Number(lminmaxarr[0]);
-          var lMax = Number(lminmaxarr[1]);
+  var rminmaxarr = leagueTitleDataRequest.Data["TrophyGainRange"].split("_");
+  var lminmaxarr = leagueTitleDataRequest.Data["TrophyLoseRange"].split("_");
+  var rMin = Number(rminmaxarr[0]);
+  var rMax = Number(rminmaxarr[1]);
+  var lMin = Number(lminmaxarr[0]);
+  var lMax = Number(lminmaxarr[1]);
   for(var i = 0; i < sdvalParsed.subdivisions.length; i++)
   {
     if(trophyCount<Number(sdvalParsed.subdivisions[i]))
