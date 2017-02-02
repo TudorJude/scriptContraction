@@ -2,60 +2,6 @@ handlers.endGame = function(args, context) {
   
   var mC = CheckMaintenanceAndVersion(args);
   if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
-
-  //var wlStat = "01";
-  //var wlStatInt = 0;
-  //var curWL = "0";
-  //if(args.outcome == "rWin")curWL="1";
-  //var ps=server.GetPlayerStatistics(
-  //{
-//     PlayFabId: currentPlayerId,
-//     StatisticNames: ["WinLoss"]
-//  });
-//  if(ps.Statistics.length != 0)
-//  {
-//      wlStatInt = ps.Statistics[0].Value.toString();
-//      //log.debug("wlStatInt " + wlStatInt);
-//      wlStat = Number(wlStatInt).toString(2);
-//      //log.debug("wlStat " + wlStat);
-//  }
-//  var wins = 0;
-//  var totalGames = 2;
-//  var winRatio = 0;
-//  //log.debug("wlStat.length " + wlStat.length);
-//  var tempString = new Array(wlStat.length);
-//  //log.debug("tempString.length " + tempString.length);
-//  for(var i = 0 ; i < tempString.length - 1; i++)
-//  {
-//    tempString[i] = wlStat[i];
-//  }
-//	tempString[tempString.length-1] = curWL;
-//  //log.debug("tempString " + tempString);
-//  wlStat = tempString;
-//  //log.debug("wlStat " + wlStat);
-//	totalGames = wlStat.length;
-//  var winStreak = 0;
-//  var winStreakTemp = 0;
-//	for(var i = 1; i < wlStat.length; i++)
-//	{
-//		if(wlStat[i] == "1") 
-//      {
-//        wins++;
-//        winStreakTemp++;
-//      }
-//      else
-//      {
-//        if(winStreakTemp > winStreak)
-//        {
-//          winStreak = winStreakTemp;
-//        }
-//        winStreakTemp = 0;
-//      }
-//	}
-	//log.debug("wlStatNew " + wlStat);
-
-//  winRatio = Math.round( 100* (wins/totalGames));
-  //log.debug("winRatio " + winRatio);
   //let's get some relevant title wide data
     var titleDataRequest = server.GetTitleData(
     {
@@ -103,12 +49,31 @@ handlers.endGame = function(args, context) {
      "LastGameOutcome" : "Loss"
   }
 
+
   if(args.outcome == "rWin")
   {
   		trophyCount += refund;
       dataToUpdate["LastGameOutcome"] = "Win";
       if(lastMatchOutcome == "Loss") latestStreak = 1;
-      else latestStreak ++;      
+      else latestStreak ++;  
+
+      //Let's check the leaderboard and see if our player is in the top
+      var isKing = false;
+      ldata = server.GetLeaderboard(
+      {
+        StatisticName : "TrophyCount",
+        StartPosition : 0,
+        MaxResultsCount : 1
+      });
+      
+      if(ldata.Leaderboard != null)
+      {
+        if(ldata.Leaderboard.PlayFabId == currentPlayerId) //looks like our player is already top of the leaderboard
+          isKing = true;
+        else
+          if(Number(ldata.Leaderboard.StatValue) < trophyCount) // he wasn't before but he sure is now
+            publishToLiveFeed(currentPlayerId, "topPlayer", trophyCount);
+      }    
   }
 
   dataToUpdate["LatestStreak"] = latestStreak;
@@ -126,6 +91,7 @@ handlers.endGame = function(args, context) {
      PlayFabId: currentPlayerId,
      StatisticNames: ["Wins", "TotalGamesCompleted","LongestWinStreak","BestDriftScore", "HighestLeagueReached"]
   }).Statistics;
+  var cLeague = calculateLeague(trophyCount);
   var totalGamesCompleted = GetValueFromStatistics(ms, "TotalGamesCompleted", 0);
   totalGamesCompleted = Number(totalGamesCompleted) + 1;
   var totalWins = GetValueFromStatistics(ms, "Wins", 0);
@@ -136,17 +102,30 @@ handlers.endGame = function(args, context) {
   if(Number(longestStreak) < latestStreak) 
   {    
     longestStreak = latestStreak;
-    if(Number(longestStreak) == 10)
-      publishToLiveFeed(currentPlayerId, "winStreak", 10);
+    if(cLeague > 2)
+    {
+      if(Number(longestStreak) == 10)
+        publishToLiveFeed(currentPlayerId, "winStreak", 10);
+      if(Number(longestStreak) == 15)
+        publishToLiveFeed(currentPlayerId, "winStreak", 15);
+      if(Number(longestStreak) == 20)
+        publishToLiveFeed(currentPlayerId, "winStreak", 20);
+    }
   }
   var bestScore = GetValueFromStatistics(ms, "BestDriftScore", 0);
   if(Number(recHeader.Score) > bestScore)
     bestScore = Number(recHeader.Score);
   //log.debug("trophies change: " + initTrophyCount + " => " + trophyCount);
-  var cLeague = calculateLeague(trophyCount);
 
   var highestLeague = GetValueFromStatistics(ms, "HighestLeagueReached", 1);
-  if(cLeague > highestLeague) highestLeague = cLeague;
+  if(Number(cLeague) > Number(highestLeague)) 
+    {
+      highestLeague = cLeague;
+      if(highestLeague > 2)
+      {
+        publishToLiveFeed(currentPlayerId, "arenaUnlocked", Number(cLeague));
+      }
+    }
   //wlStatInt = 0;
   //for(var i = 0 ; i < wlStat.length; i++)
   //{
@@ -282,62 +261,6 @@ handlers.endGame = function(args, context) {
   		{
 			 uniqueKeyExists = true;
 			 recArray[i] = recObj;
-       /*
-       //LEGACY WL RATIO SORT
-            if(recArray.length == 1) break; //if it's the only recording there is no use to sort anymore
-      if(i > 0) // if not first
-      {
-        if(recArray[i].wl > recArray[i-1].wl) // if bigger than left we start comparing to elements to the right
-        {
-          if(i == recArray.length-1) break; // there are no more elements to the right so no more sorting required
-          for(var j = i + 1; j < recArray.length; j++) // we check elements i+1 to length-1
-          {
-            if(recArray[j - 1].wl > recArray[j].wl) // if wl of element j - 1 is greater than that of element j we swap them
-            {
-              var aux = recArray[j];
-              recArray[j] = recArray[j - 1];
-              recArray[j - 1] = aux;
-            }
-            else // the element stays where it is
-            {
-              break;
-            }
-          }
-        }
-        else // not bigger than the left let's start comparing with elements to the left
-        {
-          for(var j = i - 1; j >= 0; j--) // we check elements i-1 to 0
-          {
-            if(recArray[j + 1].wl < recArray[j].wl) // if wl of element j + 1 is smaller than that of element j we swap them
-            {
-              var aux = recArray[j];
-              recArray[j] = recArray[j + 1];
-              recArray[j + 1] = aux;
-            }
-            else // the element stays where it is
-            {
-              break;
-            }
-          }
-        }
-        } // if(i > 0)
-        else
-        {
-          for(var j = i + 1; j < recArray.length; j++) // we check elements i+1 to length-1
-          {
-            if(recArray[j - 1].wl > recArray[j].wl) // if wl of element j - 1 is greater than that of element j we swap them
-            {
-              var aux = recArray[j];
-              recArray[j] = recArray[j - 1];
-              recArray[j - 1] = aux;
-            }
-            else // the element stays where it is
-            {
-              break;
-            }
-          }
-        }
-       */
   		}
   	}
   	if(uniqueKeyExists == false)

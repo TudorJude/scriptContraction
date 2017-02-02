@@ -81,8 +81,11 @@ handlers.openChest = function(args, context)
           ItemIds : ans
         }
           );      
-        }
-        else return generateFailObj("You haven't reached this level yet");
+        //let's publish to the feed that the user leveled up
+        if(Number(currLvl) > 2)
+          publishToLiveFeed(currentPlayerId, "levelUp", Number(currLvl));
+      }
+      else return generateFailObj("You haven't reached this level yet");
 
   }
   var objectsUpdated = [];
