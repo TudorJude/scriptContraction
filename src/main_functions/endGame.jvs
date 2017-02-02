@@ -68,8 +68,8 @@ handlers.endGame = function(args, context) {
       
       if(ldata.Leaderboard != null)
       {
-        if(args.debug == true) log.debug("leaderboardData: " + ldata.Leaderboard);
-        if(ldata.Leaderboard.PlayFabId == currentPlayerId) //looks like our player is already top of the leaderboard
+        if(args.debug == true) log.debug("leaderboardData: " + ldata.Leaderboard[0]);
+        if(ldata.Leaderboard[0].PlayFabId == currentPlayerId) //looks like our player is already top of the leaderboard
         {
           if(args.debug == true) log.debug("ALREADY IN FIRST PLACE IN LEADERBOARD");
           isKing = true;
@@ -77,12 +77,12 @@ handlers.endGame = function(args, context) {
         else
         {
           if(args.debug == true) log.debug("WASN'T FIRST PLACE");
-          if(Number(ldata.Leaderboard.StatValue) < trophyCount) // he wasn't before but he sure is now
+          if(Number(ldata.Leaderboard.StatValue[0]) < trophyCount) // he wasn't before but he sure is now
           {
             if(args.debug == true) log.debug("BUT HE IS NOW!");
             publishToLiveFeed(currentPlayerId, "topPlayer", trophyCount);
           }
-          if(args.debug == true) log.debug("DIFF: " + Number(ldata.Leaderboard.StatValue) + " vs " + trophyCount);
+          if(args.debug == true) log.debug("DIFF: " + Number(ldata.Leaderboard.StatValue[0]) + " vs " + trophyCount);
         }
       }    
   }
