@@ -82,6 +82,7 @@ handlers.endGame = function(args, context) {
             if(args.debug == true) log.debug("BUT HE IS NOW!");
             publishToLiveFeed(currentPlayerId, "topPlayer", trophyCount);
           }
+          if(args.debug == true) log.debug("DIFF: " + Number(ldata.Leaderboard.StatValue) + " vs " + trophyCount);
         }
       }    
   }
