@@ -15,7 +15,7 @@ handlers.setMainCar = function(args, context)
   		{
   			mainCarInfo[carId] = userInventoryObject.Inventory[i].ItemId;
   			mainCarInfo[carData] = userInventoryObject.Inventory[i].CustomData
-  			updateUserProfileInfo(mainCarInfo);
+  			updateUserProfileInfo(currentPlayerId, mainCarInfo);
   			break;
   		}
     }
