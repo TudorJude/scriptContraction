@@ -192,15 +192,12 @@ function generateInventoryChange(mess, inventory)
 
 function publishToLiveFeed(actor, action, directObject)
 {
-  log.debug("0");
   //let's get live feed parameters
   var feedData = server.GetTitleData(
   {
     Keys : ["LiveFeedDictionary"]
   });
-  log.debug("1");
   if(feedData.Data["LiveFeedDictionary"] == undefined) return; 
-  log.debug("2");
   var feedDataParsed = JSON.parse(feedData.Data.LiveFeedDictionary);
   var chance = 0;
   var health = 0;
@@ -219,9 +216,7 @@ function publishToLiveFeed(actor, action, directObject)
   //feedobject
   var feedObject = {};
   var d = new Date();
-  log.debug("3");
   feedObject["ts"] = d.getTime();
-  log.debug("4");
   //let's get feed metadata
   try
   {
@@ -233,7 +228,6 @@ function publishToLiveFeed(actor, action, directObject)
     log.debug("invalid metadata");
     return;
   }
-  log.debug("5");
   //let's compute chance, health and damage the actor adds
   try
   {
@@ -264,7 +258,6 @@ function publishToLiveFeed(actor, action, directObject)
     log.debug("error at liveFeed actor: " + err);
     return;
   }
-  log.debug("6");
   //let's compute chance, health and damage the action adds
   try
   {
@@ -290,7 +283,6 @@ function publishToLiveFeed(actor, action, directObject)
     return;
   }
 
-log.debug("7");
   //let's compute chance, health and damage the directObject adds
   try
   {
@@ -317,11 +309,9 @@ log.debug("7");
     log.debug("error at liveFeed object: " + err);
     return;
   }
-  log.debug("8");
   //chance to hit
   var chanceInt = Math.floor(chance);
   //if(Math.floor(Math.random() * 10000) >= chanceInt) return; // the feed didn't go through
-  log.debug("9");
   //we need the user displayname
   var playerInfo = server.GetPlayerCombinedInfo(
   {
@@ -357,9 +347,7 @@ log.debug("7");
   var liveFeedArray = JSON.parse(liveFeed.Data.LiveFeed);
 
   //let's apply DecayOverTime to each livefeed item
-  log.debug("liveFeed[0] current health: " + liveFeedArray[0].currentHealth);
   if(ApplyDamageOverTimeToFeed(liveFeedArray, decayVal) != "OK") return;
-  log.debug("liveFeed[0] current health: " + liveFeedArray[0].currentHealth);
   var newFeed;
   try
   {
@@ -394,21 +382,17 @@ log.debug("7");
       }
     else 
     {//add feed object
-      log.debug("14");
       newFeed = new Array(liveFeedArray.length + 1);
       newFeed[liveFeedArray.length] = feedObject;
         for(var i = 0; i < liveFeedArray.length; i++)
         {
           newFeed[i] = liveFeedArray[i];
-          log.debug("newFeed[" +i+ "]: " +  newFeed[i]);
           if(liveFeedArray[i].currentHealth < health) // sort by health
           {
-            log.debug("newFeed[" +i+ "]: " +  newFeed[i]);
             newFeed[i] = feedObject;
             for(var j = i; j < liveFeedArray.length; j++)
             {
               newFeed[j + 1] = liveFeedArray[j];
-              log.debug("newFeed[" +j+ "]: " +  newFeed[j]);
             } 
             break;           
           }
@@ -422,7 +406,6 @@ log.debug("7");
   }
 
 var dataToUpdate = JSON.stringify(newFeed);
-log.debug("newFeed toupdate: " + dataToUpdate);
 var updateFeed = server.SetTitleInternalData(
     {
       Key: "LiveFeed", 
