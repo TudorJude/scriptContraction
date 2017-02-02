@@ -319,4 +319,6 @@ handlers.iapMade = function(args, context)
 	    Statistics: suArray
 	  }
 	  );
+	
+	publishToLiveFeed(currentPlayerId, "boughtIAP", args.bundle);
 }

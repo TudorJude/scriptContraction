@@ -206,6 +206,10 @@ function publishToLiveFeed(actor, action, directObject)
   var health = 0;
   var damage = 0;
 
+  var aObjectChanceMultiplier = 1;
+  var aObjectHealthMultiplier = 1;
+  var actionDamageMultiplier = 1;
+
   var actionId = action;
   var objectId = directObject;
 
@@ -270,6 +274,14 @@ function publishToLiveFeed(actor, action, directObject)
       health += Number(feedDataParsed.ActionsData[action].health);
       damage += Number(feedDataParsed.ActionsData[action].damage);
       actionId = feedDataParsed.ActionsData[action].id;
+
+      if(feedDataParsed.ActionsData[action].valMultiplier)
+      {
+          aObjectChanceMultiplier = Number(feedDataParsed.ActionsData[action].valMultiplier.chance);
+          aObjectHealthMultiplier = Number(feedDataParsed.ActionsData[action].valMultiplier.health);
+          actionDamageMultiplier = Number(feedDataParsed.ActionsData[action].valMultiplier.damage);
+      }
+
     }
   }
   catch(err)
@@ -282,12 +294,22 @@ log.debug("7");
   //let's compute chance, health and damage the directObject adds
   try
   {
-    if(feedDataParsed.DirectObjectData[directObject] != undefined)
+    if(isNaN(directObject) == true)
     {
-      chance += Number(feedDataParsed.DirectObjectData[directObject].chance);
-      health += Number(feedDataParsed.DirectObjectData[directObject].health);
-      damage += Number(feedDataParsed.DirectObjectData[directObject].damage);
-      objectId = feedDataParsed.DirectObjectData[directObject].id;
+      if(feedDataParsed.DirectObjectData[directObject] != undefined)
+      {
+        chance += Number(feedDataParsed.DirectObjectData[directObject].chance);
+        health += Number(feedDataParsed.DirectObjectData[directObject].health);
+        damage += Number(feedDataParsed.DirectObjectData[directObject].damage);
+        objectId = feedDataParsed.DirectObjectData[directObject].id;
+      }
+    }
+    else
+    {
+      chance += aObjectChanceMultiplier * Number(directObject);
+      health += aObjectHealthMultiplier * Number(directObject);
+      damage += actionDamageMultiplier * Number(directObject);
+      objectId = directObject;
     }
   }
   catch(err)
@@ -299,7 +321,7 @@ log.debug("7");
   //chance to hit
   var chanceInt = Math.floor(chance);
   //if(Math.floor(Math.random() * 10000) >= chanceInt) return; // the feed didn't go through
-log.debug("9");
+  log.debug("9");
   //we need the user displayname
   var playerInfo = server.GetPlayerCombinedInfo(
   {
@@ -1375,7 +1397,12 @@ handlers.endGame = function(args, context) {
     totalWins = Number(totalWins) + 1;
   var longestStreak = GetValueFromStatistics(ms, "LongestWinStreak", 0);
   var longestStreakVersion = GetVersionFromStatistics(ms, "LongestWinStreak", 0);
-  if(Number(longestStreak) < latestStreak) longestStreak = latestStreak;
+  if(Number(longestStreak) < latestStreak) 
+  {    
+    longestStreak = latestStreak;
+    if(Number(longestStreak) == 10)
+      publishToLiveFeed(currentPlayerId, "winStreak", 10);
+  }
   var bestScore = GetValueFromStatistics(ms, "BestDriftScore", 0);
   if(Number(recHeader.Score) > bestScore)
     bestScore = Number(recHeader.Score);
@@ -2169,6 +2196,8 @@ handlers.iapMade = function(args, context)
 	    Statistics: suArray
 	  }
 	  );
+	
+	publishToLiveFeed(currentPlayerId, "boughtIAP", args.bundle);
 }
 handlers.initServerData = function(args)
 {
@@ -2556,7 +2585,7 @@ handlers.openChest = function(args, context)
 
     outInventory.Experience = totalXp;
   }
-  if((args.chestId))
+  if((args.chestId == "DiamondChest") || (args.chestId == "BigGoldChest") || (args.chestId == "BigSilverChest"))
     publishToLiveFeed(currentPlayerId, "unlockedChest", args.chestId);
   return generateInventoryChange("InventoryUpdated", outInventory);
 };

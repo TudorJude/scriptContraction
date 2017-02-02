@@ -133,7 +133,12 @@ handlers.endGame = function(args, context) {
     totalWins = Number(totalWins) + 1;
   var longestStreak = GetValueFromStatistics(ms, "LongestWinStreak", 0);
   var longestStreakVersion = GetVersionFromStatistics(ms, "LongestWinStreak", 0);
-  if(Number(longestStreak) < latestStreak) longestStreak = latestStreak;
+  if(Number(longestStreak) < latestStreak) 
+  {    
+    longestStreak = latestStreak;
+    if(Number(longestStreak) == 10)
+      publishToLiveFeed(currentPlayerId, "winStreak", 10);
+  }
   var bestScore = GetValueFromStatistics(ms, "BestDriftScore", 0);
   if(Number(recHeader.Score) > bestScore)
     bestScore = Number(recHeader.Score);
