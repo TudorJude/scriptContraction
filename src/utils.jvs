@@ -348,16 +348,27 @@ log.debug("9");
       var found = false;
         for(var i = 0; i < liveFeedArray.length; i++)
         {
-          newFeed[i] = liveFeedArray[i];
-          if(found == true) continue;
           if(liveFeedArray[i].currentHealth < damage)
           {
             found = true;
-            newFeed[i] = feedObject;
+            liveFeedArray.splice(i,1);
+            break;
           }
         }
         if(found == false)
-          newFeed[newFeed.length - 1] = feedObject;
+        {
+          liveFeedArray.splice(newFeed.length - 1,1);
+        }
+        
+        for(var i = 0; i < liveFeedArray.length; i++)
+        {
+          if(liveFeedArray[i].currentHealth < health)
+          {
+            liveFeedArray.splice(i,0,feedObject);
+            newFeed = liveFeedArray;
+            break;
+          }
+        }
       }
     else 
     {//add feed object
@@ -368,7 +379,7 @@ log.debug("9");
         {
           newFeed[i] = liveFeedArray[i];
           log.debug("newFeed[" +i+ "]: " +  newFeed[i]);
-          if(liveFeedArray[i].currentHealth < damage)
+          if(liveFeedArray[i].currentHealth < health) // sort by health
           {
             log.debug("newFeed[" +i+ "]: " +  newFeed[i]);
             newFeed[i] = feedObject;
@@ -381,7 +392,6 @@ log.debug("9");
           }
         }
       }
-      log.debug("newFeed after: " + newFeed);
   }
   catch(err)
   {
