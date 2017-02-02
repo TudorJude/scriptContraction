@@ -77,12 +77,12 @@ handlers.endGame = function(args, context) {
         else
         {
           if(args.debug == true) log.debug("WASN'T FIRST PLACE");
-          if(Number(ldata.Leaderboard.StatValue[0]) < trophyCount) // he wasn't before but he sure is now
+          if(Number(ldata.Leaderboard[0].StatValue) < trophyCount) // he wasn't before but he sure is now
           {
             if(args.debug == true) log.debug("BUT HE IS NOW!");
             publishToLiveFeed(currentPlayerId, "topPlayer", trophyCount);
           }
-          if(args.debug == true) log.debug("DIFF: " + Number(ldata.Leaderboard.StatValue[0]) + " vs " + trophyCount);
+          if(args.debug == true) log.debug("DIFF: " + Number(ldata.Leaderboard[0].StatValue) + " vs " + trophyCount);
         }
       }    
   }
