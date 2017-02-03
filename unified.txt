@@ -213,6 +213,8 @@ function publishToLiveFeed(actor, action, directObject)
   var decayVal = 0;
   var maxFeedLength = 0;
 
+  var isUniqueAction = false;
+
   //feedobject
   var feedObject = {};
   var d = new Date();
@@ -267,6 +269,9 @@ function publishToLiveFeed(actor, action, directObject)
       health += Number(feedDataParsed.ActionsData[action].health);
       damage += Number(feedDataParsed.ActionsData[action].damage);
       actionId = feedDataParsed.ActionsData[action].id;
+
+      if(feedDataParsed.ActionsData[action].isUnique == "true")
+      	isUniqueAction = true;
 
       if(feedDataParsed.ActionsData[action].valMultiplier)
       {
@@ -351,19 +356,23 @@ function publishToLiveFeed(actor, action, directObject)
   var newFeed;
   try
   {
-    if(Number(maxFeedLength) <= Number(liveFeedArray.length)) 
+    if((Number(maxFeedLength) <= Number(liveFeedArray.length)) || (isUniqueAction == true)) 
     {// replace with one
       log.debug("13");
       newFeed = new Array(liveFeedArray.length);
       var found = false;
         for(var i = 0; i < liveFeedArray.length; i++)
         {
-          if(liveFeedArray[i].currentHealth < damage)
-          {
-            found = true;
-            liveFeedArray.splice(i,1);
-            break;
-          }
+	      if(
+	         ((liveFeedArray[i].Action == actionId) && (isUniqueAction == true))
+	         ||
+	         ((liveFeedArray[i].currentHealth < damage) && (isUniqueAction == false))
+	         )
+	          {
+	          	found = true;
+	            liveFeedArray.splice(i,1);
+	            break;
+	          }
         }
         if(found == false)
         {
