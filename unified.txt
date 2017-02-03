@@ -453,7 +453,7 @@ function updateUserProfileInfo(userId, carInfo)
   var dict = [];
     dict.push({
         Key:"UserProfileInfo",
-        Value: profileInfoObj
+        Value: JSON.stringify(profileInfoObj)
     });
 
     var playerData = server.UpdateUserReadOnlyData(
