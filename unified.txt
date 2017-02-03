@@ -3151,7 +3151,7 @@ handlers.setMainCar = function(args, context)
 {
 	//var mC = CheckMaintenanceAndVersion(args);
   //	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
-
+log.debug("ayyy lmao");
   	var userInventoryObject = server.GetUserInventory(
     {
       PlayFabId: currentPlayerId
@@ -3162,10 +3162,8 @@ handlers.setMainCar = function(args, context)
  	{
   		if((userInventoryObject.Inventory[i].ItemId == args.carId) && (userInventoryObject.Inventory[i].CatalogVersion == "CarsProgress"))
   		{
-        log.debug("BEFORE: mainCarInfo: " + " carId: " + userInventoryObject.Inventory[i].ItemId + " carData: " + userInventoryObject.Inventory[i].CustomData);
   			mainCarInfo["carId"] = userInventoryObject.Inventory[i].ItemId;
   			mainCarInfo["carData"] = userInventoryObject.Inventory[i].CustomData;
-        log.debug("AFTER: mainCarInfo: " + " carId: " + mainCarInfo.carId + " carData: " + mainCarInfo.carData);
   			updateUserProfileInfo(currentPlayerId, mainCarInfo);
   			break;
   		}
@@ -3748,7 +3746,10 @@ handlers.updateCarCust = function(args, context)
        Data: DataToUpdate
      }
      );
-  if(args.debug == true) log.debug("customization object: " + JSON.stringify(updatedItem))
+
+  //let's update user's UserInfoData
+  handlers.setMainCar(args,context);
+
   var objectsUpdated =
   [
   {

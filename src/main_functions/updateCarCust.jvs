@@ -61,7 +61,10 @@ handlers.updateCarCust = function(args, context)
        Data: DataToUpdate
      }
      );
-  if(args.debug == true) log.debug("customization object: " + JSON.stringify(updatedItem))
+
+  //let's update user's UserInfoData
+  handlers.setMainCar(args,context);
+
   var objectsUpdated =
   [
   {
