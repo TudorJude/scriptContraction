@@ -3182,9 +3182,10 @@ function updateProfileCar(args, context, userId)
         Keys: ["UserProfileInfo"]
       }
       );
-    if(userPorfileObject.UserProfileInfo == undefined) return;
-    if(userPorfileObject.UserProfileInfo.Value == undefined) return;
-    var upObj = JSON.parse(userPorfileObject.UserProfileInfo.Value);
+    if(userPorfileObject.Data == undefined) return;
+    if(userPorfileObject.Data.UserProfileInfo == undefined) return;
+    if(userPorfileObject.Data.UserProfileInfo.Value == undefined) return;
+    var upObj = JSON.parse(userPorfileObject.Data.UserProfileInfo.Value);
     log.debug("upObj.CarData.carId: " + upObj.CarData.carId + " vs " + args.carId);
     if(upObj.CarData.carId == args.carId)
       handlers.setMainCar(args,context);
