@@ -36,6 +36,7 @@ function updateProfileCar(args, context, userId)
     if(userPorfileObject.UserProfileInfo == undefined) return;
     if(userPorfileObject.UserProfileInfo.Value == undefined) return;
     var upObj = JSON.parse(userPorfileObject.UserProfileInfo.Value);
+    log.debug("upObj.CarData.carId: " + upObj.CarData.carId + " vs " + args.carId);
     if(upObj.CarData.carId == args.carId)
       handlers.setMainCar(args,context);
 }
