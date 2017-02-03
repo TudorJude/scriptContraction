@@ -8,7 +8,7 @@ handlers.setMainCar = function(args, context)
       PlayFabId: currentPlayerId
     }
   	);
-  	var mainCarInfo;
+  	var mainCarInfo = {};
  	for(var i = 0; i < userInventoryObject.Inventory.length; i++)
  	{
   		if((userInventoryObject.Inventory[i].ItemId == args.carId) && (userInventoryObject.Inventory[i].CatalogVersion == "CarsProgress"))
