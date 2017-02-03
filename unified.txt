@@ -2715,10 +2715,10 @@ handlers.purchaseItems = function(args, context)
   switch(args.purchaseType)
   {
     case "carUpgrade":
-      return upgradeCar(args, userInventoryObject, playerSC, playerHC);
+      return upgradeCar(args, context, userInventoryObject, playerSC, playerHC);
 
     case "partUpgrade":
-      return upgradePart(args, userInventoryObject, playerSC, playerHC);
+      return upgradePart(args, context, userInventoryObject, playerSC, playerHC);
 
     case "custPurchase":
     // log.debug("Purchasing Customization: " + args.custId + " with val: " + args.custVal);
@@ -3149,9 +3149,12 @@ handlers.rewardUsers = function(args, context)
 
 handlers.setMainCar = function(args, context)
 {
-	//var mC = CheckMaintenanceAndVersion(args);
-  //	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
-log.debug("ayyy lmao");
+	  var mC = CheckMaintenanceAndVersion(args);
+  	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+
+    log.debug("ayyy lmao");
+    log.debug("context: " + JSON.stringify(context));
+    
   	var userInventoryObject = server.GetUserInventory(
     {
       PlayFabId: currentPlayerId
@@ -3795,7 +3798,7 @@ handlers.updateCarCust = function(args, context)
   return returnObj;
 
 };
-function upgradeCar(args, userInventoryObject, playerSC, playerHC)
+function upgradeCar(args, context, userInventoryObject, playerSC, playerHC)
 {
   var carCardsCatalog = server.GetCatalogItems(
     {
@@ -3856,15 +3859,6 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
         cardFound = true;
         try
         {
-          //old consume code
-          // var itemConsumptionResult = server.ConsumeItem(
-          //  {
-          //    PlayFabId: currentPlayerId,
-          //    ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
-          //    ConsumeCount:cardCost
-          //  }
-          //);
-          //new consume code
           if(userInventoryObject.Inventory[i].CustomData === undefined)//let's check if item has custom data
           {
             return generateFailObj("Insufficient cards, CusotmData undefined");
@@ -3924,6 +3918,10 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
         Data: CarData
       }
     );
+
+    //let's udpate our profile
+    handlers.setMainCar(args, context);
+
     var subtractUserCurrencyResult;
     if(currCost > 0){
       subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
@@ -3979,15 +3977,6 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
         cardFound = true;
         try
         {
-          //old consume code
-          //var itemConsumptionResult = server.ConsumeItem(
-          // {
-          //  PlayFabId: currentPlayerId,
-          // ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
-          //ConsumeCount: cardInfo.baseCardCost
-          //  }
-          //  );
-          //new consume code
           if(userInventoryObject.Inventory[i].CustomData === undefined)//let's check if item has custom data
           {
             return generateFailObj("Insufficient cards, CustomData null");
@@ -4233,11 +4222,14 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
         i.VirtualCurrency =currencyUpdated;
       }
 
+      //let's udpate our profile
+      handlers.setMainCar(args, context);
+
       i.Experience = UpdateExperience("Balancing", "BalancingItem", "Car_" + cardInfo.rarity, 1, true);
       return generateInventoryChange("InventoryUpdateNewCar", i);
     }
   }
-function upgradePart(args, userInventoryObject, playerSC, playerHC)
+function upgradePart(args, context, userInventoryObject, playerSC, playerHC)
 {
   var carCatalog = server.GetCatalogItems(
     {
@@ -4429,6 +4421,9 @@ function upgradePart(args, userInventoryObject, playerSC, playerHC)
     currencyUpdated[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
     i.VirtualCurrency = currencyUpdated;
   }
+
+  //let's udpate our profile
+  handlers.setMainCar(args, context);
 
   i.Experience = UpdateExperience("Balancing", "BalancingItem", "Parts_" + cardInfo.rarity, newlvl, true);
   return generateInventoryChange("InventoryUpdatePart", i);

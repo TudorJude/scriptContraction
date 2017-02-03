@@ -18,10 +18,10 @@ handlers.purchaseItems = function(args, context)
   switch(args.purchaseType)
   {
     case "carUpgrade":
-      return upgradeCar(args, userInventoryObject, playerSC, playerHC);
+      return upgradeCar(args, context, userInventoryObject, playerSC, playerHC);
 
     case "partUpgrade":
-      return upgradePart(args, userInventoryObject, playerSC, playerHC);
+      return upgradePart(args, context, userInventoryObject, playerSC, playerHC);
 
     case "custPurchase":
     // log.debug("Purchasing Customization: " + args.custId + " with val: " + args.custVal);

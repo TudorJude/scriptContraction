@@ -1,8 +1,11 @@
 handlers.setMainCar = function(args, context)
 {
-	//var mC = CheckMaintenanceAndVersion(args);
-  //	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
-log.debug("ayyy lmao");
+	  var mC = CheckMaintenanceAndVersion(args);
+  	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+
+    log.debug("ayyy lmao");
+    log.debug("context: " + JSON.stringify(context));
+    
   	var userInventoryObject = server.GetUserInventory(
     {
       PlayFabId: currentPlayerId

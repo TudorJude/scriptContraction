@@ -1,4 +1,4 @@
-function upgradeCar(args, userInventoryObject, playerSC, playerHC)
+function upgradeCar(args, context, userInventoryObject, playerSC, playerHC)
 {
   var carCardsCatalog = server.GetCatalogItems(
     {
@@ -59,15 +59,6 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
         cardFound = true;
         try
         {
-          //old consume code
-          // var itemConsumptionResult = server.ConsumeItem(
-          //  {
-          //    PlayFabId: currentPlayerId,
-          //    ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
-          //    ConsumeCount:cardCost
-          //  }
-          //);
-          //new consume code
           if(userInventoryObject.Inventory[i].CustomData === undefined)//let's check if item has custom data
           {
             return generateFailObj("Insufficient cards, CusotmData undefined");
@@ -127,6 +118,10 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
         Data: CarData
       }
     );
+
+    //let's udpate our profile
+    handlers.setMainCar(args, context);
+
     var subtractUserCurrencyResult;
     if(currCost > 0){
       subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
@@ -182,15 +177,6 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
         cardFound = true;
         try
         {
-          //old consume code
-          //var itemConsumptionResult = server.ConsumeItem(
-          // {
-          //  PlayFabId: currentPlayerId,
-          // ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
-          //ConsumeCount: cardInfo.baseCardCost
-          //  }
-          //  );
-          //new consume code
           if(userInventoryObject.Inventory[i].CustomData === undefined)//let's check if item has custom data
           {
             return generateFailObj("Insufficient cards, CustomData null");
@@ -435,6 +421,9 @@ function upgradeCar(args, userInventoryObject, playerSC, playerHC)
         currencyUpdated[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
         i.VirtualCurrency =currencyUpdated;
       }
+
+      //let's udpate our profile
+      handlers.setMainCar(args, context);
 
       i.Experience = UpdateExperience("Balancing", "BalancingItem", "Car_" + cardInfo.rarity, 1, true);
       return generateInventoryChange("InventoryUpdateNewCar", i);

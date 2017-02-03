@@ -1,4 +1,4 @@
-function upgradePart(args, userInventoryObject, playerSC, playerHC)
+function upgradePart(args, context, userInventoryObject, playerSC, playerHC)
 {
   var carCatalog = server.GetCatalogItems(
     {
@@ -190,6 +190,9 @@ function upgradePart(args, userInventoryObject, playerSC, playerHC)
     currencyUpdated[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
     i.VirtualCurrency = currencyUpdated;
   }
+
+  //let's udpate our profile
+  handlers.setMainCar(args, context);
 
   i.Experience = UpdateExperience("Balancing", "BalancingItem", "Parts_" + cardInfo.rarity, newlvl, true);
   return generateInventoryChange("InventoryUpdatePart", i);
