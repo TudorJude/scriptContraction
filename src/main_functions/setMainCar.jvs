@@ -2,10 +2,7 @@ handlers.setMainCar = function(args, context)
 {
 	  var mC = CheckMaintenanceAndVersion(args);
   	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
-
-    log.debug("ayyy lmao");
-    log.debug("context: " + JSON.stringify(context));
-    
+    log.debug("ayyy lmayonaisse");
   	var userInventoryObject = server.GetUserInventory(
     {
       PlayFabId: currentPlayerId
@@ -22,4 +19,23 @@ handlers.setMainCar = function(args, context)
   			break;
   		}
     }
+}
+
+function updateProfileCar(args, context)
+{
+
+    log.debug("ayyy lmao");
+    log.debug("context: " + JSON.stringify(context));
+
+    var userPorfileObject = server.GetUserReadOnlyData(
+      {
+        PlayFabId: userId,
+        Keys: ["UserProfileInfo"]
+      }
+      );
+    if(userPorfileObject.UserProfileInfo == undefined) return;
+    if(userPorfileObject.UserProfileInfo.Value == undefined) return;
+    var upObj = JSON.parse(userPorfileObject.UserProfileInfo.Value);
+    if(upObj.CarData.carId == args.carId)
+      handlers.setMainCar(args,context);
 }
