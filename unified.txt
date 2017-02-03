@@ -3741,13 +3741,14 @@ handlers.updateCarCust = function(args, context)
   }
 
   if(DataToUpdate == {}) return generateFailObj("User doesn't own any of those customizations");
-  server.UpdateUserInventoryItemCustomData(
+  var updatedItem = server.UpdateUserInventoryItemCustomData(
      {
        PlayFabId: currentPlayerId,
        ItemInstanceId: carFound,
        Data: DataToUpdate
      }
      );
+  if(args.debug == true) log.debug("customization object: " + JSON.stringify(updatedItem))
   var objectsUpdated =
   [
   {
@@ -3770,7 +3771,7 @@ handlers.updateCarCust = function(args, context)
       0 : "Owned"
     };
 
-   for(var i = 0; i < grantRequest.ItemGrantResults.length; i++)
+  for(var i = 0; i < grantRequest.ItemGrantResults.length; i++)
   {
     server.UpdateUserInventoryItemCustomData(
          {
