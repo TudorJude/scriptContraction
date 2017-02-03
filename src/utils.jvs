@@ -440,7 +440,7 @@ function ApplyDamageOverTimeToFeed(feedList, DoT)
 
 function updateUserProfileInfo(userId, carInfo)
 {
-  var profileInfoObj;
+  var profileInfoObj ={};
   //var userPorfileObject = server.GetUserReadOnlyData(
   //    {
   //      PlayFabId: userId,
@@ -448,7 +448,7 @@ function updateUserProfileInfo(userId, carInfo)
   //    }
   //    );
   //if(userProfileInfo.Data.UserProfileInfo == undefined)
-  profileInfoObj[CarData] = carInfo;
+  profileInfoObj["CarData"] = carInfo;
   log.debug("carInfo is: " + carInfo);
   var dict = [];
     dict.push({
