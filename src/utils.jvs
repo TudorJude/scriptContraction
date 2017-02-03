@@ -463,6 +463,7 @@ function updateUserProfileInfo(userId, carInfo)
       Permission: "Public"
     }
   );
+    log.debug("playerData is: " + playerData);
 }
 
 function updateCurrencySpentStatistic(currType, amount)
