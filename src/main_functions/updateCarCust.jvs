@@ -63,7 +63,7 @@ handlers.updateCarCust = function(args, context)
      );
 
   //let's update user's UserInfoData
-  updateProfileCar(args,context);
+  updateProfileCar(args,context, currentPlayerId);
 
   var objectsUpdated =
   [

@@ -192,7 +192,7 @@ function upgradePart(args, context, userInventoryObject, playerSC, playerHC)
   }
 
   //let's udpate our profile
-  updateProfileCar(args, context);
+  updateProfileCar(args, context, currentPlayerId);
 
   i.Experience = UpdateExperience("Balancing", "BalancingItem", "Parts_" + cardInfo.rarity, newlvl, true);
   return generateInventoryChange("InventoryUpdatePart", i);

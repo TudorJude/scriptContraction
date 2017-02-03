@@ -3170,7 +3170,7 @@ handlers.setMainCar = function(args, context)
     }
 }
 
-function updateProfileCar(args, context)
+function updateProfileCar(args, context, userId)
 {
 
     log.debug("ayyy lmao");
@@ -3766,7 +3766,7 @@ handlers.updateCarCust = function(args, context)
      );
 
   //let's update user's UserInfoData
-  updateProfileCar(args,context);
+  updateProfileCar(args,context, currentPlayerId);
 
   var objectsUpdated =
   [
@@ -3935,7 +3935,7 @@ function upgradeCar(args, context, userInventoryObject, playerSC, playerHC)
     );
 
     //let's udpate our profile
-    updateProfileCar(args, context);
+    updateProfileCar(args, context, currentPlayerId);
 
     var subtractUserCurrencyResult;
     if(currCost > 0){
@@ -4238,7 +4238,7 @@ function upgradeCar(args, context, userInventoryObject, playerSC, playerHC)
       }
 
       //let's udpate our profile
-      updateProfileCar(args, context);
+      updateProfileCar(args, context, currentPlayerId);
 
       i.Experience = UpdateExperience("Balancing", "BalancingItem", "Car_" + cardInfo.rarity, 1, true);
       return generateInventoryChange("InventoryUpdateNewCar", i);
@@ -4438,7 +4438,7 @@ function upgradePart(args, context, userInventoryObject, playerSC, playerHC)
   }
 
   //let's udpate our profile
-  updateProfileCar(args, context);
+  updateProfileCar(args, context, currentPlayerId);
 
   i.Experience = UpdateExperience("Balancing", "BalancingItem", "Parts_" + cardInfo.rarity, newlvl, true);
   return generateInventoryChange("InventoryUpdatePart", i);

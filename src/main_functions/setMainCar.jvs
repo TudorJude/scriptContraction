@@ -21,7 +21,7 @@ handlers.setMainCar = function(args, context)
     }
 }
 
-function updateProfileCar(args, context)
+function updateProfileCar(args, context, userId)
 {
 
     log.debug("ayyy lmao");

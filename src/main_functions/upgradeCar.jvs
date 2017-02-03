@@ -120,7 +120,7 @@ function upgradeCar(args, context, userInventoryObject, playerSC, playerHC)
     );
 
     //let's udpate our profile
-    updateProfileCar(args, context);
+    updateProfileCar(args, context, currentPlayerId);
 
     var subtractUserCurrencyResult;
     if(currCost > 0){
@@ -423,7 +423,7 @@ function upgradeCar(args, context, userInventoryObject, playerSC, playerHC)
       }
 
       //let's udpate our profile
-      updateProfileCar(args, context);
+      updateProfileCar(args, context, currentPlayerId);
 
       i.Experience = UpdateExperience("Balancing", "BalancingItem", "Car_" + cardInfo.rarity, 1, true);
       return generateInventoryChange("InventoryUpdateNewCar", i);
