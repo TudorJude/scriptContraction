@@ -13,8 +13,10 @@ handlers.setMainCar = function(args, context)
  	{
   		if((userInventoryObject.Inventory[i].ItemId == args.carId) && (userInventoryObject.Inventory[i].CatalogVersion == "CarsProgress"))
   		{
+        log.debug("BEFORE: mainCarInfo: " + " carId: " + userInventoryObject.Inventory[i].ItemId + " carData: " + userInventoryObject.Inventory[i].CustomData);
   			mainCarInfo["carId"] = userInventoryObject.Inventory[i].ItemId;
-  			mainCarInfo["carData"] = userInventoryObject.Inventory[i].CustomData
+  			mainCarInfo["carData"] = userInventoryObject.Inventory[i].CustomData;
+        log.debug("AFTER: mainCarInfo: " + " carId: " + mainCarInfo.carId + " carData: " + mainCarInfo.carData);
   			updateUserProfileInfo(currentPlayerId, mainCarInfo);
   			break;
   		}
