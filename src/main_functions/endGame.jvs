@@ -5,7 +5,7 @@ handlers.endGame = function(args, context) {
   //let's get some relevant title wide data
     var titleDataRequest = server.GetTitleData(
     {
-      Key: ["LeagueSubdivisions","SubdivisionTrophyRanges"]
+      Key: ["LeagueSubdivisions","SubdivisionTrophyRanges", "RecUploadLock"]
     }
     );
   //let's update user trophies
@@ -167,18 +167,24 @@ handlers.endGame = function(args, context) {
     Statistics: suArray
   }
   );
+
+  var uploadLock = false;
+  if(titleDataRequest.Data["RecUploadLock"] != undefined)
+  {
+    uploadLock = titleDataRequest.Data["RecUploadLock"];
+  }
   
   //if(Number(recHeader.Score) <= 100)
-  if(Number(recHeader.Score) > -1)
-    {
-      if(args.debug == true) log.debug("this recording will not be stored, but endgame stats still apply");
-        var newPlayerStats =
-        {
-          "TrophyCount" : trophyCount,
-          "League" : cLeague
-        }
-        return {Result : newPlayerStats};
-    }
+    if((Number(recHeader.Score) <= 100) || (uploadLock == true))
+      {
+        if(args.debug == true) log.debug("this recording will not be stored, but endgame stats still apply. uploadLock: " + uploadLock);
+          var newPlayerStats =
+          {
+            "TrophyCount" : trophyCount,
+            "League" : cLeague
+          }
+          return {Result : newPlayerStats};
+      }
   //let's see which Subdivision this player is in
   var sdval = titleDataRequest.Data["SubdivisionTrophyRanges"];
   var sdvalParsed = JSON.parse(sdval);
