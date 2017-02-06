@@ -167,11 +167,11 @@ handlers.endGame = function(args, context) {
     Statistics: suArray
   }
   );
-  //user ran out of time so we don't store recording
-  //legacy code
   
-  if(Number(recHeader.Score) <= 100)
+  //if(Number(recHeader.Score) <= 100)
+  if(Number(recHeader.Score) > -1)
     {
+      if(args.debug == true) log.debug("this recording will not be stored, but endgame stats still apply");
         var newPlayerStats =
         {
           "TrophyCount" : trophyCount,
