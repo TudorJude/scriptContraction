@@ -175,9 +175,9 @@ handlers.endGame = function(args, context) {
   }
   
   //if(Number(recHeader.Score) <= 100)
-    if((Number(recHeader.Score) <= 100) || (uploadLock == "true"))
+    if((Number(recHeader.Score) <= 100) || ((args.cVersion) == "A.1.1.21") || ((args.cVersion) == "ios.1.1.21"))
       {
-        if(args.debug == true) log.debug("this recording will not be stored, but endgame stats still apply. uploadLock: " + uploadLock);
+        if(args.debug == true) log.debug("this recording will not be stored, but endgame stats still apply. clientVersion: " + args.cVersion);
           var newPlayerStats =
           {
             "TrophyCount" : trophyCount,
