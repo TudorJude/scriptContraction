@@ -1462,7 +1462,7 @@ handlers.endGame = function(args, context) {
   }
   
   //if(Number(recHeader.Score) <= 100)
-    if((Number(recHeader.Score) <= 100) || ((args.cVersion) == "A.1.1.21") || ((args.cVersion) == "ios.1.1.21"))
+    if(Number(recHeader.Score) <= 100)
       {
         if(args.debug == true) log.debug("this recording will not be stored, but endgame stats still apply. clientVersion: " + args.cVersion);
           var newPlayerStats =
@@ -3365,7 +3365,7 @@ else
   }
 
   //default recording code
-  var subDivisionLength = 15; // we have 25 possible courses
+  var subDivisionLength = 25; // we have 25 possible courses
   var envCourseArray =
   [
   0,0,0,0,0,
