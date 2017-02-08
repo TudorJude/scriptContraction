@@ -168,7 +168,7 @@ handlers.endGame = function(args, context) {
   }
   );
 
-  var uploadLock = "false";
+  var uploadLock;//array of versions that cannot upload
   if(titleDataRequest.Data["RecUploadLock"] != undefined)
   {
     uploadLock = titleDataRequest.Data["RecUploadLock"];

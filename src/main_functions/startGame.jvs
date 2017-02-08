@@ -238,11 +238,11 @@ if(isIncompleteSubDivision == true)
           var suArray = [];
           //var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
           //suArray.push(su);
-          var sut = {StatisticName: "TrophyCount", Version : "0", Value: trophyCount};
+          var sut = {StatisticName: "TrophyCount", Value: trophyCount};
           suArray.push(sut);
-          var sul = {StatisticName: "League", Version : "0", Value: cLeague};
+          var sul = {StatisticName: "League", Value: cLeague};
           suArray.push(sul);
-          var sul = {StatisticName: "TotalGames", Version : "0", Value: totalGamesStarted};
+          var sul = {StatisticName: "TotalGames", Value: totalGamesStarted};
           suArray.push(sul);
           //log.debug("updatingStats: " + suArray);
           var updateRequest = server.UpdatePlayerStatistics(
@@ -465,11 +465,11 @@ var sAlen = vrAidx;
   var suArray = [];
   //var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
   //suArray.push(su);
-  var sut = {StatisticName: "TrophyCount", Version : "0", Value: trophyCount};
+  var sut = {StatisticName: "TrophyCount", Value: trophyCount};
   suArray.push(sut);
-  var sul = {StatisticName: "League", Version : "0", Value: cLeague};
+  var sul = {StatisticName: "League", Value: cLeague};
   suArray.push(sul);
-  var sul = {StatisticName: "TotalGames", Version : "0", Value: totalGamesStarted};
+  var sul = {StatisticName: "TotalGames", Value: totalGamesStarted};
   suArray.push(sul);
  // log.debug("updatingStats: " + suArray);
   var updateRequest = server.UpdatePlayerStatistics(

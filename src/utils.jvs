@@ -396,7 +396,10 @@ function publishToLiveFeed(actor, action, directObject)
         for(var i = 0; i < liveFeedArray.length; i++)
         {
           newFeed[i] = liveFeedArray[i];
-          if(liveFeedArray[i].currentHealth < health) // sort by health
+          if(
+          ((liveFeedArray[i].currentHealth < health) && (isUniqueAction == false)) || // sort by health
+          ((liveFeedArray[i].Action == actionId) && (isUniqueAction == true)) //replace unique action
+          ) 
           {
             newFeed[i] = feedObject;
             for(var j = i; j < liveFeedArray.length; j++)

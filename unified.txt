@@ -396,7 +396,10 @@ function publishToLiveFeed(actor, action, directObject)
         for(var i = 0; i < liveFeedArray.length; i++)
         {
           newFeed[i] = liveFeedArray[i];
-          if(liveFeedArray[i].currentHealth < health) // sort by health
+          if(
+          ((liveFeedArray[i].currentHealth < health) && (isUniqueAction == false)) || // sort by health
+          ((liveFeedArray[i].Action == actionId) && (isUniqueAction == true)) //replace unique action
+          ) 
           {
             newFeed[i] = feedObject;
             for(var j = i; j < liveFeedArray.length; j++)
@@ -1452,7 +1455,7 @@ handlers.endGame = function(args, context) {
   }
   );
 
-  var uploadLock = "false";
+  var uploadLock;//array of versions that cannot upload
   if(titleDataRequest.Data["RecUploadLock"] != undefined)
   {
     uploadLock = titleDataRequest.Data["RecUploadLock"];
@@ -3191,7 +3194,42 @@ function updateProfileCar(args, context, userId)
     var upObj = JSON.parse(userPorfileObject.Data.UserProfileInfo.Value);
     if(upObj.CarData.carId == args.carId)
       handlers.setMainCar(args,context);
-}handlers.startGame = function(args, context) {
+}handlers.skipTutorial = function(args, content)
+{
+  var mC = CheckMaintenanceAndVersion(args);
+  if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+
+  var tc=server.GetPlayerStatistics(
+  {
+     PlayFabId: currentPlayerId,
+     StatisticNames: ["TrophyCount"]
+  });
+  var trophyCount = 0;
+  if(tc.Statistics.length != 0)
+  {
+    trophyCount = tc.Statistics[0].Value;
+  }
+  trophyCount = Number(trophyCount);
+
+  if(trophyCount <= 0)
+  {
+  	trophyCount = 1;
+  }
+
+  var suArray = [];
+  //var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
+  //suArray.push(su);
+  var sut = {StatisticName: "TrophyCount", Value: trophyCount};
+  suArray.push(sut);
+
+  var updateRequest = server.UpdatePlayerStatistics(
+  {
+    PlayFabId: currentPlayerId,
+    Statistics: suArray
+  }
+  );
+}
+handlers.startGame = function(args, context) {
 
   var mC = CheckMaintenanceAndVersion(args);
   if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
@@ -3431,11 +3469,11 @@ if(isIncompleteSubDivision == true)
           var suArray = [];
           //var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
           //suArray.push(su);
-          var sut = {StatisticName: "TrophyCount", Version : "0", Value: trophyCount};
+          var sut = {StatisticName: "TrophyCount", Value: trophyCount};
           suArray.push(sut);
-          var sul = {StatisticName: "League", Version : "0", Value: cLeague};
+          var sul = {StatisticName: "League", Value: cLeague};
           suArray.push(sul);
-          var sul = {StatisticName: "TotalGames", Version : "0", Value: totalGamesStarted};
+          var sul = {StatisticName: "TotalGames", Value: totalGamesStarted};
           suArray.push(sul);
           //log.debug("updatingStats: " + suArray);
           var updateRequest = server.UpdatePlayerStatistics(
@@ -3658,11 +3696,11 @@ var sAlen = vrAidx;
   var suArray = [];
   //var su = {StatisticName: "WinLoss", Version : "0", Value: wlStatInt};
   //suArray.push(su);
-  var sut = {StatisticName: "TrophyCount", Version : "0", Value: trophyCount};
+  var sut = {StatisticName: "TrophyCount", Value: trophyCount};
   suArray.push(sut);
-  var sul = {StatisticName: "League", Version : "0", Value: cLeague};
+  var sul = {StatisticName: "League", Value: cLeague};
   suArray.push(sul);
-  var sul = {StatisticName: "TotalGames", Version : "0", Value: totalGamesStarted};
+  var sul = {StatisticName: "TotalGames", Value: totalGamesStarted};
   suArray.push(sul);
  // log.debug("updatingStats: " + suArray);
   var updateRequest = server.UpdatePlayerStatistics(
