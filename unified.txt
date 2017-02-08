@@ -3228,6 +3228,7 @@ function updateProfileCar(args, context, userId)
     Statistics: suArray
   }
   );
+  return {"trophies" : trophyCount};
 }
 handlers.startGame = function(args, context) {
 

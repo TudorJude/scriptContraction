@@ -32,4 +32,5 @@ handlers.skipTutorial = function(args, content)
     Statistics: suArray
   }
   );
+  return {"trophies" : trophyCount};
 }
