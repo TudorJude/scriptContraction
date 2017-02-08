@@ -1455,16 +1455,26 @@ handlers.endGame = function(args, context) {
   }
   );
 
-  var uploadLock;//array of versions that cannot upload
+  var uploadLock = false;//array of versions that cannot upload
+  var RecUploadLockParsed;
   if(titleDataRequest.Data["RecUploadLock"] != undefined)
   {
-    uploadLock = titleDataRequest.Data["RecUploadLock"];
+    RecUploadLockParsed = JSON.parse(titleDataRequest.Data["RecUploadLock"]);
   }
   
-  //if(Number(recHeader.Score) <= 100)
-    if(Number(recHeader.Score) <= 100)
+  if(RecUploadLockParsed != undefined)
+    for(var i = 0; i < RecUploadLockParsed.length; i++)
+    {
+      if(args.cVersion == RecUploadLockParsed[i])
       {
-        if(args.debug == true) log.debug("this recording will not be stored, but endgame stats still apply. clientVersion: " + args.cVersion);
+        uploadLock = true;
+        break;
+      }
+    } 
+  //if(Number(recHeader.Score) <= 100)
+    if((Number(recHeader.Score) <= 100) || (uploadLock == true))
+      {
+        if(args.debug == true) log.debug("this recording will not be stored, but endgame stats still apply. clientVersion: " + args.cVersion + ". upload lock:  " + uploadLock);
           var newPlayerStats =
           {
             "TrophyCount" : trophyCount,
