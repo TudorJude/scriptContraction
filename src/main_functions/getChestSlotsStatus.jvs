@@ -87,4 +87,5 @@ handlers.getChestSlotsStatus = function(args, context)
 		"ChestSlotInfo" : chestSlotInfo,
 		"FreeSlotsInfo" : freeChestSlotInfo
 	}
+	return r;
 }
