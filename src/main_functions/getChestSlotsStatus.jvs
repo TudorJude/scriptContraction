@@ -85,7 +85,7 @@ handlers.getChestSlotsStatus = function(args, context)
 						    "orderTimeStamp": 0,
 						    "arrivalTimeStamp": 0
 						  }
-						]
+						];
 
 		var chestSlotInfoString = JSON.stringify(chestSlotInfo);
 		server.UpdateUserInternalData(
@@ -104,7 +104,7 @@ handlers.getChestSlotsStatus = function(args, context)
 
 	var r = {
 		"Result" : "OK",
-		"ChestSlotInfo" : chestSlotInfo,
+		"ChestSlotInfo" : JSON.parse(chestSlotInfo),
 		"FreeSlotsInfo" : freeChestSlotInfo
 	}
 	return r;
