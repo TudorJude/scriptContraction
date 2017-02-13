@@ -41,9 +41,18 @@ handlers.getChestSlotsStatus = function(args, context)
 			  "status": 1,
 			  "TimeUntilFullRecharge": timeStampOfNextFreeChestArrival
 			}
+			
+		server.UpdateUserInternalData(
+		{
+			PlayFabId: currentPlayerId,
+			Data: 
+			{
+				"ChestFreeStatus" : freeChestSlotInfo
+			}
+		});
 	}
 	else
-		freeChestSlotInfo = chestData.Data.ChestFreeStatus;
+		freeChestSlotInfo = chestData.Data.ChestFreeStatus.Value;
 
 	if(chestData.Data.ChestSlotsStatus == undefined)
 	{
@@ -77,10 +86,18 @@ handlers.getChestSlotsStatus = function(args, context)
 						    "arrivalTimeStamp": 0
 						  }
 						}
+		server.UpdateUserInternalData(
+		{
+			PlayFabId: currentPlayerId,
+			Data: 
+			{
+				"ChestSlotsStatus" : chestSlotInfo
+			}
+		});
 	}
 	else
 	{
-		chestSlotInfo = chestData.Data.ChestSlotsStatus;
+		chestSlotInfo = chestData.Data.ChestSlotsStatus.Value;
 	}
 
 	var r = {
