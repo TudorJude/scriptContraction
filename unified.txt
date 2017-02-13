@@ -1760,13 +1760,13 @@ handlers.getChestSlotsStatus = function(args, context)
 			  "status": 1,
 			  "TimeUntilFullRecharge": timeStampOfNextFreeChestArrival
 			}
-		freeChestSlotInfo = JSON.stringify(freeChestSlotInfo);
+		var freeChestSlotInfoString = JSON.stringify(freeChestSlotInfo);
 		server.UpdateUserInternalData(
 		{
 			PlayFabId: currentPlayerId,
 			Data: 
 			{
-				"ChestFreeStatus" : freeChestSlotInfo
+				"ChestFreeStatus" : freeChestSlotInfoString
 			}
 		});
 	}
@@ -1806,13 +1806,13 @@ handlers.getChestSlotsStatus = function(args, context)
 						  }
 						]
 
-		chestSlotInfo = JSON.stringify(chestSlotInfo);
+		var chestSlotInfoString = JSON.stringify(chestSlotInfo);
 		server.UpdateUserInternalData(
 		{
 			PlayFabId: currentPlayerId,
 			Data: 
 			{
-				"ChestSlotsStatus" : chestSlotInfo
+				"ChestSlotsStatus" : chestSlotInfoString
 			}
 		});
 	}
