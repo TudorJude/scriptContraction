@@ -1719,6 +1719,9 @@ handlers.generateDaily = function(args, context)
 }
 handlers.getChestSlotsStatus = function(args, context)
 {
+	var mC = CheckMaintenanceAndVersion(args);
+  	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+
 	//let's get the user's chest info
 	var chestData = server.GetUserInternalData(
 	{
@@ -1822,6 +1825,7 @@ handlers.getChestSlotsStatus = function(args, context)
 	}
 
 	var r = {
+		"Result" : "OK",
 		"ChestSlotInfo" : chestSlotInfo,
 		"FreeSlotsInfo" : freeChestSlotInfo
 	}
