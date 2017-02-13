@@ -1760,7 +1760,7 @@ handlers.getChestSlotsStatus = function(args, context)
 			  "status": 1,
 			  "TimeUntilFullRecharge": timeStampOfNextFreeChestArrival
 			}
-			
+		freeChestSlotInfo = JSON.stringify(freeChestSlotInfo);
 		server.UpdateUserInternalData(
 		{
 			PlayFabId: currentPlayerId,
@@ -1805,6 +1805,8 @@ handlers.getChestSlotsStatus = function(args, context)
 						    "arrivalTimeStamp": 0
 						  }
 						}
+
+		chestSlotInfo = JSON.stringify(chestSlotInfo);
 		server.UpdateUserInternalData(
 		{
 			PlayFabId: currentPlayerId,
