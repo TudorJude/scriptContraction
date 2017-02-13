@@ -1,0 +1,90 @@
+handlers.getChestSlotsStatus = function(args, context)
+{
+	//let's get the user's chest info
+	var chestData = server.GetUserInternalData(
+	{
+		PlayFabId : currentPlayerId,
+		Keys : ["ChestFreeStatus", "ChestSlotsStatus"]
+	});
+	var chestSlotInfo;
+	var freeChestSlotInfo;
+	if(chestData.Data.ChestFreeStatus == undefined)
+	{
+		//let's get the catalog data for our chests
+		var catalogData = server.GetCatalogItems(
+		{
+			CatalogVersion : "Chests"
+		});
+
+		var freeChestInfo;
+
+		for(var i = 0; i < catalogData.Catalog.length; i++)
+		{
+			if(catalogData.Catalog[i].ItemId == "FreeChest")
+			{
+				freeChestInfo = JSON.parse(catalogData.CataLog[i].CustomData);
+				break;
+			}
+		}
+
+		if(freeChestInfo == undefined) return generateErrObj("Chest catalog has no freechestinfo");
+
+		var freeOpenTime = Number(freeChestInfo.hoursToOpen.split(",")[0]); // we init with first value
+		if(isNaN(freeOpenTime)) return generateErrObj("FreeChest open time info is invalid");		
+
+		var d = new Date();
+		var currentTimeStampSeconds = Math.floor(Number(d.getTime()) /1000);
+		var timeStampOfNextFreeChestArrival = Math.floor(currentTimeStampSeconds + freeOpenTime * 60 * 60);
+
+		freeChestSlotInfo = 
+			{
+			  "status": 1,
+			  "TimeUntilFullRecharge": timeStampOfNextFreeChestArrival
+			}
+	}
+	else
+		freeChestSlotInfo = chestData.Data.ChestFreeStatus;
+
+	if(chestData.Data.ChestSlotsStatus == undefined)
+	{
+		chestSlotInfo = {
+						  "Slot0": {
+						    "chestId": null,
+						    "chestLeague": 0,
+						    "status": "Empty",
+						    "orderTimeStamp": 0,
+						    "arrivalTimeStamp": 0
+						  },
+						  "Slot1": {
+						    "chestId": null,
+						    "chestLeague": 0,
+						    "status": "Empty",
+						    "orderTimeStamp": 0,
+						    "arrivalTimeStamp": 0
+						  },
+						  "Slot2": {
+						    "chestId": null,
+						    "chestLeague": 0,
+						    "status": "Empty",
+						    "orderTimeStamp": 0,
+						    "arrivalTimeStamp": 0
+						  },
+						  "Slot3": {
+						    "chestId": null,
+						    "chestLeague": 0,
+						    "status": "Empty",
+						    "orderTimeStamp": 0,
+						    "arrivalTimeStamp": 0
+						  }
+						}
+	}
+	else
+	{
+		chestSlotInfo = chestData.Data.ChestSlotsStatus;
+	}
+
+	var r = {
+		"ChestSlotInfo" : chestSlotInfo,
+		"FreeSlotsInfo" : freeChestSlotInfo
+	}
+}
