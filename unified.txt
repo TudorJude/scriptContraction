@@ -1778,36 +1778,36 @@ handlers.getChestSlotsStatus = function(args, context)
 
 	if(chestData.Data.ChestSlotsStatus == undefined)
 	{
-		chestSlotInfo = {
-						  "Slot0": {
+		chestSlotInfo = [
+						  {
 						    "chestId": null,
 						    "chestLeague": 0,
 						    "status": "Empty",
 						    "orderTimeStamp": 0,
 						    "arrivalTimeStamp": 0
 						  },
-						  "Slot1": {
+						  {
 						    "chestId": null,
 						    "chestLeague": 0,
 						    "status": "Empty",
 						    "orderTimeStamp": 0,
 						    "arrivalTimeStamp": 0
 						  },
-						  "Slot2": {
+						  {
 						    "chestId": null,
 						    "chestLeague": 0,
 						    "status": "Empty",
 						    "orderTimeStamp": 0,
 						    "arrivalTimeStamp": 0
 						  },
-						  "Slot3": {
+						  {
 						    "chestId": null,
 						    "chestLeague": 0,
 						    "status": "Empty",
 						    "orderTimeStamp": 0,
 						    "arrivalTimeStamp": 0
 						  }
-						}
+						]
 
 		chestSlotInfo = JSON.stringify(chestSlotInfo);
 		server.UpdateUserInternalData(
