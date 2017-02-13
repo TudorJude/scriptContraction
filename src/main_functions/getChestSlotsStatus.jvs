@@ -22,7 +22,7 @@ handlers.getChestSlotsStatus = function(args, context)
 		{
 			if(catalogData.Catalog[i].ItemId == "FreeChest")
 			{
-				freeChestInfo = JSON.parse(catalogData.CataLog[i].CustomData);
+				freeChestInfo = JSON.parse(catalogData.Catalog[i].CustomData);
 				break;
 			}
 		}
