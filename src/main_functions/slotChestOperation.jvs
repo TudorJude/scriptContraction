@@ -7,22 +7,20 @@ handlers.slotChestOperation = function(args,context)
 		Keys : ["ChestSlotsStatus"]
 	});
 
-	var operation = args.operation;
-
 	//check user slots data validity.
 	if(chestData.Data.ChestSlotsStatus == undefined) return generateErrObj("No Chest Data found!");
 
 	var slotArray = JSON.parse(chestData.Data.ChestSlotsStatus.Value);
-	log.debug("slotArray: " + JSON.stringify(slotArray) + " has ln: " + slotArray.length);
 
 	//check slot idx is within range
 	if((Number(args.slotIndex) >= slotArray.length) || (Number(args.slotIndex) < 0)) return generateErrObj("Invalid slot index");
 
-	log.debug("args: " + JSON.stringify(args) + " args.slotIndex: " + args.slotIndex);
-	log.debug("slotArray["+(Number(args.slotIndex)) + "]: " + JSON.stringify(slotArray[(Number(args.slotIndex))]));
-
+	var operation = args.operation;
 	//check if slot is
 	if(slotArray[(Number(args.slotIndex))].status == "Empty") return generateFailObj(JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // there is no chest in this slot. Refresh the client's chest slot info status
+
+	//let's now get the chests catalogData
+	var catalogData = server.GetCatalogItems({CatalogVersion : "Chests"});
 
 	switch (operation)
 	{
@@ -33,8 +31,28 @@ handlers.slotChestOperation = function(args,context)
 			{
 				if(slotArray[i].status == "Arriving") return generateFailObj(JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // there is already a chest in "arriving state". Refresh the client's chest slot info status
 			}
-			slotArray[(Number(args.slotIndex))].status = "Arriving";		
-				
+			slotArray[(Number(args.slotIndex))].status = "Arriving";	
+			var d = new Date();	
+			slotArray[(Number(args.slotIndex))].orderTimeStamp = Math.floor(Number(d.getTime()) / 1000);
+			//let's get the catalog data for our slot's chest
+			// we require: hoursToOpen (splitable array)
+			var hoursToOpen;
+			var chestInfo;
+			for(var i = 0; i < catalogData.Catalog.length; i++)
+			{
+				if(catalogData.Catalog[i].ItemId == slotArray[(Number(args.slotIndex))].chestId)
+				{
+					chestInfo = JSON.parse(catalogData.Catalog[i].CustomData);
+					var hoursToOpenArr = chestInfo.hoursToOpen.split(",");
+					if(slotArray[(Number(args.slotIndex))].chestLeague == "0") // arena 0 has same opening time as arena 1 exception
+						hoursToOpen = Number(hoursToOpenArr[0]);
+					else
+						hoursToOpen = Number(hoursToOpenArr[Math.min(Number(slotArray[(Number(args.slotIndex))].chestLeague), hoursToOpenArr.length - 1)]);
+				}
+			}
+			log.debug("hoursToOpen: " + hoursToOpen);
+			slotArray[(Number(args.slotIndex))].arrivalTimeStamp = Number(slotArray[(Number(args.slotIndex))].orderTimeStamp) + Math.floor(hoursToOpen * 3600);
+			if(chestInfo == undefined) return generateErrObj("Could not find chest with id: " + slotArray[(Number(args.slotIndex))].chestId + " in the Chests catalog, or this chest's custom data is undefined");
 			//let's update the user's chest slot data
 			var chestSlotInfoString = JSON.stringify(slotArray);
 			server.UpdateUserInternalData(
