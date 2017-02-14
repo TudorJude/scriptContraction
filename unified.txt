@@ -1821,7 +1821,7 @@ handlers.getChestSlotsStatus = function(args, context)
 	var r = {
 		"Result" : "OK",
 		"ChestSlotInfo" : JSON.parse(chestSlotInfo),
-		"FreeSlotsInfo" : freeChestSlotInfo
+		"FreeSlotsInfo" : JSON.parse(freeChestSlotInfo)
 	}
 	return r;
 }
@@ -2673,6 +2673,10 @@ handlers.openChest = function(args, context)
     publishToLiveFeed(currentPlayerId, "unlockedChest", args.chestId);
   return generateInventoryChange("InventoryUpdated", outInventory);
 };
+handlers.openFreeChest = function(args, context)
+{
+	
+}
 handlers.purchaseBMItem = function(args, context)
 {
   var mC = CheckMaintenanceAndVersion(args);

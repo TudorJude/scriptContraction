@@ -102,7 +102,7 @@ handlers.getChestSlotsStatus = function(args, context)
 	var r = {
 		"Result" : "OK",
 		"ChestSlotInfo" : JSON.parse(chestSlotInfo),
-		"FreeSlotsInfo" : freeChestSlotInfo
+		"FreeSlotsInfo" : JSON.parse(freeChestSlotInfo)
 	}
 	return r;
 }
