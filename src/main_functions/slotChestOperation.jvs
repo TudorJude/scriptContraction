@@ -18,6 +18,8 @@ handlers.slotChestOperation = function(args,context)
 	//check slot idx is within range
 	if((Number(args.slotIndex) >= slotArray.length) || (Number(args.slotIndex) < 0)) return generateErrObj("Invalid slot index");
 
+	log.debug("slotArray[(Number(args.slotIndex))]: " + JSON.stringify(slotArray[(Number(args.slotIndex))]));
+
 	//check if slot is
 	if(slotArray[(Number(args.slotIndex))].status == "Empty") return generateFailObj(JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // there is no chest in this slot. Refresh the client's chest slot info status
 
