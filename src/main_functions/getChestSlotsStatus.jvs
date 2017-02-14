@@ -36,7 +36,7 @@ handlers.getChestSlotsStatus = function(args, context)
 		var currentTimeStampSeconds = Math.floor(Number(d.getTime()) /1000);
 		var timeStampOfNextFreeChestArrival = Math.floor(currentTimeStampSeconds + freeOpenTime * 60 * 60);
 
-		freeChestSlotInfo = [{"status":0,"TimeUntilFullRecharge":timeStampOfNextFreeChestArrival},{"status":1,"TimeUntilFullRecharge":0}];
+		freeChestSlotInfo = [{"status":0,"TimeUntilArrival":timeStampOfNextFreeChestArrival},{"status":1,"TimeUntilArrival":0}];
 
 		var freeChestSlotInfoString = JSON.stringify(freeChestSlotInfo);
 		server.UpdateUserInternalData(
