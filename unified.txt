@@ -3366,7 +3366,7 @@ handlers.slotChestOperation = function(args,context)
 	//check user slots data validity.
 	if(chestData.Data.ChestSlotsStatus == undefined) return generateErrObj("No Chest Data found!");
 
-	var slotArray = JSON.parse(chestData.Data.ChestFreeStatus.Value);
+	var slotArray = JSON.parse(chestData.Data.ChestSlotsStatus.Value);
 	log.debug("slotArray: " + slotArray + " has ln: " + slotArray.length);
 
 	//check slot idx is within range
