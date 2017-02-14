@@ -1,0 +1,63 @@
+handlers.slotChestOperation = function(args,context)
+{
+	//let's get the user's slots chest info
+	var chestData = server.GetUserInternalData(
+	{
+		PlayFabId : currentPlayerId,
+		Keys : ["ChestSlotsStatus"]
+	});
+
+	var operation = args.operation;
+
+	//check user slots data validity.
+	if(chestData.Data.ChestSlotsStatus == undefined) return generateErrObj("No Chest Data found!");
+
+	var slotArray = JSON.parse(chestData.Data.ChestFreeStatus.Value);
+	log.debug("slotArray: " + slotArray + " has ln: " + slotArray.length);
+
+	//check slot idx is within range
+	if((Number(args.slotIndex) >= slotArray.length) || (Number(args.slotIndex) < 0)) return generateErrObj("Invalid slot index");
+
+	//check if slot is
+	if(slotArray[(Number(args.slotIndex))].status == "Empty") return generateFailObj(JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // there is no chest in this slot. Refresh the client's chest slot info status
+
+	switch (operation)
+	{
+		case "order" :
+		{
+			//let's check if there are any other chests in "ArrivingState"
+			for(var i = 0; i < slotArray.length; i++)
+			{
+				if(slotArray[i].status == "Arriving") return generateFailObj(JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // there is already a chest in "arriving state". Refresh the client's chest slot info status
+			}
+			slotArray[(Number(args.slotIndex))].status = "Arriving";		
+				
+			//let's update the user's chest slot data
+			var chestSlotInfoString = JSON.stringify(slotArray);
+			server.UpdateUserInternalData(
+			{
+				PlayFabId: currentPlayerId,
+				Data: 
+				{
+					"ChestSlotsStatus" : chestSlotInfoString
+				}
+			});
+
+		}
+		break;
+
+		case "rush" :
+		{
+			
+		}
+		break;
+
+		case "open" :
+		{
+			
+		}
+		break;
+
+	}
+
+}
