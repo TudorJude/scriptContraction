@@ -79,6 +79,16 @@ function checkCarDataValidity(inventoryCarData, carCardsCatalog)
   }
   return "OK";
 }
+
+function generateFailObjCustom(propName, mess)
+{
+  var retObj = {
+    Result: "Failed",
+    propName: mess
+  };
+  return retObj;
+}
+
 function generateFailObj(mess)
 {
   var retObj = {
@@ -3378,7 +3388,7 @@ handlers.slotChestOperation = function(args,context)
 
 	var operation = args.operation;
 	//check if slot is
-	if(slotArray[(Number(args.slotIndex))].status == "Empty") return generateFailObj(JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // there is no chest in this slot. Refresh the client's chest slot info status
+	if(slotArray[(Number(args.slotIndex))].status == "Empty") return generateFailObjCustom("ChestSlotInfo", JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // there is no chest in this slot. Refresh the client's chest slot info status
 
 	//let's now get the chests catalogData
 	var catalogData = server.GetCatalogItems({CatalogVersion : "Chests"});
@@ -3392,11 +3402,11 @@ handlers.slotChestOperation = function(args,context)
 			//let's check if there are any other chests in "Incoming State"
 			for(var i = 0; i < slotArray.length; i++)
 			{
-				if(slotArray[i].status == "Incoming") return generateFailObj(JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // there is already a chest in "Incoming state". Refresh the client's chest slot info status
+				if(slotArray[i].status == "Incoming") return generateFailObjCustom("ChestSlotInfo", JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // there is already a chest in "Incoming state". Refresh the client's chest slot info status
 			}
 
 			//only slots that are in state "Occupied" may be set ordered and set to "Incoming" state
-			if(slotArray[(Number(args.slotIndex))].status != "Occupied") return generateFailObj(JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // there is no chest in this slot. Refresh the client's chest slot info status
+			if(slotArray[(Number(args.slotIndex))].status != "Occupied") return generateFailObjCustom("ChestSlotInfo", JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // there is no chest in this slot. Refresh the client's chest slot info status
 
 			slotArray[(Number(args.slotIndex))].status = "Incoming";	
 			var d = new Date();	
@@ -3434,7 +3444,7 @@ handlers.slotChestOperation = function(args,context)
 
 			var r = {
 				"Result" : "OK",
-				"ChestSlots" : slotArray
+				"ChestSlotInfo" : slotArray
 			}
 
 			return r;
@@ -3447,7 +3457,7 @@ handlers.slotChestOperation = function(args,context)
 		case "rush" :
 		{
 			//only slots that are in state that are not "Arrived" or "Empty" may be set ordered and set to "Incoming" state. We already checked for "Empty" prior
-			if(slotArray[(Number(args.slotIndex))].status == "Arrived") return generateFailObj(JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // invalid operation on this slot
+			if(slotArray[(Number(args.slotIndex))].status == "Arrived") return generateFailObjCustom("ChestSlotInfo", JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // invalid operation on this slot
 
 			// let's get the catalog data for our slot's chest
 			// we require: hoursToOpen (splitable array) and priceToUnlock (Number)
@@ -3486,7 +3496,7 @@ handlers.slotChestOperation = function(args,context)
 
 				r = {
 				    Result: "OK",
-				    ChestSlots : slotArray
+				    ChestSlotInfo : slotArray
 				  };
 			}
 			else
@@ -3501,7 +3511,7 @@ handlers.slotChestOperation = function(args,context)
 			      PlayFabId: currentPlayerId
 			    });
 
-			    if(rushPrice > userInventoryObject.VirtualCurrency.HC) return generateFailObj("Not enough HC.");
+			    if(rushPrice > userInventoryObject.VirtualCurrency.HC) return generateErrObj("Not enough HC.");
 
 			    //let's set the user's chest slot info to "Arrived"
 			    slotArray[(Number(args.slotIndex))].status = "Arrived";
@@ -3527,7 +3537,7 @@ handlers.slotChestOperation = function(args,context)
 			     r = {
 				    Result: "OK",
 				    InventoryChange:i,
-				    ChestSlots : slotArray
+				    ChestSlotInfo : slotArray
 				  };
 			}
 

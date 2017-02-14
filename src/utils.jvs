@@ -79,6 +79,16 @@ function checkCarDataValidity(inventoryCarData, carCardsCatalog)
   }
   return "OK";
 }
+
+function generateFailObjCustom(propName, mess)
+{
+  var retObj = {
+    Result: "Failed",
+    propName: mess
+  };
+  return retObj;
+}
+
 function generateFailObj(mess)
 {
   var retObj = {
