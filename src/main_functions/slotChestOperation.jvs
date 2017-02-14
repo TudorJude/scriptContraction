@@ -1,5 +1,12 @@
 handlers.slotChestOperation = function(args,context)
 {
+	//CHEST SLOTS INFO
+	//SLOTS HAVE 4 STATES: 
+	//"Empty" <- no chest, chestID will be null
+	//"Occupied" <- chest in standard state
+	//"Incoming" <- chest that has been "ordered" and will arrive in set amount of time set in each chests custom data in "Chests" catalog data. Only 1 chest may be "Incoming" at any one time
+	//"Arrived" <- chest that is openable as a result of waiting the "Incoming" period or performing the "rush".
+
 	//let's get the user's slots chest info
 	var chestData = server.GetUserInternalData(
 	{
@@ -24,14 +31,20 @@ handlers.slotChestOperation = function(args,context)
 
 	switch (operation)
 	{
+		//"order" works only on "Occupied" slot state
+		//after succesfull operation slot state changes to "Incoming"
 		case "order" :
 		{
-			//let's check if there are any other chests in "ArrivingState"
+			//let's check if there are any other chests in "Incoming State"
 			for(var i = 0; i < slotArray.length; i++)
 			{
-				if(slotArray[i].status == "Arriving") return generateFailObj(JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // there is already a chest in "arriving state". Refresh the client's chest slot info status
+				if(slotArray[i].status == "Incoming") return generateFailObj(JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // there is already a chest in "Incoming state". Refresh the client's chest slot info status
 			}
-			slotArray[(Number(args.slotIndex))].status = "Arriving";	
+
+			//only slots that are in state "Occupied" may be set ordered and set to "Incoming" state
+			if(slotArray[(Number(args.slotIndex))].status != "Occupied") return generateFailObj(JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // there is no chest in this slot. Refresh the client's chest slot info status
+
+			slotArray[(Number(args.slotIndex))].status = "Incoming";	
 			var d = new Date();	
 			slotArray[(Number(args.slotIndex))].orderTimeStamp = Math.floor(Number(d.getTime()) / 1000);
 			//let's get the catalog data for our slot's chest
@@ -53,6 +66,7 @@ handlers.slotChestOperation = function(args,context)
 			log.debug("hoursToOpen: " + hoursToOpen);
 			slotArray[(Number(args.slotIndex))].arrivalTimeStamp = Number(slotArray[(Number(args.slotIndex))].orderTimeStamp) + Math.floor(hoursToOpen * 3600);
 			if(chestInfo == undefined) return generateErrObj("Could not find chest with id: " + slotArray[(Number(args.slotIndex))].chestId + " in the Chests catalog, or this chest's custom data is undefined");
+
 			//let's update the user's chest slot data
 			var chestSlotInfoString = JSON.stringify(slotArray);
 			server.UpdateUserInternalData(
@@ -64,12 +78,111 @@ handlers.slotChestOperation = function(args,context)
 				}
 			});
 
+			var r = {
+				"Result" : "OK",
+				"ChestSlots" : slotArray
+			}
+
+			return r;
+
 		}
 		break;
 
+		//"rush" works on "Occupied" slot state or on "Incoming" slot state with reduced cost proportional with time passed of the total time needed for chest to change from "Incoming" to "Arrived"
+		//after succesfull operation slot state changes to "Arrived"
 		case "rush" :
 		{
-			
+			//only slots that are in state that are not "Arrived" or "Empty" may be set ordered and set to "Incoming" state. We already checked for "Empty" prior
+			if(slotArray[(Number(args.slotIndex))].status == "Arrived") return generateFailObj(JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // invalid operation on this slot
+
+			// let's get the catalog data for our slot's chest
+			// we require: hoursToOpen (splitable array) and priceToUnlock (Number)
+			var priceToUnlock;
+			var hoursToOpen; //total
+			var chestInfo;
+			for(var i = 0; i < catalogData.Catalog.length; i++)
+			{
+				if(catalogData.Catalog[i].ItemId == slotArray[(Number(args.slotIndex))].chestId)
+				{
+					chestInfo = JSON.parse(catalogData.Catalog[i].CustomData);
+					priceToUnlock = Number(chestInfo.priceToUnlock);
+					var hoursToOpenArr = chestInfo.hoursToOpen.split(",");
+					if(slotArray[(Number(args.slotIndex))].chestLeague == "0") // arena 0 has same opening time as arena 1 exception
+						hoursToOpen = Number(hoursToOpenArr[0]);
+					else
+						hoursToOpen = Number(hoursToOpenArr[Math.min(Number(slotArray[(Number(args.slotIndex))].chestLeague), hoursToOpenArr.length - 1)]);
+				}
+			}
+
+			//let's calculate the amount of gold user needs to spend to rush this chest
+			var d = new Date();
+			var t = 0; // interpolator
+			t = (Number(slotArray[(Number(args.slotIndex))].arrivalTimeStamp) - Math.floor(Number(d.getTime()) / 1000)) / (hoursToOpen * 3600);
+			log.debug("interpolator: " + t);
+			var r; // return result
+			if(t <= 0) //this means that the chest had arrived already. This may happen on rare occasions when client and server are a few seconds out of sync
+			{
+				slotArray[(Number(args.slotIndex))].status = "Arrived";
+				slotArray[(Number(args.slotIndex))].arrivalTimeStamp = "0"; // set this for the client
+				
+				r = {
+				    Result: "OK",
+				    ChestSlots : slotArray
+				  };
+			}
+			else
+			{
+				var rushPrice = Math.floor(1 + t * (priceToUnlock - 1));
+				log.debug("rushPrice: " + rushPrice);
+
+				//we now have to querry the user's inventory to see if he has enough currency to rush the chest
+				var userInventoryObject = server.GetUserInventory(
+			    {
+			      PlayFabId: currentPlayerId
+			    });
+
+			    if(rushPrice > userInventoryObject.VirtualCurrency.HC) return generateFailObj("Not enough HC.");
+
+			    //let's set the user's chest slot info to "Arrived"
+			    slotArray[(Number(args.slotIndex))].status = "Arrived";
+				slotArray[(Number(args.slotIndex))].arrivalTimeStamp = "0"; // set this for the client
+
+			    //let's subtract rushPrice amount of gold from the user
+			    var subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
+		        {
+		          PlayFabId: currentPlayerId,
+		          VirtualCurrency : "HC",
+		          Amount: rushPrice
+		        });
+		        //update the CurrencySpent stat for this user
+			    updateCurrencySpentStatistic("HC", rushPrice);
+
+			    var currencyUpdated = {};
+			    currencyUpdated[subtractUserCurrencyResult.VirtualCurrency] = subtractUserCurrencyResult.Balance;
+			    var i =
+			      {
+			        VirtualCurrency: currencyUpdated
+			      };
+
+			     r = {
+				    Result: "OK",
+				    InventoryChange:i,
+				    ChestSlots : slotArray
+				  };
+			}
+
+			//let's update the user's chest slot data
+			var chestSlotInfoString = JSON.stringify(slotArray);
+			server.UpdateUserInternalData(
+			{
+				PlayFabId: currentPlayerId,
+				Data: 
+				{
+					"ChestSlotsStatus" : chestSlotInfoString
+				}
+			});
+
+			return r;
 		}
 		break;
 
