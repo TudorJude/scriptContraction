@@ -107,24 +107,29 @@ handlers.slotChestOperation = function(args,context)
 					chestInfo = JSON.parse(catalogData.Catalog[i].CustomData);
 					priceToUnlock = Number(chestInfo.priceToUnlock);
 					var hoursToOpenArr = chestInfo.hoursToOpen.split(",");
-					if(slotArray[(Number(args.slotIndex))].chestLeague == "0") // arena 0 has same opening time as arena 1 exception
+					if(slotArray[(Number(args.slotIndex))].chestLeague == 0) // arena 0 has same opening time as arena 1 exception
 						hoursToOpen = Number(hoursToOpenArr[0]);
 					else
 						hoursToOpen = Number(hoursToOpenArr[Math.min(Number(slotArray[(Number(args.slotIndex))].chestLeague), hoursToOpenArr.length - 1)]);
 				}
 			}
 
-			//let's calculate the amount of gold user needs to spend to rush this chest
+			var r; // return result
+
+			//let's calculate the amount of gold user needs to spend to rush this chest in case it's in the "Incoming state"
 			var d = new Date();
 			var t = 0; // interpolator
-			t = (Number(slotArray[(Number(args.slotIndex))].arrivalTimeStamp) - Math.floor(Number(d.getTime()) / 1000)) / (hoursToOpen * 3600);
+			if(slotArray[(Number(args.slotIndex))].status == "Occupied") // if we rush an "Occupied" state slot rushPrice = priceToUnlock and therefore the interpolator will be 1.
+				t = 1;
+			else //"Incoming" state
+				t = (Number(slotArray[(Number(args.slotIndex))].arrivalTimeStamp) - Math.floor(Number(d.getTime()) / 1000)) / (hoursToOpen * 3600);
+
 			log.debug("interpolator: " + t);
-			var r; // return result
 			if(t <= 0) //this means that the chest had arrived already. This may happen on rare occasions when client and server are a few seconds out of sync
 			{
 				slotArray[(Number(args.slotIndex))].status = "Arrived";
-				slotArray[(Number(args.slotIndex))].arrivalTimeStamp = "0"; // set this for the client
-				
+				slotArray[(Number(args.slotIndex))].arrivalTimeStamp = 0; // set this for the client
+
 				r = {
 				    Result: "OK",
 				    ChestSlots : slotArray
@@ -133,6 +138,7 @@ handlers.slotChestOperation = function(args,context)
 			else
 			{
 				var rushPrice = Math.floor(1 + t * (priceToUnlock - 1));
+
 				log.debug("rushPrice: " + rushPrice);
 
 				//we now have to querry the user's inventory to see if he has enough currency to rush the chest
@@ -145,7 +151,7 @@ handlers.slotChestOperation = function(args,context)
 
 			    //let's set the user's chest slot info to "Arrived"
 			    slotArray[(Number(args.slotIndex))].status = "Arrived";
-				slotArray[(Number(args.slotIndex))].arrivalTimeStamp = "0"; // set this for the client
+				slotArray[(Number(args.slotIndex))].arrivalTimeStamp = 0; // set this for the client
 
 			    //let's subtract rushPrice amount of gold from the user
 			    var subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
