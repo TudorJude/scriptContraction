@@ -1,4 +1,50 @@
 handlers.openFreeChest = function(args, context)
 {
-	
+		//let's get the user's slots chest info
+	var chestData = server.GetUserInternalData(
+	{
+		PlayFabId : currentPlayerId,
+		Keys : ["ChestFreeStatus"]
+	});
+	//let's figure out hte user's league
+	var tc=server.GetPlayerStatistics(
+	  {
+	     PlayFabId: currentPlayerId,
+	     StatisticNames: ["TrophyCount"]
+	  });
+	var trophyCount = 0;
+	if(tc.Statistics.length != 0)
+	  {
+	    trophyCount = tc.Statistics[0].Value;
+	  }
+	trophyCount = Number(trophyCount);
+	var cLeague = Number(calculateLeague(trophyCount));
+
+	//let's get the catalog data for chests
+	var catalogData = server.GetCatalogItems({CatalogVersion : "Chests"});
+
+	//let's get the chestInfo for freeChest
+	var chestInfo;
+	for(var i = 0; i < catalogData.Catalog.length; i++)
+	{
+		if(catalogData.Catalog[i].ItemId == "FreeChest")
+		{
+			chestInfo = JSON.parse(catalogData.Catalog[i].CustomData);
+		}
+	}
+	if(chestInfo == undefined) return generateErrObj("Could not find chest with id: " + "FreeChest" + " in the Chests catalog, or this chest's custom data is undefined");
+	//check user free slots data validity.
+	if(chestData.Data.ChestFreeStatus == undefined) return generateErrObj("No Chest Data found!");
+
+	var chestBounty = GenerateChestBounty(currentPlayerId, "FreeChest", cLeague, chestInfo);
+
+	//let's get the new user inventory
+	var outInventory = server.GetUserInventory({PlayFabId: currentPlayerId});
+	var returnObject = 
+	{
+		Result : "OK",
+		ChestBounty : chestBounty,
+		ChestSlotInfo : JSON.parse(chestData.Data.ChestFreeStatus),
+		InventoryChange : outInventory
+	}	
 }
