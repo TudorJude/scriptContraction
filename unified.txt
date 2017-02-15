@@ -3856,7 +3856,7 @@ handlers.slotChestOperation = function(args,context)
 			var chestBounty = GenerateChestBounty(currentPlayerId, slotArray[slotIndex].chestId, slotArray[slotIndex].chestLeague, chestInfo);
 
 			var outInventory = server.GetUserInventory({PlayFabId: currentPlayerId});
-			var totalXp = UpdateExperience("Chests", args.chestId, "xpGain", 0, true);
+			var totalXp = UpdateExperience("Chests", slotArray[slotIndex].chestId, "xpGain", 0, true);
 			outInventory.Experience = totalXp;
 
 			var returnObject = {
