@@ -229,6 +229,19 @@ handlers.endDaily = function(args, context)
 	    }
 	  }
 */
+	//let's get user leage info
+	var tc=server.GetPlayerStatistics(
+	  {
+	     PlayFabId: currentPlayerId,
+	     StatisticNames: ["TrophyCount"]
+	  });
+	var trophyCount = 0;
+	if(tc.Statistics.length != 0)
+	  {
+	    trophyCount = tc.Statistics[0].Value;
+	  }
+	trophyCount = Number(trophyCount);
+	var cLeague = Number(calculateLeague(trophyCount));
 	//let's get the catalog data for daily mission chest
 	var catalogData = server.GetCatalogItems({CatalogVersion : "Chests"});
 	var chestInfo;
@@ -241,7 +254,7 @@ handlers.endDaily = function(args, context)
 		}
 	}
 	if(chestInfo == undefined) return generateErrObj("Could not find chest with id: " + "DailyMissionChest" + " in the Chests catalog, or this chest's custom data is undefined");
-	var chestBounty = GenerateChestBounty(currentPlayerId, "FreeChest", cLeague, chestInfo);
+	var chestBounty = GenerateChestBounty(currentPlayerId, "DailyMissionChest", cLeague, chestInfo);
 
 	    var outInventory = server.GetUserInventory({PlayFabId: currentPlayerId});
 		var dStObj = 
