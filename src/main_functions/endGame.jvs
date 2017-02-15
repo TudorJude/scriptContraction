@@ -57,6 +57,9 @@ handlers.endGame = function(args, context) {
       if(lastMatchOutcome == "Loss") latestStreak = 1;
       else latestStreak ++;  
 
+      //let's give your player a chest
+      grantUserChest(currentPlayerId, "endGameNormal");
+
       //Let's check the leaderboard and see if our player is in the top
       var isKing = false;
       ldata = server.GetLeaderboard(
@@ -66,6 +69,7 @@ handlers.endGame = function(args, context) {
         MaxResultsCount : 1
       });
       
+      //this is for the livefeed
       if(ldata.Leaderboard != null)
       {
         if(args.debug == true) log.debug("leaderboardData: " + ldata.Leaderboard[0]);

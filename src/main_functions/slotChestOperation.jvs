@@ -201,3 +201,138 @@ handlers.slotChestOperation = function(args,context)
 	}
 
 }
+
+//function will fill an empty chest slot with the appropriate chest
+// args
+// currentPlayerId <- user's playFab ID
+// source <- where the chest came from : "endGameNormal", "endGameFreeWin" or "tutorial"
+function grantUserChest(currentPlayerId, source)
+{
+	//let's get the chests catalog data
+	var catalogData = server.GetCatalogItems({CatalogVersion : "Chests"});
+
+	//let's also get the user's chest slot info data
+	var chestData = server.GetUserInternalData(
+	{
+		PlayFabId : currentPlayerId,
+		Keys : ["ChestSlotsStatus"]
+	});
+
+	//check user slots data validity.
+	if(chestData.Data.ChestSlotsStatus == undefined) return generateErrObj("No Chest Data found!");
+
+	var slotArray = JSON.parse(chestData.Data.ChestSlotsStatus.Value);
+
+	var slotIndex = -1; //what's the slot index that this operation will fill with a chest? if -1 then all slots are full
+	//let's check if there are any Empty slots. If not then we give the user nothing
+	for(var i = 0; i < slotArray.length; i++)
+	{
+		if(slotArray[i].status == "Empty") 
+			{
+				slotIndex = i;
+				break;
+			}
+	}	
+
+	if(slotIndex < 0) return; // we found no empty slot. No further operations necessary
+
+	//we need the trophy count to calculate the league the user is in
+	var tc=server.GetPlayerStatistics(
+	  {
+	     PlayFabId: currentPlayerId,
+	     StatisticNames: ["TrophyCount"]
+	  });
+	var trophyCount = 0;
+	if(tc.Statistics.length != 0)
+	  {
+	    trophyCount = tc.Statistics[0].Value;
+	  }
+	trophyCount = Number(trophyCount);
+	var cLeague = Number(calculateLeague(trophyCount));
+	//the source can be "endGameNormal", "endGameFreeWin" and "tutorial"
+	switch(source)
+	{
+		case "endGameNormal" : // we examine all the chests' "dropChance" variable and decide which will drop and fill the user's slot 
+		{
+			var chestInfo;
+			var sumOfWeights = 0;
+			var leftRange =0;
+			var rightRange = 0;
+			var chestWeightsArray = [];
+			for(var i = 0; i < catalogData.Catalog.length; i++)
+			{
+				chestInfo = JSON.parse(catalogData.Catalog[i].CustomData);
+				if(Number(chestInfo.dropChance) <= 0) continue; // this chest will never be added to a slot in this manner
+				sumOfWeights += Number(chestInfo.dropChance) * 10; //we multiply by 10 for drop chances that have a decimal point
+				leftRange = rightRange;
+				rightRange = sumOfWeights; 
+				var chestItem = 
+				{
+					"chestId" : catalogData.Catalog[i].ItemId,
+					"leftRange" : leftRange,
+					"rightRange" : rightRange
+				}
+				chestWeightsArray.push(chestItem);
+			}
+			if(chestWeightsArray.length <= 0) // if for whatever reason the chestWeightArray is 0 we will grant the user the "SilverChest"
+			{
+				slotArray[slotIndex].chestId = "SilverChest";
+			}
+			else
+			{
+				//calculate what chest will occupy slot based on ChestWeightArray
+				var randVal = Math.floor(Math.random() * sumOfWeights);
+				var chestFound = "SilverChest";
+				for(var i = 0; i < chestWeightsArray.length; i++)
+				{
+					if(chestWeightsArray.rightRange <= randVal) continue;
+					if(chestWeightsArray.leftRange > randVal) continue;
+					chestFound = chestWeightsArray.chestId;
+					break;
+				}
+				slotArray[slotIndex].chestId = chestFound;
+			}
+
+			slotArray[slotIndex].chestLeague = cLeague;
+			slotArray[slotIndex].status = "Occupied";
+			slotArray[slotIndex].orderTimeStamp = 0;
+			slotArray[slotIndex].arrivalTimeStamp = 0;
+
+
+		}break;
+		case "endGameFreeWin" :
+		{
+			slotArray[slotIndex].chestId = "QuickChest";
+			slotArray[slotIndex].chestLeague = cLeague;
+			slotArray[slotIndex].status = "Occupied";
+			slotArray[slotIndex].orderTimeStamp = 0;
+			slotArray[slotIndex].arrivalTimeStamp = 0;
+		}break;
+		case "tutorial" :
+		{
+			slotArray[slotIndex].chestId = "QuickChest";
+			slotArray[slotIndex].chestLeague = cLeague;
+			slotArray[slotIndex].status = "Occupied";
+			slotArray[slotIndex].orderTimeStamp = 0;
+			slotArray[slotIndex].arrivalTimeStamp = 0;
+		}break;
+		default:
+		{
+			log.debug("unexpected source, returning from grantChest");
+			return;
+		}
+		break;
+	}
+
+	//let's update the user's chest slot data
+	var chestSlotInfoString = JSON.stringify(slotArray);
+		server.UpdateUserInternalData(
+		{
+			PlayFabId: currentPlayerId,
+			Data: 
+			{
+				"ChestSlotsStatus" : chestSlotInfoString
+			}
+		});
+
+}
