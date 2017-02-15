@@ -230,6 +230,7 @@ handlers.endDaily = function(args, context)
 	  }
 */
 	//let's get the catalog data for daily mission chest
+	var catalogData = server.GetCatalogItems({CatalogVersion : "Chests"});
 	var chestInfo;
 	for(var i = 0; i < catalogData.Catalog.length; i++)
 	{
