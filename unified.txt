@@ -2737,9 +2737,11 @@ handlers.openFreeChest = function(args, context)
 	{
 		Result : "OK",
 		ChestBounty : chestBounty,
-		ChestSlotInfo : JSON.parse(chestData.Data.ChestFreeStatus),
+		ChestSlotInfo : JSON.parse(chestData.Data.ChestFreeStatus.Value),
 		InventoryChange : outInventory
 	}	
+
+	return returnObject;
 }
 handlers.purchaseBMItem = function(args, context)
 {
