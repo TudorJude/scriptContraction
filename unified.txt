@@ -3585,6 +3585,23 @@ handlers.slotChestOperation = function(args,context)
 				ChestBounty : chestBounty 
 			}
 
+			slotArray[slotIndex].chestId = null;
+			slotArray[slotIndex].chestLeague = 0;
+			slotArray[slotIndex].status = "Empty";
+			slotArray[slotIndex].orderTimeStamp = 0;
+			slotArray[slotIndex].arrivalTimeStamp = 0;
+
+			//let's update the user's chest slot data
+			var chestSlotInfoString = JSON.stringify(slotArray);
+			server.UpdateUserInternalData(
+			{
+				PlayFabId: currentPlayerId,
+				Data: 
+				{
+					"ChestSlotsStatus" : chestSlotInfoString
+				}
+			});
+
 			return returnObject;
 		}
 		break;
