@@ -258,7 +258,7 @@ handlers.openChest = function(args, context)
     }
   }
 
-  var outInventory =   server.GetUserInventory({PlayFabId: currentPlayerId});
+  var outInventory = server.GetUserInventory({PlayFabId: currentPlayerId});
 
   //give experience for opening chest unless this chest was opened as part of leveling up reward:
   //if no chest id is provided, it means that this function is used for inventory update
