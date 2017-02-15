@@ -3664,8 +3664,8 @@ function grantUserChest(currentPlayerId, source)
 				var chestFound = "SilverChest";
 				for(var i = 0; i < chestWeightsArray.length; i++)
 				{
-					if(Number(chestWeightsArray.rightRange) <= Number(randVal)) continue;
-					if(Number(chestWeightsArray.leftRange) > Number(randVal)) continue;
+					if(Number(chestWeightsArray[i].rightRange) <= Number(randVal)) continue;
+					if(Number(chestWeightsArray[i].leftRange) > Number(randVal)) continue;
 					chestFound = chestWeightsArray[i].chestId;
 					log.debug("chestFoundAfterWeights: " + chestFound);
 					break;
