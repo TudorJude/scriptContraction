@@ -1029,6 +1029,9 @@ handlers.buyPremiumChest = function(args, context)
 
 		//let's get the new user inventory
 	var outInventory = server.GetUserInventory({PlayFabId: currentPlayerId});
+	var totalXp = UpdateExperience("Chests", args.chestId, "xpGain", 0, true);
+	outInventory.Experience = totalXp;
+	
 	var returnObject = 
 	{
 		Result : "OK",
@@ -3849,9 +3852,16 @@ handlers.slotChestOperation = function(args,context)
 			if(slotArray[slotIndex].status == "Empty") return generateFailObjCustom("ChestSlotInfo", JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // invalid operation on this slot
 			if(slotArray[slotIndex].status == "Occupied") return generateFailObjCustom("ChestSlotInfo", JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // invalid operation on this slot
 			if((slotArray[slotIndex].status == "Incoming") && (slotArray[slotIndex].arrivalTimeStamp > Math.floor((new Date().getTime() /1000)))) return generateFailObjCustom("ChestSlotInfo", JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // invalid operation on this slot
+
 			var chestBounty = GenerateChestBounty(currentPlayerId, slotArray[slotIndex].chestId, slotArray[slotIndex].chestLeague, chestInfo);
+
+			var outInventory = server.GetUserInventory({PlayFabId: currentPlayerId});
+			var totalXp = UpdateExperience("Chests", args.chestId, "xpGain", 0, true);
+			outInventory.Experience = totalXp;
+
 			var returnObject = {
 				Result : "OK",
+				InventoryChange: outInventory,
 				ChestBounty : chestBounty 
 			}
 
@@ -3962,6 +3972,7 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
 		Inventory: dataChanged,
         VirtualCurrency: currencyUpdated
 	};
+
 	return chestItems;
 }
 

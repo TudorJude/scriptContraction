@@ -58,6 +58,9 @@ handlers.buyPremiumChest = function(args, context)
 
 		//let's get the new user inventory
 	var outInventory = server.GetUserInventory({PlayFabId: currentPlayerId});
+	var totalXp = UpdateExperience("Chests", args.chestId, "xpGain", 0, true);
+	outInventory.Experience = totalXp;
+	
 	var returnObject = 
 	{
 		Result : "OK",
