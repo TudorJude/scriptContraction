@@ -152,6 +152,7 @@ handlers.slotChestOperation = function(args,context)
 			    //let's set the user's chest slot info to "Arrived"
 			    slotArray[(Number(args.slotIndex))].status = "Arrived";
 				slotArray[(Number(args.slotIndex))].arrivalTimeStamp = 0; // set this for the client
+				slotArray[(Number(args.slotIndex))].orderTimeStamp = 1; // set this for the client
 
 			    //let's subtract rushPrice amount of gold from the user
 			    var subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
