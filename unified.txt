@@ -1179,23 +1179,23 @@ handlers.endDaily = function(args, context)
 		timeStamp = parsedData.timeStamp;
 	}
 
-			var dailyObject = 
-			{
-				"DailyStatus" : DailyStatus,
-				"dailyMissionClaimStatus" : DailyMissionClaimStatus,
-				"timeStamp" : timeStamp
-			};
-			var dailyObjectStringified = JSON.stringify(dailyObject);
-			var objectToUpdate = 
-			{
-				"DailyMissionStatus" : dailyObjectStringified
-			}
-			server.UpdateUserInternalData(
-		       {
-		          PlayFabId: currentPlayerId,
-		          Data: objectToUpdate
-		       });
-
+	var dailyObject = 
+	{
+		"DailyStatus" : DailyStatus,
+		"dailyMissionClaimStatus" : DailyMissionClaimStatus,
+		"timeStamp" : timeStamp
+	};
+	var dailyObjectStringified = JSON.stringify(dailyObject);
+	var objectToUpdate = 
+	{
+		"DailyMissionStatus" : dailyObjectStringified
+	}
+	server.UpdateUserInternalData(
+	      {
+	         PlayFabId: currentPlayerId,
+	         Data: objectToUpdate
+	      });
+/*
 	  var invChangeObj;
 	  var userInventoryObject = server.GetUserInventory(
 	    {
@@ -1346,8 +1346,21 @@ handlers.endDaily = function(args, context)
 	      }
 	    }
 	  }
+*/
+	//let's get the catalog data for daily mission chest
+	var chestInfo;
+	for(var i = 0; i < catalogData.Catalog.length; i++)
+	{
+		if(catalogData.Catalog[i].ItemId == "DailyMissionChest")
+		{
+			chestInfo = JSON.parse(catalogData.Catalog[i].CustomData);
+			break;
+		}
+	}
+	if(chestInfo == undefined) return generateErrObj("Could not find chest with id: " + "DailyMissionChest" + " in the Chests catalog, or this chest's custom data is undefined");
+	var chestBounty = GenerateChestBounty(currentPlayerId, "FreeChest", cLeague, chestInfo);
 
-	  var outInventory = server.GetUserInventory({PlayFabId: currentPlayerId});
+	    var outInventory = server.GetUserInventory({PlayFabId: currentPlayerId});
 		var dStObj = 
 		{
 			status : DailyStatus,
@@ -1358,6 +1371,7 @@ handlers.endDaily = function(args, context)
 	    var r = {
     		Result: "OK",
     		Message: "DailyCompleted",
+    		ChestBounty : chestBounty,
     		InventoryChange:outInventory,
     		"DailyStatus":dStObj
   			};
