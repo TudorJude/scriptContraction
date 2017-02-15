@@ -107,6 +107,9 @@ handlers.updateCarCust = function(args, context)
     Message: "InventoryUpdate",
     InventoryChange:invChangeObj
   };
+  
+  //let's give your player a chest
+  grantUserChest(currentPlayerId, "endGameNormal");
   return returnObj;
 
 };

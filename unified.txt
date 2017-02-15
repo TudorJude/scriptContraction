@@ -3656,7 +3656,7 @@ function grantUserChest(currentPlayerId, source)
 			}
 			else
 			{
-				log.debug("chestWeightsArray: " + Json.stringify(chestWeightsArray));
+				log.debug("chestWeightsArray: " + JSON.stringify(chestWeightsArray));
 				log.debug("sumOfWeights: " + sumOfWeights);
 				//calculate what chest will occupy slot based on ChestWeightArray
 				var randVal = Math.floor(Math.random() * sumOfWeights);
@@ -4343,6 +4343,9 @@ handlers.updateCarCust = function(args, context)
     Message: "InventoryUpdate",
     InventoryChange:invChangeObj
   };
+  
+  //let's give your player a chest
+  grantUserChest(currentPlayerId, "endGameNormal");
   return returnObj;
 
 };
