@@ -1498,15 +1498,21 @@ handlers.endGame = function(args, context) {
   var ms=server.GetPlayerStatistics( //miscelanious statistics
   {
      PlayFabId: currentPlayerId,
-     StatisticNames: ["Wins", "TotalGamesCompleted","LongestWinStreak","BestDriftScore", "HighestLeagueReached"]
+     StatisticNames: ["Wins", "TotalGamesCompleted","LongestWinStreak","BestDriftScore", "HighestLeagueReached", "TotalGames"]
   }).Statistics;
   var cLeague = calculateLeague(trophyCount);
   var totalGamesCompleted = GetValueFromStatistics(ms, "TotalGamesCompleted", 0);
-
-  if(Number(totalGamesCompleted) > 3)
-    grantUserChest(currentPlayerId, "endGameNormal");
-  else
-    grantUserChest(currentPlayerId, "endGameFreeWin");
+  var isTutorial = false;
+  var totalGamesStarted = GetValueFromStatistics(ms, "TotalGames", 0);
+  if(Number(totalGamesStarted) <= 1) isTutorial = true;
+  
+  if(isTutorial == false) // we already gave him his tutorial chest
+  {
+    if(Number(totalGamesCompleted) > 3)
+      grantUserChest(currentPlayerId, "endGameNormal");
+    else
+      grantUserChest(currentPlayerId, "endGameFreeWin");
+  }
 
   totalGamesCompleted = Number(totalGamesCompleted) + 1;
   var totalWins = GetValueFromStatistics(ms, "Wins", 0);
