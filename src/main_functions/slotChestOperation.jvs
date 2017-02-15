@@ -206,7 +206,8 @@ handlers.slotChestOperation = function(args,context)
 				}
 			}
 			if(chestInfo == undefined) return generateErrObj("Could not find chest with id: " + slotArray[(Number(args.slotIndex))].chestId + " in the Chests catalog, or this chest's custom data is undefined");
-
+			if(slotArray[slotIndex].status == "Empty") return generateFailObjCustom("ChestSlotInfo", JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // invalid operation on this slot
+			if((slotArray[slotIndex].status == "Incoming") && (slotArray[slotIndex].arrivalTimeStamp > Math.floor((new Date().getTime() /1000)))) return generateFailObjCustom("ChestSlotInfo", JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // invalid operation on this slot
 			var chestBounty = GenerateChestBounty(currentPlayerId, slotArray[slotIndex].chestId, slotArray[slotIndex].chestLeague, chestInfo);
 			var returnObject = {
 				Result : "OK",
