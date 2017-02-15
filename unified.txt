@@ -4102,11 +4102,11 @@ function grantUserChest(currentPlayerId, source)
 		}break;
 		case "tutorial" :
 		{
-			slotArray[slotIndex].chestId = "TutorialChest";
+			slotArray[slotIndex].chestId = "QuickChest";
 			slotArray[slotIndex].chestLeague = cLeague;
-			slotArray[slotIndex].status = "Occupied";
+			slotArray[slotIndex].status = "Arrived";
 			slotArray[slotIndex].orderTimeStamp = 0;
-			slotArray[slotIndex].arrivalTimeStamp = 0;
+			slotArray[slotIndex].arrivalTimeStamp = 1;
 		}break;
 		default:
 		{
