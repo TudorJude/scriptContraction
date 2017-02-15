@@ -235,7 +235,7 @@ function grantUserChest(currentPlayerId, source)
 	}	
 
 	if(slotIndex < 0) return; // we found no empty slot. No further operations necessary
-
+	log.debug("emptySlotFound: " + slotIndex);
 	//we need the trophy count to calculate the league the user is in
 	var tc=server.GetPlayerStatistics(
 	  {
@@ -249,6 +249,8 @@ function grantUserChest(currentPlayerId, source)
 	  }
 	trophyCount = Number(trophyCount);
 	var cLeague = Number(calculateLeague(trophyCount));
+	log.debug("cLeague: " + cLeague);
+	log.debug("source: " + source);
 	//the source can be "endGameNormal", "endGameFreeWin" and "tutorial"
 	switch(source)
 	{
@@ -277,20 +279,25 @@ function grantUserChest(currentPlayerId, source)
 			if(chestWeightsArray.length <= 0) // if for whatever reason the chestWeightArray is 0 we will grant the user the "SilverChest"
 			{
 				slotArray[slotIndex].chestId = "SilverChest";
+				log.debug("0 chestWeightsArrayLn");
 			}
 			else
 			{
+				log.debug("sumOfWeights: " + sumOfWeights);
 				//calculate what chest will occupy slot based on ChestWeightArray
 				var randVal = Math.floor(Math.random() * sumOfWeights);
+				log.debug("randVal: " + randVal);
 				var chestFound = "SilverChest";
 				for(var i = 0; i < chestWeightsArray.length; i++)
 				{
 					if(chestWeightsArray.rightRange <= randVal) continue;
 					if(chestWeightsArray.leftRange > randVal) continue;
 					chestFound = chestWeightsArray.chestId;
+					log.debug("chestFoundAfterWeights: " + chestFound);
 					break;
 				}
 				slotArray[slotIndex].chestId = chestFound;
+				log.debug("finalCHest: " + chestFound);
 			}
 
 			slotArray[slotIndex].chestLeague = cLeague;
@@ -326,6 +333,7 @@ function grantUserChest(currentPlayerId, source)
 
 	//let's update the user's chest slot data
 	var chestSlotInfoString = JSON.stringify(slotArray);
+	log.debug("updating ChestSlotsStatus: " + chestSlotInfoString);
 		server.UpdateUserInternalData(
 		{
 			PlayFabId: currentPlayerId,
