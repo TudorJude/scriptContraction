@@ -47,11 +47,11 @@ handlers.getChestSlotsStatus = function(args, context)
 				"ChestFreeStatus" : freeChestSlotInfoString
 			}
 		});
+		freeChestSlotInfo = freeChestSlotInfoString;
 	}
 	else
 	{
 		freeChestSlotInfo = chestData.Data.ChestFreeStatus.Value;
-		log.debug("freeChestSlotInfo: " + chestData.Data.ChestFreeStatus.Value);
 	}
 
 	if(chestData.Data.ChestSlotsStatus == undefined)
@@ -96,11 +96,11 @@ handlers.getChestSlotsStatus = function(args, context)
 				"ChestSlotsStatus" : chestSlotInfoString
 			}
 		});
+		chestSlotInfo = chestSlotInfoString;
 	}
 	else
 	{
 		chestSlotInfo = chestData.Data.ChestSlotsStatus.Value;
-		log.debug("chestSlotInfo: " + chestData.Data.ChestSlotsStatus.Value);
 	}
 
 	var r = {
