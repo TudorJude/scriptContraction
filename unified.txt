@@ -3666,7 +3666,7 @@ function grantUserChest(currentPlayerId, source)
 				{
 					if(Number(chestWeightsArray.rightRange) <= randVal) continue;
 					if(Number(chestWeightsArray.leftRange) > randVal) continue;
-					chestFound = chestWeightsArray.chestId;
+					chestFound = chestWeightsArray[i].chestId;
 					log.debug("chestFoundAfterWeights: " + chestFound);
 					break;
 				}
