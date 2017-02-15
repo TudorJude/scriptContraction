@@ -1454,9 +1454,6 @@ handlers.endGame = function(args, context) {
       if(lastMatchOutcome == "Loss") latestStreak = 1;
       else latestStreak ++;  
 
-      //let's give your player a chest
-      grantUserChest(currentPlayerId, "endGameNormal");
-
       //Let's check the leaderboard and see if our player is in the top
       var isKing = false;
       ldata = server.GetLeaderboard(
@@ -1505,6 +1502,12 @@ handlers.endGame = function(args, context) {
   }).Statistics;
   var cLeague = calculateLeague(trophyCount);
   var totalGamesCompleted = GetValueFromStatistics(ms, "TotalGamesCompleted", 0);
+
+  if(Number(totalGamesCompleted) > 3)
+    grantUserChest(currentPlayerId, "endGameNormal");
+  else
+    grantUserChest(currentPlayerId, "endGameFreeWin");
+
   totalGamesCompleted = Number(totalGamesCompleted) + 1;
   var totalWins = GetValueFromStatistics(ms, "Wins", 0);
   if(args.outcome == "rWin")
@@ -4093,7 +4096,7 @@ function grantUserChest(currentPlayerId, source)
 		}break;
 		case "tutorial" :
 		{
-			slotArray[slotIndex].chestId = "QuickChest";
+			slotArray[slotIndex].chestId = "TutorialChest";
 			slotArray[slotIndex].chestLeague = cLeague;
 			slotArray[slotIndex].status = "Occupied";
 			slotArray[slotIndex].orderTimeStamp = 0;
@@ -4347,6 +4350,9 @@ if(isIncompleteSubDivision == true)
           var updateTrophyInternal = true;
           if(trophyCount == 0)
           {
+            //this is the tutorial condition
+            //let's give your player a chest. THIS ONLY HAPPENS ONCE
+            grantUserChest(currentPlayerId, "tutorial");
             trophyCount = rMax;
             updateTrophyInternal = false;
           }
@@ -4573,6 +4579,9 @@ var sAlen = vrAidx;
   var updateTrophiesToGiveTake = true;
   if(trophyCount == 0)
   {
+    //this is the tutorialCondition
+    //let's give your player a chest. THIS ONLY HAPPENS ONCE
+    grantUserChest(currentPlayerId, "tutorial");
     updateTrophiesToGiveTake = false;
     trophyCount = rMax;
   }

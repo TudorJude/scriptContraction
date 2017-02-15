@@ -225,6 +225,9 @@ if(isIncompleteSubDivision == true)
           var updateTrophyInternal = true;
           if(trophyCount == 0)
           {
+            //this is the tutorial condition
+            //let's give your player a chest. THIS ONLY HAPPENS ONCE
+            grantUserChest(currentPlayerId, "tutorial");
             trophyCount = rMax;
             updateTrophyInternal = false;
           }
@@ -451,6 +454,9 @@ var sAlen = vrAidx;
   var updateTrophiesToGiveTake = true;
   if(trophyCount == 0)
   {
+    //this is the tutorialCondition
+    //let's give your player a chest. THIS ONLY HAPPENS ONCE
+    grantUserChest(currentPlayerId, "tutorial");
     updateTrophiesToGiveTake = false;
     trophyCount = rMax;
   }

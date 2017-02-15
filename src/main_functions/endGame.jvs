@@ -57,9 +57,6 @@ handlers.endGame = function(args, context) {
       if(lastMatchOutcome == "Loss") latestStreak = 1;
       else latestStreak ++;  
 
-      //let's give your player a chest
-      grantUserChest(currentPlayerId, "endGameNormal");
-
       //Let's check the leaderboard and see if our player is in the top
       var isKing = false;
       ldata = server.GetLeaderboard(
@@ -108,6 +105,12 @@ handlers.endGame = function(args, context) {
   }).Statistics;
   var cLeague = calculateLeague(trophyCount);
   var totalGamesCompleted = GetValueFromStatistics(ms, "TotalGamesCompleted", 0);
+
+  if(Number(totalGamesCompleted) > 3)
+    grantUserChest(currentPlayerId, "endGameNormal");
+  else
+    grantUserChest(currentPlayerId, "endGameFreeWin");
+
   totalGamesCompleted = Number(totalGamesCompleted) + 1;
   var totalWins = GetValueFromStatistics(ms, "Wins", 0);
   if(args.outcome == "rWin")

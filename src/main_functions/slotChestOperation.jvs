@@ -450,7 +450,7 @@ function grantUserChest(currentPlayerId, source)
 		}break;
 		case "tutorial" :
 		{
-			slotArray[slotIndex].chestId = "QuickChest";
+			slotArray[slotIndex].chestId = "TutorialChest";
 			slotArray[slotIndex].chestLeague = cLeague;
 			slotArray[slotIndex].status = "Occupied";
 			slotArray[slotIndex].orderTimeStamp = 0;
