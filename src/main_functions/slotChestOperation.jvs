@@ -195,6 +195,7 @@ handlers.slotChestOperation = function(args,context)
 
 		case "open" :
 		{
+			var slotIndex = Number(args.slotIndex);
 			var chestInfo;
 			for(var i = 0; i < catalogData.Catalog.length; i++)
 			{
