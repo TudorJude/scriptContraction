@@ -270,7 +270,7 @@ handlers.iapMade = function(args, context)
 
 					  }
 				  }
-				  var chestModel = "DiamonChest";
+				  var chestModel = "DiamondChest";
 				  //ChestModel
 				  if(bundleInfo.ChestModel != undefined)
 				  {

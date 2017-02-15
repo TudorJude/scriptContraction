@@ -2246,7 +2246,7 @@ handlers.iapMade = function(args, context)
 
 					  }
 				  }
-				  var chestModel = "DiamonChest";
+				  var chestModel = "DiamondChest";
 				  //ChestModel
 				  if(bundleInfo.ChestModel != undefined)
 				  {
@@ -3567,12 +3567,114 @@ handlers.slotChestOperation = function(args,context)
 
 		case "open" :
 		{
-			
+			var chestInfo;
+			for(var i = 0; i < catalogData.Catalog.length; i++)
+			{
+				if(catalogData.Catalog[i].ItemId == slotArray[(Number(args.slotIndex))].chestId)
+				{
+					chestInfo = JSON.parse(catalogData.Catalog[i].CustomData);
+					break;
+				}
+			}
+			if(chestInfo == undefined) return generateErrObj("Could not find chest with id: " + slotArray[(Number(args.slotIndex))].chestId + " in the Chests catalog, or this chest's custom data is undefined");
+
+			var chestBounty = GenerateChestBounty(currentPlayerId, slotArray[slotIndex].chestId, slotArray[slotIndex].chestLeague, chestInfo);
+			var returnObject = {
+				Result : "OK",
+				ChestBounty : chestBounty 
+			}
+
+			return returnObject;
 		}
 		break;
 
 	}
 
+}
+
+//this function will return the contents of a chests that's been opened and grant them to the user's inventory
+// args
+// chestOd <- string id of chest i.e. "SilverChest" as found in the Chests Economy Catalog
+// cheastLeague <- league of chest
+// chestInfo <- Custom chest info found in catalog data for this particular chest. Must be passed as argument
+function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
+{
+	var itemData = {"Amount" : 3};
+	dataChanged = 
+	[
+      {
+        ItemId : "Engine",
+        CatalogVersion: "PartsCards",
+        CustomData: {"Amount" : 13}
+      },
+      {
+        ItemId : "Exhaust",
+        CatalogVersion: "PartsCards",
+        CustomData: {"Amount" : 32}
+      },
+      {
+        ItemId : "Gearbox",
+        CatalogVersion: "PartsCards",
+        CustomData: {"Amount" : 123}
+      },
+      {
+        ItemId : "Suspension",
+        CatalogVersion: "PartsCards",
+        CustomData: {"Amount" : 1}
+      },
+      {
+        ItemId : "Tires",
+        CatalogVersion: "PartsCards",
+        CustomData: {"Amount" : 0}
+      },
+      {
+        ItemId : "Turbo",
+        CatalogVersion: "PartsCards",
+        CustomData: {"Amount" : 5}
+      },
+      {
+        ItemId : "AcuraNSX",
+        CatalogVersion: "CarCards",
+        CustomData: {"Amount" : 7}
+      },
+      {
+        ItemId : "BMWM3-1988",
+        CatalogVersion: "CarCards",
+        CustomData: {"Amount" : 3}
+      },
+      {
+        ItemId : "SubaruImpreza",
+        CatalogVersion: "CarCards",
+        CustomData: {"Amount" : 13}
+      },
+      {
+        ItemId : "CorvetteC7",
+        CatalogVersion: "CarCards",
+        CustomData: {"Amount" : 113}
+      },
+      {
+        ItemId : "MitsubishiEclipse",
+        CatalogVersion: "CarCards",
+        CustomData: {"Amount" : 3}
+      },
+      {
+        ItemId : "NissanNavara",
+        CatalogVersion: "CarCards",
+        CustomData: {"Amount" : 3}
+      },
+      {
+        ItemId : "ToyotaLandCruiser70",
+        CatalogVersion: "CarCards",
+        CustomData: {"Amount" : 3}
+      }
+	];
+	currencyUpdated ={"HC":1500,"SC":1234};
+   var chestItems = 
+	{
+		Inventory: dataChanged,
+        VirtualCurrency: currencyUpdated
+	};
+	return chestItems;
 }
 
 //function will fill an empty chest slot with the appropriate chest
