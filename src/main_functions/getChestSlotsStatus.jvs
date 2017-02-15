@@ -38,7 +38,7 @@ handlers.getChestSlotsStatus = function(args, context)
 
 		freeChestSlotInfo = [{"status":0,"TimeUntilArrival":timeStampOfNextFreeChestArrival},{"status":1,"TimeUntilArrival":0}];
 
-		freeChestSlotInfoString = JSON.stringify(freeChestSlotInfo);
+		var freeChestSlotInfoString = JSON.stringify(freeChestSlotInfo);
 		server.UpdateUserInternalData(
 		{
 			PlayFabId: currentPlayerId,
@@ -49,7 +49,10 @@ handlers.getChestSlotsStatus = function(args, context)
 		});
 	}
 	else
+	{
 		freeChestSlotInfo = chestData.Data.ChestFreeStatus.Value;
+		log.debug("freeChestSlotInfo: " + chestData.Data.ChestFreeStatus.Value);
+	}
 
 	if(chestData.Data.ChestSlotsStatus == undefined)
 	{
@@ -97,6 +100,7 @@ handlers.getChestSlotsStatus = function(args, context)
 	else
 	{
 		chestSlotInfo = chestData.Data.ChestSlotsStatus.Value;
+		log.debug("chestSlotInfo: " + chestData.Data.ChestSlotsStatus.Value);
 	}
 
 	var r = {
