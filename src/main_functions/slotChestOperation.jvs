@@ -250,32 +250,32 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
 	[
       {
         ItemId : "Engine",
-        CatalogVersion: "PartsCards",
+        CatalogVersion: "PartCards",
         CustomData: {"Amount" : 13}
       },
       {
         ItemId : "Exhaust",
-        CatalogVersion: "PartsCards",
+        CatalogVersion: "PartCards",
         CustomData: {"Amount" : 32}
       },
       {
         ItemId : "Gearbox",
-        CatalogVersion: "PartsCards",
+        CatalogVersion: "PartCards",
         CustomData: {"Amount" : 123}
       },
       {
         ItemId : "Suspension",
-        CatalogVersion: "PartsCards",
+        CatalogVersion: "PartCards",
         CustomData: {"Amount" : 1}
       },
       {
         ItemId : "Tires",
-        CatalogVersion: "PartsCards",
+        CatalogVersion: "PartCards",
         CustomData: {"Amount" : 0}
       },
       {
         ItemId : "Turbo",
-        CatalogVersion: "PartsCards",
+        CatalogVersion: "PartCards",
         CustomData: {"Amount" : 5}
       },
       {
