@@ -3717,7 +3717,7 @@ handlers.slotChestOperation = function(args,context)
 					if(slotArray[(Number(args.slotIndex))].chestLeague == "0") // arena 0 has same opening time as arena 1 exception
 						hoursToOpen = Number(hoursToOpenArr[0]);
 					else
-						hoursToOpen = Number(hoursToOpenArr[Math.min(Number(slotArray[(Number(args.slotIndex))].chestLeague), hoursToOpenArr.length - 1)]);
+						hoursToOpen = Number(hoursToOpenArr[Math.min(Number(slotArray[(Number(args.slotIndex))].chestLeague) - 1, hoursToOpenArr.length - 1)]);
 				}
 			}
 			log.debug("hoursToOpen: " + hoursToOpen);
