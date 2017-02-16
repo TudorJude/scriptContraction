@@ -385,7 +385,7 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
             {
               PlayFabId: currentPlayerId,
               ItemInstanceId: userInventoryObject.Inventory[j].ItemInstanceId,
-              Data: itemData
+              Data: iData
             }
           );
           itemFound = true;
