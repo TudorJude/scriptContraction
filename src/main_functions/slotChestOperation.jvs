@@ -350,14 +350,14 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
       });
    }
    //Let's grant the user the items
-   var userInventory = server.GetUserInventory({PlayFabId: currentPlayerId});
+   var userInventoryObject = server.GetUserInventory({PlayFabId: currentPlayerId});
 
    var itemFound = false;
    var newAmount = 0;
    var iData;
    for(var i = 0; i < dataChanged.length; i++)
    {
-   	for(var j = 0; j < userInventory.Inventory.length; j++)
+   	for(var j = 0; j < userInventoryObject.Inventory.length; j++)
    	{
    	  itemFound = false;
       newAmount = 0;
