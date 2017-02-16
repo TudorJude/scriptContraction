@@ -2969,7 +2969,7 @@ handlers.openFreeChest = function(args, context)
 	{
 		Result : "OK",
 		ChestBounty : chestBounty,
-		FreeChestStatus : JSON.parse(slotArray),
+		FreeChestStatus : slotArray,
 		InventoryChange : outInventory
 	}	
 
