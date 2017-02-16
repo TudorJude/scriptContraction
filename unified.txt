@@ -3980,7 +3980,96 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
         CustomData: {"Amount" : 3}
       }
 	];
-	currencyUpdated ={"HC":1500,"SC":1234};
+   currencyUpdated ={"HC":1500,"SC":1234};
+
+   //let's give the user the money
+   var addUserCurrencyResult;
+   //HC
+   if(currencyUpdated.HC != undefined)
+   {
+   	if(Number(currencyUpdated.HC) > 0)
+   	addUserCurrencyResult = server.AddUserVirtualCurrency(
+      {
+        PlayFabId: currentPlayerId,
+        VirtualCurrency : "HC",
+        Amount: Number(currencyUpdated.HC)
+      });
+   }
+   //HC
+   if(currencyUpdated.SC != undefined)
+   {
+   	if(Number(currencyUpdated.SC) > 0)
+   	addUserCurrencyResult = server.AddUserVirtualCurrency(
+      {
+        PlayFabId: currentPlayerId,
+        VirtualCurrency : "SC",
+        Amount: Number(currencyUpdated.SC)
+      });
+   }
+   //Let's grant the user the items
+   var userInventory = server.GetUserInventory({PlayFabId: currentPlayerId});
+
+   var itemFound = false;
+   var newAmount = 0;
+   var iData;
+   for(var i = 0; i < dataChanged.length; i++)
+   {
+   	for(var j = 0; j < userInventory.Inventory.length; j++)
+   	{
+   	  itemFound = false;
+      newAmount = 0;
+      if((userInventoryObject.Inventory[j].ItemId == dataChanged[i].ItemId) && (userInventoryObject.Inventory[j].CatalogVersion == dataChanged[i].CatalogVersion)) // we found the item
+      {
+          if(userInventoryObject.Inventory[j].CustomData == undefined)
+          {
+            newAmount = Number(dataChanged[i].CustomData.Amount);
+          }
+          else
+          {
+            if(userInventoryObject.Inventory[j].CustomData.Amount == undefined)
+            	newAmount = Number(dataChanged[i].CustomData.Amount);
+            else
+            {
+              if(isNaN(Number(userInventoryObject.Inventory[j].CustomData.Amount)))
+              	newAmount = Number(dataChanged[i].CustomData.Amount);
+              else
+              	newAmount = Number(userInventoryObject.Inventory[j].CustomData.Amount) + Number(dataChanged[i].CustomData.Amount);
+            }
+          }
+          iData = {"Amount" : newAmount};
+          server.UpdateUserInventoryItemCustomData(
+            {
+              PlayFabId: currentPlayerId,
+              ItemInstanceId: userInventoryObject.Inventory[j].ItemInstanceId,
+              Data: itemData
+            }
+          );
+          itemFound = true;
+          break;
+      }
+   	}
+    if(itemFound == false)
+      {
+        var itemsToGrant = [dataChanged[i].ItemId];
+        var grantVar = server.GrantItemsToUser(
+          {
+            CatalogVersion : dataChanged[i].CatalogVersion,
+            PlayFabId: currentPlayerId,
+            ItemIds : itemsToGrant
+          }
+        );
+
+        iData = {"Amount" : dataChanged[i].CustomData.Amount};
+        server.UpdateUserInventoryItemCustomData(
+          {
+            PlayFabId: currentPlayerId,
+            ItemInstanceId: grantVar.ItemGrantResults[0].ItemInstanceId,
+            Data: iData
+          }
+        );
+      }
+   }
+
    var chestItems = 
 	{
 		Inventory: dataChanged,
