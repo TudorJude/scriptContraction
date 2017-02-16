@@ -80,7 +80,7 @@ handlers.openFreeChest = function(args, context)
 	{
 		Result : "OK",
 		ChestBounty : chestBounty,
-		FreeSlotsInfo : slotArray,
+		FreeChestStatus : slotArray,
 		InventoryChange : outInventory
 	}	
 
