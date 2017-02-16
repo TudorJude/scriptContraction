@@ -109,12 +109,15 @@ handlers.endGame = function(args, context) {
   var totalGamesStarted = GetValueFromStatistics(ms, "TotalGames", 0);
   if(Number(totalGamesStarted) <= 1) isTutorial = true;
   
-  if(isTutorial == false) // we already gave him his tutorial chest
+  if(args.outcome == "rWin")
   {
-    if(Number(totalGamesCompleted) > 3)
-      grantUserChest(currentPlayerId, "endGameNormal");
-    else
-      grantUserChest(currentPlayerId, "endGameFreeWin");
+    if(isTutorial == false) // we already gave him his tutorial chest
+    {
+      if(Number(totalGamesCompleted) > 3)
+        grantUserChest(currentPlayerId, "endGameNormal");
+      else
+        grantUserChest(currentPlayerId, "endGameFreeWin");
+    }
   }
 
   totalGamesCompleted = Number(totalGamesCompleted) + 1;
