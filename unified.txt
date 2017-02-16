@@ -3695,7 +3695,7 @@ handlers.slotChestOperation = function(args,context)
 			//let's check if there are any other chests in "Incoming State"
 			for(var i = 0; i < slotArray.length; i++)
 			{
-				if(slotArray[i].status == "Incoming") return generateFailObjCustom("ChestSlotInfo", JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // there is already a chest in "Incoming state". Refresh the client's chest slot info status
+				if((slotArray[i].status == "Incoming") && (slotArray[i].arrivalTimeStamp > Math.floor((new Date().getTime() /1000)))) return generateFailObjCustom("ChestSlotInfo", JSON.parse(chestData.Data.ChestSlotsStatus.Value)); // there is already a chest in "Incoming state". Refresh the client's chest slot info status
 			}
 
 			//only slots that are in state "Occupied" may be set ordered and set to "Incoming" state
