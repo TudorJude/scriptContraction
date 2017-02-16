@@ -363,6 +363,7 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
       newAmount = 0;
       if((userInventoryObject.Inventory[j].ItemId == dataChanged[i].ItemId) && (userInventoryObject.Inventory[j].CatalogVersion == dataChanged[i].CatalogVersion)) // we found the item
       {
+      	log.debug("found: " + dataChanged[i].ItemId);
           if(userInventoryObject.Inventory[j].CustomData == undefined)
           {
             newAmount = Number(dataChanged[i].CustomData.Amount);
@@ -393,6 +394,7 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
    	}
     if(itemFound == false)
       {
+      	log.debug("not found: " + dataChanged[i].ItemId + " granting...");
         var itemsToGrant = [dataChanged[i].ItemId];
         var grantVar = server.GrantItemsToUser(
           {
