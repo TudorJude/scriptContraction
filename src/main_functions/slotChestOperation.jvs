@@ -452,7 +452,7 @@ function grantUserChest(currentPlayerId, source)
 		{
 			slotArray[slotIndex].chestId = "QuickChest";
 			slotArray[slotIndex].chestLeague = 1;
-			slotArray[slotIndex].status = "Arrived";
+			slotArray[slotIndex].status = "Occupied";
 			slotArray[slotIndex].orderTimeStamp = 1;
 			slotArray[slotIndex].arrivalTimeStamp = 0;
 		}break;
