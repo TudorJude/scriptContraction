@@ -254,10 +254,10 @@ handlers.slotChestOperation = function(args,context)
 // chestInfo <- Custom chest info found in catalog data for this particular chest. Must be passed as argument
 function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
 {
-	var actualChestLeague = Number(league) + Number(chestId.arenasAdvance);
+	var actualChestLeague = Number(league) + Number(chestInfo.arenasAdvance);
 	var currentStacks = 0;
 	var currencyStacks = 0;
-	var maxStacks = Number(chestId.maxCardStacks);
+	var maxStacks = Number(chestInfo.maxCardStacks);
 
 
 	var currencyUpdated = {};
