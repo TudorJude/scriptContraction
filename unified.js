@@ -4059,7 +4059,6 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
 		carInfo = JSON.parse(carsCatalog.Catalog[i].CustomData);
 		if(carInfo == undefined) continue;
 		if(carInfo.unlockedAtRank == undefined) continue;
-		log.debug("Car: " + carsCatalog.Catalog[i].ItemId + ": " + Number(carInfo.unlockedAtRank) + "; chest arena: " + actualChestLeague);
 		if(Number(carInfo.unlockedAtRank) > Number(actualChestLeague)) continue;
 		if(carInfo.rarity == undefined) continue;
 		switch(Number(carInfo.rarity))
@@ -4436,7 +4435,6 @@ if(arenaBonus > 0)
       newAmount = 0;
       if((userInventoryObject.Inventory[j].ItemId == dataChanged[i].ItemId) && (userInventoryObject.Inventory[j].CatalogVersion == dataChanged[i].CatalogVersion)) // we found the item
       {
-      	log.debug("found: " + dataChanged[i].ItemId);
           if(userInventoryObject.Inventory[j].CustomData == undefined)
           {
             newAmount = Number(dataChanged[i].CustomData.Amount);
@@ -4467,7 +4465,6 @@ if(arenaBonus > 0)
    	}
     if(itemFound == false)
       {
-      	log.debug("not found: " + dataChanged[i].ItemId + " granting...");
         var itemsToGrant = [dataChanged[i].ItemId];
         var grantVar = server.GrantItemsToUser(
           {
@@ -4544,8 +4541,6 @@ function grantUserChest(currentPlayerId, source)
 	  }
 	trophyCount = Number(trophyCount);
 	var cLeague = Number(calculateLeague(trophyCount));
-	log.debug("cLeague: " + cLeague);
-	log.debug("source: " + source);
 	//the source can be "endGameNormal", "endGameFreeWin" and "tutorial"
 	switch(source)
 	{
@@ -4563,7 +4558,6 @@ function grantUserChest(currentPlayerId, source)
 				sumOfWeights += Number(chestInfo.dropChance) * 10; //we multiply by 10 for drop chances that have a decimal point
 				leftRange = rightRange;
 				rightRange = sumOfWeights; 
-				log.debug("chest id with drop chance found: " + catalogData.Catalog[i].ItemId);
 				var chestItem = 
 				{
 					"chestId" : catalogData.Catalog[i].ItemId,
@@ -4575,26 +4569,20 @@ function grantUserChest(currentPlayerId, source)
 			if(chestWeightsArray.length <= 0) // if for whatever reason the chestWeightArray is 0 we will grant the user the "SilverChest"
 			{
 				slotArray[slotIndex].chestId = "SilverChest";
-				log.debug("0 chestWeightsArrayLn");
 			}
 			else
 			{
-				log.debug("chestWeightsArray: " + JSON.stringify(chestWeightsArray));
-				log.debug("sumOfWeights: " + sumOfWeights);
 				//calculate what chest will occupy slot based on ChestWeightArray
 				var randVal = Math.floor(Math.random() * sumOfWeights);
-				log.debug("randVal: " + randVal);
 				var chestFound = "SilverChest";
 				for(var i = 0; i < chestWeightsArray.length; i++)
 				{
 					if(Number(chestWeightsArray[i].rightRange) <= Number(randVal)) continue;
 					if(Number(chestWeightsArray[i].leftRange) > Number(randVal)) continue;
 					chestFound = chestWeightsArray[i].chestId;
-					log.debug("chestFoundAfterWeights: " + chestFound);
 					break;
 				}
 				slotArray[slotIndex].chestId = chestFound;
-				log.debug("finalCHest: " + chestFound);
 			}
 
 			slotArray[slotIndex].chestLeague = cLeague;
