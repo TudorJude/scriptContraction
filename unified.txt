@@ -938,7 +938,82 @@ function calculateLeague(currentTrophies)
 
       return dataChanged;
     }
-handlers.buyChest = function(args, context)
+//Chest Generation functions
+function GetRandomCard(cardList, arenaLevel)
+{
+  var randIndex = Math.floor(Math.random() * cardList.length);
+  if (cardList.length == undefined) return "ERROR";
+  if (cardList.length <= 0) return "ERROR";
+  return cardList[randIndex];
+}
+
+function AddCardToListOfStacks(catalog, rarityCardsListFinal, card, canCreateNewStack)
+{
+  if(rarityCardsListFinal == undefined)
+  {
+    rarityCardsListFinal = 
+    [
+      {
+        ItemId : card,
+        CatalogVersion: catalog,
+        CustomData: {"Amount" : 1}
+      }
+    ];
+    return rarityCardsListFinal;
+  }
+
+  for(var i = 0; i < rarityCardsListFinal.length; i++)
+  {
+    if(rarityCardsListFinal[i].ItemId == card)
+    {
+      rarityCardsListFinal.CustomData.Amount = Number(rarityCardsListFinal.CustomData.Amount) + 1;
+      return rarityCardsListFinal;
+    }
+  }
+
+  if(canCreateNewStack == true)
+  {
+    var obj = {
+        ItemId : card,
+        CatalogVersion: catalog,
+        CustomData: {"Amount" : 1}
+    }
+    rarityCardsListFinal.push(obj);
+    return rarityCardsListFinal;
+  }
+  else
+  {
+    rarityCardsListFinal[Math.floor(Math.random() * rarityCardsListFinal.length)].CustomData.Amount = Number(rarityCardsListFinal[Math.floor(Math.random() * rarityCardsListFinal.length)].CustomData.Amount) + 1;
+    return rarityCardsListFinal;
+  }
+}
+
+function WeightedRandom(array, totalweight)
+{
+  try
+  {
+    var totalWeight = 0;
+    for(var i = 0; i < array.length; i++)
+    {
+      totalWeight += Number(array[i]);
+    }
+    var rand = Math.floor(Math.random() * totalweight);
+    for(var i = 0; i < array.length; i++)
+    {
+      if(rand <= Number(array[i])) // we found it
+      {
+        return i;
+      }
+      rand -= Number(array[i]);
+    }
+    return 0;
+  }
+  catch(err)
+  {
+    log.debug(err);
+    return 0;
+  }
+}handlers.buyChest = function(args, context)
 {
   var mC = CheckMaintenanceAndVersion(args);
   if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
@@ -3906,12 +3981,321 @@ handlers.slotChestOperation = function(args,context)
 
 //this function will return the contents of a chests that's been opened and grant them to the user's inventory
 // args
-// chestOd <- string id of chest i.e. "SilverChest" as found in the Chests Economy Catalog
+// chestId <- string id of chest i.e. "SilverChest" as found in the Chests Economy Catalog
 // cheastLeague <- league of chest
 // chestInfo <- Custom chest info found in catalog data for this particular chest. Must be passed as argument
 function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
 {
-	var itemData = {"Amount" : 3};
+	var actualChestLeague = Number(league) + Number(chestId.arenasAdvance);
+	var currentStacks = 0;
+	var currencyStacks = 0;
+	var maxStacks = Number(chestId.maxCardStacks);
+
+	//let's calculate SC
+	var scToGive = 0;
+	var scArrSplit = chestId.guaranteedSC.split(",");
+	switch(scArrSplit.length)
+	{
+		case 1:
+		{
+			scToGive = Number(scArrSplit[0]);
+		}break;
+		case 2:
+		{
+			scToGive = Number(scArrSplit[0]) + Math.floor(Math.random() * Math.abs(Number(scArrSplit[1]) - Number(scArrSplit[0])));
+		}break;
+		default:
+		{
+			scToGive = 0;
+		}
+	}
+	if(scToGive > 0) currentStacks++;
+
+	//let's calculate HC
+	var hcToGive = 0;
+	var hcArrSplit = chestId.guaranteedHC.split(",");
+	switch(hcArrSplit.length)
+	{
+		case 1:
+		{
+			hcToGive = Number(hcArrSplit[0]);
+		}break;
+		case 2:
+		{
+			hcToGive = Number(hcArrSplit[0]) + Math.floor(Math.random() * Math.abs(Number(hcArrSplit[1]) - Number(hcArrSplit[0])));
+		}break;
+		default:
+		{
+			hcToGive = 0;
+		}
+	}
+	if(hcToGive > 0) currentStacks++;
+	
+	currencyStacks = currentStacks;
+
+	//let's give guaranteed stacks
+	//let's get the car catalog
+	var carsCatalog = server.GetCatalogItems({CatalogVersion : "CarCards"});
+	var partsCatalog = server.GetCatalogItems({CatalogVersion : "PartCards"});
+//CARS LISTS
+	var carInfo;
+	var commonCarsList = [];
+	var rareCarsList = [];
+	var epicCarsList = [];
+
+	for(var i = 0; i < carsCatalog.Catalog.length; i++)
+	{
+		carInfo = JSON.parse(carsCatalog.Catalog[i].CustomData);
+		if(carInfo == undefined) continue;
+		if(carInfo.unlockedAtRank == undefined) continue;
+		if(Number(carInfo.unlockedAtRank) > actualChestLeague) continue;
+		if(carInfo.rarity == undefined) continue;
+		switch(Number(carInfo.rarity))
+		{
+			case 0: // common
+			{
+				commonCarsList.push(carsCatalog.Catalog[i].ItemId);
+			}break;
+			case 1: // rare
+			{
+				rareCarsList.push(carsCatalog.Catalog[i].ItemId);
+			}break;
+			case 2: // epic
+			{
+				epicCarsList.push(carsCatalog.Catalog[i].ItemId);
+			}break;
+			default:
+			{
+				epicCarsList.push(carsCatalog.Catalog[i].ItemId);
+			}
+		}
+	}
+//PARTS LIST
+	var partInfo;
+	var commonPartsList = [];
+	var rarePartsList = [];
+	var epicPartsList = [];
+
+	for(var i = 0; i < partsCatalog.Catalog.length; i++)
+	{
+		partInfo = JSON.parse(partsCatalog.Catalog[i].CustomData);
+		if(partInfo.rarity == undefined) continue;
+		switch(Number(partInfo.rarity))
+		{
+			case 0: // common
+			{
+				commonPartsList.push(partsCatalog.Catalog[i].ItemId);
+			}break;
+			case 1: // rare
+			{
+				rarePartsList.push(carsCatalog.Catalog[i].ItemId);
+			}break;
+			case 2: // epic
+			{
+				epicPartsList.push(carsCatalog.Catalog[i].ItemId);
+			}break;
+			default:
+			{
+				epicPartsList.push(carsCatalog.Catalog[i].ItemId);
+			}
+		}
+	}
+// END PARTS LIST
+        //now, we must reserve some stacks for the guaranteed cards (we have to limit the number of stacks used up by guaranteed cards, so we leave room for the random cards)
+
+        //but only if there are any guaranteed car cards in the chest in the first place
+var chestContainsGuaranteedCarCards = false;
+var totalGuaranteedCarCards = 0;
+var guaranteedCarsPerRarityArr = chestId.guaranteedCarsPerRarity.split(",");
+for(var i = 0 ; i < guaranteedCarsPerRarityArr.length; i++)
+{
+	totalGuaranteedCarCards += Number(guaranteedCarsPerRarityArr[i]);
+}
+if(Number(totalGuaranteedCarCards) > 0) chestContainsGuaranteedCarCards = true;
+
+//FINAL LISTS OF CARDS
+//cars
+var commonCarsListFinal;
+var rareCarsListFinal;
+var epicCarsListFinal;
+
+//parts
+var commonPartsListFinal;
+var rarePartsListFinal;
+var epicPartsListFinal;
+
+//if we have at least 1 guaranteed car card in the chest
+if(chestContainsGuaranteedCarCards == true)
+{
+	var maxStacksReservedForGuaranteedCars = Number(Math.floor((maxStacks - currentStacks) * 0.55));
+	if(maxStacksReservedForGuaranteedCars <= 0) maxStacksReservedForGuaranteedCars = 1;
+
+	//now we iterate through the rarities and generate the guaranteed car cards for each rarity
+	for(var rarity = 0; rarity < 3; rarity++)
+	{
+		//skip this rarity if no cards are guaranteed
+		if(Number(guaranteedCarsPerRarityArr[rarity]) <= 0) continue;
+		//allocate stacks based on the number of guaranteed cards for this rarity and totalGuaranteedCarCards ratio
+		var stacksAllocatedForThisRarity = Math.floor((
+												Number(guaranteedCarsPerRarityArr[rarity]) 
+												/ totalGuaranteedCarCards)
+												* maxStacksReservedForGuaranteedCars
+												);
+		if (stacksAllocatedForThisRarity <= 0)
+            stacksAllocatedForThisRarity = 1;
+        //start randomly distributing the guaranteed cars. If we havent reached the stacksAllocatedForThisRarity, we can create new stacks, increment existing ones otherwise
+        for(var i = 0; i < Number(guaranteedCarsPerRarityArr[rarity]); i++)
+        {
+        	//pick a car from the eligible list
+        	var car;
+           	switch(rarity)
+        	{
+        		case 0:
+        		{
+        			var ln = commonCarsListFinal.length;
+        			if(ln == undefined) ln = 0;
+        			var canCreateNewStack = ln < stacksAllocatedForThisRarity;
+        			car = GetRandomCard(commonCarsList, actualChestLeague);
+        			if(car == "ERROR") return "Error";
+        			commonCarsListFinal = AddCardToListOfStacks("CarCards",commonCarsListFinal, car, canCreateNewStack);
+        		}break;
+        		case 1:
+        		{
+        			var ln = rareCarsListFinal.length;
+        			if(ln == undefined) ln = 0;
+        			var canCreateNewStack = ln < stacksAllocatedForThisRarity;
+        			car = GetRandomCard(rareCarsList, actualChestLeague);
+        			if(car == "ERROR") return "Error";
+        			rareCarsListFinal = AddCardToListOfStacks("CarCards", rareCarsListFinal, car, canCreateNewStack);
+        		}break;
+        		case 2:
+        		{
+        			var ln = epicCarsListFinal.length;
+        			if(ln == undefined) ln = 0;
+        			var canCreateNewStack = ln < stacksAllocatedForThisRarity;
+        			car = GetRandomCard(epicCarsList, actualChestLeague);
+        			if(car == "ERROR") return "Error";
+        			epicCarsListFinal = AddCardToListOfStacks("CarCards", epicCarsListFinal, car, canCreateNewStack);
+        		}break;
+        		default:
+        		{
+        			car = "ERROR";
+        		}
+        	}
+        	if(car == "ERROR") return "Error";       	
+
+        }
+	}
+}
+if(commonCarsListFinal != undefined) currentStacks += commonCarsListFinal.length;
+if(rareCarsListFinal != undefined) currentStacks += rareCarsListFinal.length;
+if(epicCarsListFinal != undefined) currentStacks += epicCarsListFinal.length;
+
+//Generate the random card rewards
+var partRarityDroprates = chestInfo.partRarityDroprates.split(",");
+var sumOfPartWeights = 0;
+for(var i = 0; i < partRarityDroprates.length; i++)
+{
+	sumOfPartWeights += partRarityDroprates[i];
+}
+var carRarityDroprates = chestInfo.carRarityDroprates.split(",");
+var sumOfCarWeights = 0;
+for(var i = 0; i < carRarityDroprates.length; i++)
+{
+	sumOfCarWeights += carRarityDroprates[i];
+}
+
+var partBias = 70; // chance that a rnadom card will be a part
+var canCreateNewStack;
+var currentRarity = 0;
+var tempString;
+var beforeLn;
+for(var i = 0; i < Number(chestInfo.randomCardsReward); i++)
+{
+	canCreateNewStack = currentStacks < maxStacks;
+	//is part or car?
+	if(Math.floor(Math.random() * 100) < partBias) // this is a part
+	{
+		currentRarity = WeightedRandom(partRarityDroprates);
+		switch(currentRarity)
+		{
+			case 0:
+			{
+				tempString = GetRandomCard(commonPartsList, actualChestLeague);
+				if (tempString == "ERROR") return "Error";
+				beforeLn = commonPartsListFinal.length;
+				if(beforeLn == undefined) beforeLn = 0;
+				commonPartsListFinal = AddCardToListOfStacks("PartCards", commonPartsListFinal, tempString, canCreateNewStack);
+				if(commonPartsListFinal.length > beforeLn) currentStacks++;
+			}break;
+			case 1:
+			{
+				tempString = GetRandomCard(rarePartsList, actualChestLeague);
+				if (tempString == "ERROR") return "Error";
+				beforeLn = rarePartsListFinal.length;
+				if(beforeLn == undefined) beforeLn = 0;
+				rarePartsListFinal = AddCardToListOfStacks("PartCards", rarePartsListFinal, tempString, canCreateNewStack);
+				if(rarePartsListFinal.length > beforeLn) currentStacks++;
+			}break;
+			case 2:
+			{
+				tempString = GetRandomCard(epicPartsList, actualChestLeague);
+				if (tempString == "ERROR") return "Error";
+				beforeLn = epicPartsListFinal.length;
+				if(beforeLn == undefined) beforeLn = 0;
+				epicPartsListFinal = AddCardToListOfStacks("PartCards", epicPartsListFinal, tempString, canCreateNewStack);
+				if(epicPartsListFinal.length > beforeLn) currentStacks++;
+			}break;
+		}
+	}
+	else
+	{
+		currentRarity = WeightedRandom(carRarityDroprates);
+		switch(currentRarity)
+		{
+			case 0:
+			{
+				tempString = GetRandomCard(commonCarsList, actualChestLeague);
+				if (tempString == "ERROR") return "Error";
+				beforeLn = commonCarsListFinal.length;
+				if(beforeLn == undefined) beforeLn = 0;
+				commonCarsListFinal = AddCardToListOfStacks("CarCards", commonCarsListFinal, tempString, canCreateNewStack);
+				if(commonCarsListFinal.length > beforeLn) currentStacks++;
+			}break;
+			case 1:
+			{
+				tempString = GetRandomCard(rareCarsList, actualChestLeague);
+				if (tempString == "ERROR") return "Error";
+				beforeLn = rareCarsListFinal.length;
+				if(beforeLn == undefined) beforeLn = 0;
+				rareCarsListFinal = AddCardToListOfStacks("CarCards", rareCarsListFinal, tempString, canCreateNewStack);
+				if(rareCarsListFinal.length > beforeLn) currentStacks++;
+			}break;
+			case 2:
+			{
+				tempString = GetRandomCard(epicCarsList, actualChestLeague);
+				if (tempString == "ERROR") return "Error";
+				beforeLn = epicCarsListFinal.length;
+				if(beforeLn == undefined) beforeLn = 0;
+				epicCarsListFinal = AddCardToListOfStacks("CarCards", epicCarsListFinal, tempString, canCreateNewStack);
+				if(epicCarsListFinal.length > beforeLn) currentStacks++;
+			}break;
+		}
+	}
+
+}
+//var dataChangedLn = currentStacks + currentStacks;
+var dataChanged = [];
+if(commonCarsListFinal != undefined) dataChanged = dataChanged.concat(commonCarsListFinal);
+if(rareCarsListFinal != undefined) dataChanged = dataChanged.concat(rareCarsListFinal);
+if(epicCarsListFinal != undefined) dataChanged = dataChanged.concat(epicCarsListFinal);
+if(commonPartsListFinal != undefined) dataChanged = dataChanged.concat(commonPartsListFinal);
+if(rarePartsListFinal != undefined) dataChanged = dataChanged.concat(rarePartsListFinal);
+if(epicPartsListFinal != undefined) dataChanged = dataChanged.concat(epicPartsListFinal);
+
+//apply arena bias
+
+/*
 	dataChanged = 
 	[
       {
@@ -3980,7 +4364,8 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
         CustomData: {"Amount" : 3}
       }
 	];
-   currencyUpdated ={"HC":1500,"SC":1234};
+	*/
+   currencyUpdated ={"HC":hcToGive,"SC":scToGive};
 
    //let's give the user the money
    var addUserCurrencyResult;

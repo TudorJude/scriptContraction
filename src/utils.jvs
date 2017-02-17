@@ -938,3 +938,79 @@ function calculateLeague(currentTrophies)
 
       return dataChanged;
     }
+//Chest Generation functions
+function GetRandomCard(cardList, arenaLevel)
+{
+  var randIndex = Math.floor(Math.random() * cardList.length);
+  if (cardList.length == undefined) return "ERROR";
+  if (cardList.length <= 0) return "ERROR";
+  return cardList[randIndex];
+}
+
+function AddCardToListOfStacks(catalog, rarityCardsListFinal, card, canCreateNewStack)
+{
+  if(rarityCardsListFinal == undefined)
+  {
+    rarityCardsListFinal = 
+    [
+      {
+        ItemId : card,
+        CatalogVersion: catalog,
+        CustomData: {"Amount" : 1}
+      }
+    ];
+    return rarityCardsListFinal;
+  }
+
+  for(var i = 0; i < rarityCardsListFinal.length; i++)
+  {
+    if(rarityCardsListFinal[i].ItemId == card)
+    {
+      rarityCardsListFinal.CustomData.Amount = Number(rarityCardsListFinal.CustomData.Amount) + 1;
+      return rarityCardsListFinal;
+    }
+  }
+
+  if(canCreateNewStack == true)
+  {
+    var obj = {
+        ItemId : card,
+        CatalogVersion: catalog,
+        CustomData: {"Amount" : 1}
+    }
+    rarityCardsListFinal.push(obj);
+    return rarityCardsListFinal;
+  }
+  else
+  {
+    rarityCardsListFinal[Math.floor(Math.random() * rarityCardsListFinal.length)].CustomData.Amount = Number(rarityCardsListFinal[Math.floor(Math.random() * rarityCardsListFinal.length)].CustomData.Amount) + 1;
+    return rarityCardsListFinal;
+  }
+}
+
+function WeightedRandom(array, totalweight)
+{
+  try
+  {
+    var totalWeight = 0;
+    for(var i = 0; i < array.length; i++)
+    {
+      totalWeight += Number(array[i]);
+    }
+    var rand = Math.floor(Math.random() * totalweight);
+    for(var i = 0; i < array.length; i++)
+    {
+      if(rand <= Number(array[i])) // we found it
+      {
+        return i;
+      }
+      rand -= Number(array[i]);
+    }
+    return 0;
+  }
+  catch(err)
+  {
+    log.debug(err);
+    return 0;
+  }
+}
