@@ -326,7 +326,9 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
 		carInfo = JSON.parse(carsCatalog.Catalog[i].CustomData);
 		if(carInfo == undefined) continue;
 		if(carInfo.unlockedAtRank == undefined) continue;
-		if(Number(carInfo.unlockedAtRank) > actualChestLeague) continue;
+		log.debug("Car: " + carsCatalog.Catalog[i].ItemId + ": " + Number(carInfo.unlockedAtRank) + "; chest arena: " + actualChestLeague);
+		if(Number(carInfo.unlockedAtRank) > Number(actualChestLeague)) continue;
+		log.debug("adding!");
 		if(carInfo.rarity == undefined) continue;
 		switch(Number(carInfo.rarity))
 		{
