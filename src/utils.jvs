@@ -940,10 +940,11 @@ function calculateLeague(currentTrophies)
     }
 //Chest Generation functions
 function GetRandomCard(cardList, arenaLevel)
-{
-  var randIndex = Math.floor(Math.random() * cardList.length);
+{  
+  if (cardList == undefined) return "ERROR";
   if (cardList.length == undefined) return "ERROR";
   if (cardList.length <= 0) return "ERROR";
+  var randIndex = Math.floor(Math.random() * cardList.length);
   return cardList[randIndex];
 }
 

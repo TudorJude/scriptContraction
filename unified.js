@@ -940,10 +940,11 @@ function calculateLeague(currentTrophies)
     }
 //Chest Generation functions
 function GetRandomCard(cardList, arenaLevel)
-{
-  var randIndex = Math.floor(Math.random() * cardList.length);
+{  
+  if (cardList == undefined) return "ERROR";
   if (cardList.length == undefined) return "ERROR";
   if (cardList.length <= 0) return "ERROR";
+  var randIndex = Math.floor(Math.random() * cardList.length);
   return cardList[randIndex];
 }
 
@@ -4123,7 +4124,7 @@ var epicCarsListFinal;
 var commonPartsListFinal;
 var rarePartsListFinal;
 var epicPartsListFinal;
-
+var ln;
 //if we have at least 1 guaranteed car card in the chest
 if(chestContainsGuaranteedCarCards == true)
 {
@@ -4152,7 +4153,8 @@ if(chestContainsGuaranteedCarCards == true)
         	{
         		case 0:
         		{
-        			var ln = commonCarsListFinal.length;
+        			if(commonCarsListFinal == undefined) ln = 0;
+        			else ln = Number(commonCarsListFinal.length);
         			if(ln == undefined) ln = 0;
         			var canCreateNewStack = ln < stacksAllocatedForThisRarity;
         			car = GetRandomCard(commonCarsList, actualChestLeague);
@@ -4161,7 +4163,8 @@ if(chestContainsGuaranteedCarCards == true)
         		}break;
         		case 1:
         		{
-        			var ln = rareCarsListFinal.length;
+        			if(rareCarsListFinal == undefined) ln = 0;
+        			else ln = Number(rareCarsListFinal.length);
         			if(ln == undefined) ln = 0;
         			var canCreateNewStack = ln < stacksAllocatedForThisRarity;
         			car = GetRandomCard(rareCarsList, actualChestLeague);
@@ -4170,7 +4173,8 @@ if(chestContainsGuaranteedCarCards == true)
         		}break;
         		case 2:
         		{
-        			var ln = epicCarsListFinal.length;
+        			if(epicCarsListFinal == undefined) ln = 0;
+        			else ln = Number(epicCarsListFinal.length);
         			if(ln == undefined) ln = 0;
         			var canCreateNewStack = ln < stacksAllocatedForThisRarity;
         			car = GetRandomCard(epicCarsList, actualChestLeague);
@@ -4223,7 +4227,9 @@ for(var i = 0; i < Number(chestInfo.randomCardsReward); i++)
 			{
 				tempString = GetRandomCard(commonPartsList, actualChestLeague);
 				if (tempString == "ERROR") return "Error";
-				beforeLn = commonPartsListFinal.length;
+				if(commonPartsListFinal == undefined) beforeLn = 0;
+				else beforeLn = commonPartsListFinal.length;
+
 				if(beforeLn == undefined) beforeLn = 0;
 				commonPartsListFinal = AddCardToListOfStacks("PartCards", commonPartsListFinal, tempString, canCreateNewStack);
 				if(commonPartsListFinal.length > beforeLn) currentStacks++;
@@ -4232,7 +4238,8 @@ for(var i = 0; i < Number(chestInfo.randomCardsReward); i++)
 			{
 				tempString = GetRandomCard(rarePartsList, actualChestLeague);
 				if (tempString == "ERROR") return "Error";
-				beforeLn = rarePartsListFinal.length;
+				if(rarePartsListFinal == undefined) beforeLn = 0
+				else beforeLn = rarePartsListFinal.length;
 				if(beforeLn == undefined) beforeLn = 0;
 				rarePartsListFinal = AddCardToListOfStacks("PartCards", rarePartsListFinal, tempString, canCreateNewStack);
 				if(rarePartsListFinal.length > beforeLn) currentStacks++;
@@ -4241,7 +4248,8 @@ for(var i = 0; i < Number(chestInfo.randomCardsReward); i++)
 			{
 				tempString = GetRandomCard(epicPartsList, actualChestLeague);
 				if (tempString == "ERROR") return "Error";
-				beforeLn = epicPartsListFinal.length;
+				if(epicPartsListFinal == undefined) beforeLn = 0
+				else beforeLn = epicPartsListFinal.length;
 				if(beforeLn == undefined) beforeLn = 0;
 				epicPartsListFinal = AddCardToListOfStacks("PartCards", epicPartsListFinal, tempString, canCreateNewStack);
 				if(epicPartsListFinal.length > beforeLn) currentStacks++;
@@ -4257,7 +4265,8 @@ for(var i = 0; i < Number(chestInfo.randomCardsReward); i++)
 			{
 				tempString = GetRandomCard(commonCarsList, actualChestLeague);
 				if (tempString == "ERROR") return "Error";
-				beforeLn = commonCarsListFinal.length;
+				if(commonCarsListFinal == undefined) beforeLn = 0
+				else beforeLn = commonCarsListFinal.length;
 				if(beforeLn == undefined) beforeLn = 0;
 				commonCarsListFinal = AddCardToListOfStacks("CarCards", commonCarsListFinal, tempString, canCreateNewStack);
 				if(commonCarsListFinal.length > beforeLn) currentStacks++;
@@ -4266,7 +4275,8 @@ for(var i = 0; i < Number(chestInfo.randomCardsReward); i++)
 			{
 				tempString = GetRandomCard(rareCarsList, actualChestLeague);
 				if (tempString == "ERROR") return "Error";
-				beforeLn = rareCarsListFinal.length;
+				if(rareCarsListFinal == undefined) beforeLn = 0
+				else beforeLn = rareCarsListFinal.length;
 				if(beforeLn == undefined) beforeLn = 0;
 				rareCarsListFinal = AddCardToListOfStacks("CarCards", rareCarsListFinal, tempString, canCreateNewStack);
 				if(rareCarsListFinal.length > beforeLn) currentStacks++;
@@ -4275,7 +4285,8 @@ for(var i = 0; i < Number(chestInfo.randomCardsReward); i++)
 			{
 				tempString = GetRandomCard(epicCarsList, actualChestLeague);
 				if (tempString == "ERROR") return "Error";
-				beforeLn = epicCarsListFinal.length;
+				if(epicCarsListFinal == undefined) beforeLn = 0
+				else beforeLn = epicCarsListFinal.length;
 				if(beforeLn == undefined) beforeLn = 0;
 				epicCarsListFinal = AddCardToListOfStacks("CarCards", epicCarsListFinal, tempString, canCreateNewStack);
 				if(epicCarsListFinal.length > beforeLn) currentStacks++;
