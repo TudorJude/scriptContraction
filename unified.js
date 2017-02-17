@@ -4318,7 +4318,15 @@ if(rarePartsListFinal != undefined) dataChanged = dataChanged.concat(rarePartsLi
 if(epicPartsListFinal != undefined) dataChanged = dataChanged.concat(epicPartsListFinal);
 
 //apply arena bias
-
+var balanceCatalog = server.GetCatalogItems({CatalogVersion : "Balancing"});
+var balanceInfo = JSON.parse(balanceCatalog.Catalog[0].CustomData);
+var tArena = Math.Max(Number(league), 10);
+var arenaBonus = Number(balanceInfo.ArenaBonuses[tArena]);
+if(arenaBonus > 0)
+	for(var i = 0; i < dataChanged.length; i++)
+	{
+		dataChanged[i].CustomData.Amount = Math.floor(Number(dataChanged[i].CustomData.Amount) + Number(dataChanged[i].CustomData.Amount) * (arenaBonus/100));
+	}
 /*
 	dataChanged = 
 	[
