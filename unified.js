@@ -4061,7 +4061,6 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
 		if(carInfo.unlockedAtRank == undefined) continue;
 		log.debug("Car: " + carsCatalog.Catalog[i].ItemId + ": " + Number(carInfo.unlockedAtRank) + "; chest arena: " + actualChestLeague);
 		if(Number(carInfo.unlockedAtRank) > Number(actualChestLeague)) continue;
-		log.debug("adding!");
 		if(carInfo.rarity == undefined) continue;
 		switch(Number(carInfo.rarity))
 		{
@@ -4083,6 +4082,9 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
 			}
 		}
 	}
+		log.debug("commonCarsList: " + JSON.stringify(commonCarsList));
+		log.debug("rareCarsList: " + JSON.stringify(rareCarsList));
+		log.debug("epicCarsList: " + JSON.stringify(epicCarsList));
 //PARTS LIST
 	var partInfo;
 	var commonPartsList = [];
@@ -4113,6 +4115,7 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
 			}
 		}
 	}
+
 // END PARTS LIST
         //now, we must reserve some stacks for the guaranteed cards (we have to limit the number of stacks used up by guaranteed cards, so we leave room for the random cards)
 
@@ -4170,7 +4173,7 @@ if(chestContainsGuaranteedCarCards == true)
         			if(ln == undefined) ln = 0;
         			var canCreateNewStack = ln < stacksAllocatedForThisRarity;
         			car = GetRandomCard(commonCarsList, actualChestLeague);
-        			if(car == "ERROR") return "Error";
+        			if(car == "ERROR") break;
         			commonCarsListFinal = AddCardToListOfStacks("CarCards",commonCarsListFinal, car, canCreateNewStack);
         		}break;
         		case 1:
@@ -4180,7 +4183,7 @@ if(chestContainsGuaranteedCarCards == true)
         			if(ln == undefined) ln = 0;
         			var canCreateNewStack = ln < stacksAllocatedForThisRarity;
         			car = GetRandomCard(rareCarsList, actualChestLeague);
-        			if(car == "ERROR") return "Error";
+        			if(car == "ERROR") break;
         			rareCarsListFinal = AddCardToListOfStacks("CarCards", rareCarsListFinal, car, canCreateNewStack);
         		}break;
         		case 2:
@@ -4190,7 +4193,7 @@ if(chestContainsGuaranteedCarCards == true)
         			if(ln == undefined) ln = 0;
         			var canCreateNewStack = ln < stacksAllocatedForThisRarity;
         			car = GetRandomCard(epicCarsList, actualChestLeague);
-        			if(car == "ERROR") return "Error";
+        			if(car == "ERROR") break;
         			epicCarsListFinal = AddCardToListOfStacks("CarCards", epicCarsListFinal, car, canCreateNewStack);
         		}break;
         		default:
