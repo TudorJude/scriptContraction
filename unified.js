@@ -4082,9 +4082,7 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
 			}
 		}
 	}
-		log.debug("commonCarsList: " + JSON.stringify(commonCarsList));
-		log.debug("rareCarsList: " + JSON.stringify(rareCarsList));
-		log.debug("epicCarsList: " + JSON.stringify(epicCarsList));
+
 //PARTS LIST
 	var partInfo;
 	var commonPartsList = [];
@@ -4241,7 +4239,7 @@ for(var i = 0; i < Number(chestInfo.randomCardsReward); i++)
 			case 0:
 			{
 				tempString = GetRandomCard(commonPartsList, actualChestLeague);
-				if (tempString == "ERROR") return "Error";
+				if (tempString == "ERROR") break;
 				if(commonPartsListFinal == undefined) beforeLn = 0;
 				else beforeLn = commonPartsListFinal.length;
 
@@ -4252,7 +4250,7 @@ for(var i = 0; i < Number(chestInfo.randomCardsReward); i++)
 			case 1:
 			{
 				tempString = GetRandomCard(rarePartsList, actualChestLeague);
-				if (tempString == "ERROR") return "Error";
+				if (tempString == "ERROR") break;
 				if(rarePartsListFinal == undefined) beforeLn = 0
 				else beforeLn = rarePartsListFinal.length;
 				if(beforeLn == undefined) beforeLn = 0;
@@ -4262,7 +4260,7 @@ for(var i = 0; i < Number(chestInfo.randomCardsReward); i++)
 			case 2:
 			{
 				tempString = GetRandomCard(epicPartsList, actualChestLeague);
-				if (tempString == "ERROR") return "Error";
+				if (tempString == "ERROR") break;
 				if(epicPartsListFinal == undefined) beforeLn = 0
 				else beforeLn = epicPartsListFinal.length;
 				if(beforeLn == undefined) beforeLn = 0;
@@ -4279,7 +4277,7 @@ for(var i = 0; i < Number(chestInfo.randomCardsReward); i++)
 			case 0:
 			{
 				tempString = GetRandomCard(commonCarsList, actualChestLeague);
-				if (tempString == "ERROR") return "Error";
+				if (tempString == "ERROR") break;
 				if(commonCarsListFinal == undefined) beforeLn = 0
 				else beforeLn = commonCarsListFinal.length;
 				if(beforeLn == undefined) beforeLn = 0;
@@ -4289,7 +4287,7 @@ for(var i = 0; i < Number(chestInfo.randomCardsReward); i++)
 			case 1:
 			{
 				tempString = GetRandomCard(rareCarsList, actualChestLeague);
-				if (tempString == "ERROR") return "Error";
+				if (tempString == "ERROR") break;
 				if(rareCarsListFinal == undefined) beforeLn = 0
 				else beforeLn = rareCarsListFinal.length;
 				if(beforeLn == undefined) beforeLn = 0;
@@ -4299,7 +4297,7 @@ for(var i = 0; i < Number(chestInfo.randomCardsReward); i++)
 			case 2:
 			{
 				tempString = GetRandomCard(epicCarsList, actualChestLeague);
-				if (tempString == "ERROR") return "Error";
+				if (tempString == "ERROR") break;
 				if(epicCarsListFinal == undefined) beforeLn = 0
 				else beforeLn = epicCarsListFinal.length;
 				if(beforeLn == undefined) beforeLn = 0;
