@@ -967,7 +967,7 @@ function AddCardToListOfStacks(catalog, rarityCardsListFinal, card, canCreateNew
   {
     if(rarityCardsListFinal[i].ItemId == card)
     {
-      rarityCardsListFinal.CustomData.Amount = Number(rarityCardsListFinal.CustomData.Amount) + 1;
+      rarityCardsListFinal[i].CustomData.Amount = Number(rarityCardsListFinal[i].CustomData.Amount) + 1;
       return rarityCardsListFinal;
     }
   }
