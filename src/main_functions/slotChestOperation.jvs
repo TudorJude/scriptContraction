@@ -466,7 +466,7 @@ if(chestContainsGuaranteedCarCards == true)
         			car = "ERROR";
         		}
         	}
-        	if(car == "ERROR") return "Error";       	
+        	//if(car == "ERROR") return "Error";       	
 
         }
 	}
