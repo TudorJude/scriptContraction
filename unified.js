@@ -4106,7 +4106,7 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
         //but only if there are any guaranteed car cards in the chest in the first place
 var chestContainsGuaranteedCarCards = false;
 var totalGuaranteedCarCards = 0;
-var guaranteedCarsPerRarityArr = chestId.guaranteedCarsPerRarity.split(",");
+var guaranteedCarsPerRarityArr = chestInfo.guaranteedCarsPerRarity.split(",");
 for(var i = 0 ; i < guaranteedCarsPerRarityArr.length; i++)
 {
 	totalGuaranteedCarCards += Number(guaranteedCarsPerRarityArr[i]);
