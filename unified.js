@@ -3992,6 +3992,8 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
 	var currencyStacks = 0;
 	var maxStacks = Number(chestId.maxCardStacks);
 
+
+	var currencyUpdated = {};
 	//let's calculate SC
 	var scToGive = 0;
 	var scArrSplit = chestInfo.guaranteedSC.split(",");
@@ -4010,7 +4012,11 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
 			scToGive = 0;
 		}
 	}
-	if(scToGive > 0) currentStacks++;
+	if(scToGive > 0)
+	{
+		currencyUpdated["SC"] = scToGive;
+		currentStacks++;
+	} 
 
 	//let's calculate HC
 	var hcToGive = 0;
@@ -4030,7 +4036,11 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
 			hcToGive = 0;
 		}
 	}
-	if(hcToGive > 0) currentStacks++;
+	if(hcToGive > 0) 
+	{
+		currencyUpdated["HC"] = hcToGive;
+		currentStacks++;
+	}
 	
 	currencyStacks = currentStacks;
 
@@ -4376,7 +4386,6 @@ if(epicPartsListFinal != undefined) dataChanged = dataChanged.concat(epicPartsLi
       }
 	];
 	*/
-   currencyUpdated ={"HC":hcToGive,"SC":scToGive};
 
    //let's give the user the money
    var addUserCurrencyResult;
