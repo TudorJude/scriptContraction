@@ -261,7 +261,7 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
 
 	//let's calculate SC
 	var scToGive = 0;
-	var scArrSplit = chestId.guaranteedSC.split(",");
+	var scArrSplit = chestInfo.guaranteedSC.split(",");
 	switch(scArrSplit.length)
 	{
 		case 1:
@@ -281,7 +281,7 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
 
 	//let's calculate HC
 	var hcToGive = 0;
-	var hcArrSplit = chestId.guaranteedHC.split(",");
+	var hcArrSplit = chestInfo.guaranteedHC.split(",");
 	switch(hcArrSplit.length)
 	{
 		case 1:
