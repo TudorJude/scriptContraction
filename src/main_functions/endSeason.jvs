@@ -1,0 +1,116 @@
+// WE CALL THIS ONCE
+handlers.endSeason = function(args, context)
+{
+	//let's get the end game variables
+	var endGameData = server.GetTitleData(
+	{
+		Keys : ["EndGameObject"]
+	});
+	var endGameDataParsed;
+	var endGameRewardArray;
+	try
+	{
+		endGameDataParsed = JSON.parse(endGameData.EndGameObject);
+		endGameRewardArray = endGameDataParsed.endGameRewards;
+	}
+	catch(err)
+	{
+		log.debug('err: ' + err);
+		return;
+	}
+	//let's get the users that receive chests
+	var leaderboardData;
+	if(Number(endGameRewardArray.length) > 0)
+		leaderboardData = server.GetLeaderboard(
+		{
+			StatisticName : "TrophyCount",
+			StartPosition : 0,
+			MaxResultsCount : Number(endGameRewardArray.length)
+		});
+
+	if(leaderboardData == undefined) return;
+	var arrayOfRewardees = new Array(leaderboardData.Leaderboard.length);
+	for(var i = 0; i < leaderboardData.Leaderboard.length; i++)
+	{
+		arrayOfRewardees[i] = leaderboardData.Leaderboard[i];
+		server.UpdateUserReadOnlyData(
+		{
+			PlayFabId : arrayOfRewardees[i].PlayFabId,
+			Data : {"EndSeasonChest" : endGameRewardArray[i]}
+		});
+	}
+
+}
+//W CALL THIS FOR EACH USER
+handlers.endSeasonUser = function(args, context)
+{
+	var endSeasonData = 
+	{
+		"didClaim" : true,
+		"scReceived" : 0,
+		"hcReceived" : 0,
+		"previousTrophies" : 0,
+		"currentTrophies" : 0
+	};
+	//let's get the end game variables
+	var endGameData = server.GetTitleData(
+	{
+		Keys : ["EndGameObject", "SubdivisionTrophyRanges"]
+	});
+	try
+	{
+		var endGameDataParsed = JSON.parse(endGameData.EndGameObject);
+		var trophyData = server.GetPlayerStatistics(
+		{
+			PlayFabId : currentPlayerId,
+			StatisticNames : ["TrophyCount"]
+		}).Statistics;
+		var currentTrophies = Number(trophyData[0].Value);
+		var arrTemp = JSON.parse(endGameData.SubdivisionTrophyRanges).subdivisions;
+		var resetTrophiesValue = arrTemp[arrTemp.length - 1];
+		resetTrophiesValue = Number(resetTrophiesValue) + 1; // i.e. 4001
+		var scToGive = Math.floor(Number(endGameDataParsed.scConversionRate) * (currentTrophies - resetTrophiesValue));
+		var hcToGive = Math.floor(Number(endGameDataParsed.hcConversionRate) * (currentTrophies - resetTrophiesValue));
+		endSeasonData = 
+		{
+			"didClaim" : false,
+			"scReceived" : scToGive,
+			"hcReceived" : hcToGive,
+			"previousTrophies" : currentTrophies,
+			"currentTrophies" : resetTrophiesValue
+		};
+
+		server.UpdatePlayerStatistics(
+		{
+			PlayFabId : currentPlayerId,
+			Statistics : [{StatisticName : "TrophyCount", Value: resetTrophiesValue}]
+		});
+
+		if(scToGive > 0)
+			server.AddUserVirtualCurrency(
+			{
+				PlayFabId : currentPlayerId,
+				VirtualCurrency : "SC",
+				Amount : scToGive
+			});
+		if(hcToGive > 0)
+			server.AddUserVirtualCurrency(
+			{
+				PlayFabId : currentPlayerId,
+				VirtualCurrency : "HC",
+				Amount : hcToGive
+			});
+	}
+	catch(err)
+	{
+		log.debug('err: ' + err);
+		//return;
+	}
+
+	server.UpdateUserReadOnlyData(
+	{
+		PlayFabId : currentPlayerId,
+		Data : {"EndSeasonReward" : endSeasonData}
+	});
+	return "OK";
+}
