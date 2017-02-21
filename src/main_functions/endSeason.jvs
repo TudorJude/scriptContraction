@@ -11,6 +11,7 @@ handlers.endSeason = function(args, context)
 	try
 	{
 		endGameDataParsed = JSON.parse(endGameData.EndGameObject);
+		log.debug("endGameDataParsed: " + endGameDataParsed);
 		endGameRewardArray = endGameDataParsed.endGameRewards;
 	}
 	catch(err)
