@@ -10,7 +10,7 @@ handlers.endSeason = function(args, context)
 	var endGameRewardArray;
 	try
 	{
-		endGameDataParsed = JSON.parse(endGameData.EndGameObject);
+		endGameDataParsed = JSON.parse(endGameData.Data.EndGameObject);
 		log.debug("endGameDataParsed: " + endGameDataParsed);
 		endGameRewardArray = endGameDataParsed.endGameRewards;
 	}
@@ -60,14 +60,14 @@ handlers.endSeasonUser = function(args, context)
 	});
 	try
 	{
-		var endGameDataParsed = JSON.parse(endGameData.EndGameObject);
+		var endGameDataParsed = JSON.parse(endGameData.Data.EndGameObject);
 		var trophyData = server.GetPlayerStatistics(
 		{
 			PlayFabId : currentPlayerId,
 			StatisticNames : ["TrophyCount"]
 		}).Statistics;
 		var currentTrophies = Number(trophyData[0].Value);
-		var arrTemp = JSON.parse(endGameData.SubdivisionTrophyRanges).subdivisions;
+		var arrTemp = JSON.parse(endGameData.Data.SubdivisionTrophyRanges).subdivisions;
 		var resetTrophiesValue = arrTemp[arrTemp.length - 1];
 		resetTrophiesValue = Number(resetTrophiesValue) + 1; // i.e. 4001
 		var scToGive = Math.floor(Number(endGameDataParsed.scConversionRate) * (currentTrophies - resetTrophiesValue));
