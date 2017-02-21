@@ -1917,7 +1917,7 @@ handlers.endSeasonUser = function(args, context)
 	server.UpdateUserReadOnlyData(
 	{
 		PlayFabId : currentPlayerId,
-		Data : {"EndSeasonReward" : endSeasonData}
+		Data : {"EndSeasonReward" : JSON.stringify(endSeasonData)}
 	});
 	return "OK";
 }
