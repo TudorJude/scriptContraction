@@ -113,5 +113,4 @@ handlers.endSeasonUser = function(args, context)
 		PlayFabId : currentPlayerId,
 		Data : {"EndSeasonReward" : JSON.stringify(endSeasonData)}
 	});
-	return "OK";
 }

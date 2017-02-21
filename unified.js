@@ -1919,7 +1919,6 @@ handlers.endSeasonUser = function(args, context)
 		PlayFabId : currentPlayerId,
 		Data : {"EndSeasonReward" : JSON.stringify(endSeasonData)}
 	});
-	return "OK";
 }
 /**
 * Updates the amount of experience the user has based on given variables
