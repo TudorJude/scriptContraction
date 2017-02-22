@@ -356,9 +356,7 @@ function publishToLiveFeed(actor, action, directObject)
   {
     Keys : ["LiveFeed"]
   });
-  log.debug("11");
   if(liveFeed.Data["LiveFeed"] == undefined) return; 
-  log.debug("12");
   var liveFeedArray = JSON.parse(liveFeed.Data.LiveFeed);
 
   //let's apply DecayOverTime to each livefeed item
@@ -368,7 +366,6 @@ function publishToLiveFeed(actor, action, directObject)
   {
     if((Number(maxFeedLength) <= Number(liveFeedArray.length)) || (isUniqueAction == true)) 
     {// replace with one
-      log.debug("13");
       newFeed = new Array(liveFeedArray.length);
       var found = false;
         for(var i = 0; i < liveFeedArray.length; i++)
@@ -393,6 +390,7 @@ function publishToLiveFeed(actor, action, directObject)
         {
           if(liveFeedArray[i].currentHealth < health)
           {
+            if(feedObject == null) return; //hotfix
             liveFeedArray.splice(i,0,feedObject);
             newFeed = liveFeedArray;
             break;
