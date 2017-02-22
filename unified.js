@@ -1047,6 +1047,8 @@ function WeightedRandom(array, totalweight)
 };
 handlers.buyPremiumChest = function(args, context)
 {
+	var mC = CheckMaintenanceAndVersion(args);
+  	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
 	//let's figure out the user's league
 	var tc=server.GetPlayerStatistics(
 	  {
@@ -2097,6 +2099,9 @@ handlers.generateDaily = function(args, context)
 }
 handlers.getChestSlotsStatus = function(args, context)
 {
+	var mC = CheckMaintenanceAndVersion(args);
+  	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
+
 	//let's get the user's chest info
 	var chestData = server.GetUserInternalData(
 	{
@@ -2183,6 +2188,25 @@ handlers.getChestSlotsStatus = function(args, context)
 						    "arrivalTimeStamp": 0
 						  }
 						];
+
+		//let's give older users some starting chests. already ready to open. We'll determine these users as being those who have the ChestsOpen statistic higher than let's say 15
+		//get ChestsOpen stat
+		var ms=server.GetPlayerStatistics( 
+		  {
+		     PlayFabId: currentPlayerId,
+		     StatisticNames: ["ChestsOpened", "TrophyCount"]
+		  }).Statistics;
+		var chestsOpened = GetValueFromStatistics(ms, "ChestsOpened", 0);
+		var trophies = GetValueFromStatistics(ms, "TrophyCount", 0);
+		var cLeague = calculateLeague(trophies);
+		if(Number(chestsOpened) > 15)
+		{
+			chestSlotInfo[0].chestId = "GoldChest";
+			chestSlotInfo[0].chestLeague = cLeague;
+			chestSlotInfo[0].status = "Arrived";
+			chestSlotInfo[0].arrivalTimeStamp = 0;
+			chestSlotInfo[0].orderTimeStamp = 1;
+		}
 
 		var chestSlotInfoString = JSON.stringify(chestSlotInfo);
 		server.UpdateUserInternalData(
@@ -3144,6 +3168,8 @@ handlers.openChest = function(args, context)
 };
 handlers.openFreeChest = function(args, context)
 {
+	var mC = CheckMaintenanceAndVersion(args);
+  	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
 		//let's get the user's slots chest info
 	var chestData = server.GetUserInternalData(
 	{

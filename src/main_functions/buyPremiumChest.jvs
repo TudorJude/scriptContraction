@@ -1,5 +1,7 @@
 handlers.buyPremiumChest = function(args, context)
 {
+	var mC = CheckMaintenanceAndVersion(args);
+  	if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
 	//let's figure out the user's league
 	var tc=server.GetPlayerStatistics(
 	  {
