@@ -4526,76 +4526,6 @@ if(arenaBonus > 0)
 	{
 		dataChanged[i].CustomData.Amount = Math.floor(Number(dataChanged[i].CustomData.Amount) + Number(dataChanged[i].CustomData.Amount) * (arenaBonus/100));
 	}
-/*
-	dataChanged = 
-	[
-      {
-        ItemId : "Engine",
-        CatalogVersion: "PartCards",
-        CustomData: {"Amount" : 13}
-      },
-      {
-        ItemId : "Exhaust",
-        CatalogVersion: "PartCards",
-        CustomData: {"Amount" : 32}
-      },
-      {
-        ItemId : "Gearbox",
-        CatalogVersion: "PartCards",
-        CustomData: {"Amount" : 123}
-      },
-      {
-        ItemId : "Suspension",
-        CatalogVersion: "PartCards",
-        CustomData: {"Amount" : 1}
-      },
-      {
-        ItemId : "Tires",
-        CatalogVersion: "PartCards",
-        CustomData: {"Amount" : 0}
-      },
-      {
-        ItemId : "Turbo",
-        CatalogVersion: "PartCards",
-        CustomData: {"Amount" : 5}
-      },
-      {
-        ItemId : "AcuraNSX",
-        CatalogVersion: "CarCards",
-        CustomData: {"Amount" : 7}
-      },
-      {
-        ItemId : "BMWM3-1988",
-        CatalogVersion: "CarCards",
-        CustomData: {"Amount" : 3}
-      },
-      {
-        ItemId : "SubaruImpreza",
-        CatalogVersion: "CarCards",
-        CustomData: {"Amount" : 13}
-      },
-      {
-        ItemId : "CorvetteC7",
-        CatalogVersion: "CarCards",
-        CustomData: {"Amount" : 113}
-      },
-      {
-        ItemId : "MitsubishiEclipse",
-        CatalogVersion: "CarCards",
-        CustomData: {"Amount" : 3}
-      },
-      {
-        ItemId : "NissanNavara",
-        CatalogVersion: "CarCards",
-        CustomData: {"Amount" : 3}
-      },
-      {
-        ItemId : "ToyotaLandCruiser70",
-        CatalogVersion: "CarCards",
-        CustomData: {"Amount" : 3}
-      }
-	];
-	*/
 
    //let's give the user the money
    var addUserCurrencyResult;
@@ -5461,8 +5391,6 @@ handlers.updateCarCust = function(args, context)
     InventoryChange:invChangeObj
   };
   
-  //let's give your player a chest
-  grantUserChest(currentPlayerId, "endGameNormal");
   return returnObj;
 
 };
