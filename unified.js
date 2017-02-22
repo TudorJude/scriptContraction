@@ -1920,6 +1920,64 @@ handlers.endSeasonUser = function(args, context)
 		Data : {"EndSeasonReward" : JSON.stringify(endSeasonData)}
 	});
 }
+
+//sets claim status from EndSeasonReward to true
+//if there exists an end season chest @ EndSeasonChest open it and send the data to the client
+
+handlers.claimEndSeasonReward = function(args, context)
+{
+	//let's see if the user was legend by checking for the existence of EndSeasonReward entry
+	try
+	{
+		var userData = server.GetUserReadOnlyData(
+		{
+			PlayFabId : currentPlayerId,
+			Keys : ["EndSeasonReward", "EndSeasonChest"]
+		});
+		if(userData.Data.EndSeasonReward == undefined) return generateFailObj("Nothing to claim");
+		var updateObj = JSON.parse(userData.Data.EndSeasonReward);
+		updateObj.didClaim = true;
+		server.UpdateUserReadOnlyData(
+		{
+			PlayFabId : currentPlayerId,
+			Data : {"EndSeasonReward" : JSON.stringify(updateObj)}
+		})
+
+		if(userData.Data.EndSeasonChest == undefined) return {Result : "OK", Message : "noChest"};
+		var chestId = JSON.parse(userData.Data.EndSeasonChest);
+		if(chestId == null) return {Result : "OK", Message : "noChest"};
+
+		//looks like we have a chest. Let's get its data from the catalog
+		var catalogData = server.GetCatalogItems({CatalogVersion : "Chests"});
+
+		var chestInfo;
+		for(var i = 0; i < catalogData.Catalog.length; i++)
+		{
+			if(catalogData.Catalog[i].ItemId == chestId)
+			{
+				chestInfo = JSON.parse(catalogData.Catalog[i].CustomData);
+				break;
+			}
+		}
+		if(chestInfo == undefined) return generateErrObj("Could not find chest with id: " + chestId + " in the Chests catalog, or this chest's custom data is undefined");		
+
+		var chestBounty = GenerateChestBounty(currentPlayerId,chestId, 10, chestInfo);
+
+		var outInventory = server.GetUserInventory({PlayFabId: currentPlayerId});
+
+		var returnObject = {
+				Result : "OK",
+				InventoryChange: outInventory,
+				ChestBounty : chestBounty 
+			}
+		return r
+	}
+	catch(err)
+	{
+		log.debug("err: " + err);
+		return generateErrObj("something went wrong: " + err);
+	}
+}
 /**
 * Updates the amount of experience the user has based on given variables
 * @param {string} catalogId the ID of the catalog holding xp data
