@@ -389,8 +389,7 @@ function publishToLiveFeed(actor, action, directObject)
         for(var i = 0; i < liveFeedArray.length; i++)
         {
           if(liveFeedArray[i].currentHealth < health)
-          {
-            if(feedObject == null) return; //hotfix
+          {            
             liveFeedArray.splice(i,0,feedObject);
             newFeed = liveFeedArray;
             break;
@@ -424,7 +423,10 @@ function publishToLiveFeed(actor, action, directObject)
     log.debug("found error at feed replace/add: " + err);
     return;
   }
-
+for(var i = 0; i < newFeed.length; i++)
+{
+  if(newFeed[i] == null) return; // hotfix
+}
 var dataToUpdate = JSON.stringify(newFeed);
 var updateFeed = server.SetTitleInternalData(
     {

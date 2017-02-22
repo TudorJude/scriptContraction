@@ -389,8 +389,7 @@ function publishToLiveFeed(actor, action, directObject)
         for(var i = 0; i < liveFeedArray.length; i++)
         {
           if(liveFeedArray[i].currentHealth < health)
-          {
-            if(feedObject == null) return; //hotfix
+          {            
             liveFeedArray.splice(i,0,feedObject);
             newFeed = liveFeedArray;
             break;
@@ -424,7 +423,10 @@ function publishToLiveFeed(actor, action, directObject)
     log.debug("found error at feed replace/add: " + err);
     return;
   }
-
+for(var i = 0; i < newFeed.length; i++)
+{
+  if(newFeed[i] == null) return; // hotfix
+}
 var dataToUpdate = JSON.stringify(newFeed);
 var updateFeed = server.SetTitleInternalData(
     {
@@ -1813,15 +1815,15 @@ handlers.endSeason = function(args, context)
 	//let's get the end game variables
 	var endGameData = server.GetTitleData(
 	{
-		Keys : ["EndGameObject"]
+		Keys : ["EndSezonObject"]
 	});
 	var endGameDataParsed;
 	var endGameRewardArray;
 	try
 	{
-		endGameDataParsed = JSON.parse(endGameData.Data.EndGameObject);
-		log.debug("endGameDataParsed: " + endGameDataParsed);
-		endGameRewardArray = endGameDataParsed.endGameRewards;
+		endGameDataParsed = JSON.parse(endGameData.Data.EndSezonObject);
+		//log.debug("endGameDataParsed: " + endGameDataParsed);
+		endGameRewardArray = endGameDataParsed.endSezonRewards;
 	}
 	catch(err)
 	{
@@ -1865,11 +1867,11 @@ handlers.endSeasonUser = function(args, context)
 	//let's get the end game variables
 	var endGameData = server.GetTitleData(
 	{
-		Keys : ["EndGameObject", "SubdivisionTrophyRanges"]
+		Keys : ["EndSezonObject", "SubdivisionTrophyRanges"]
 	});
 	try
 	{
-		var endGameDataParsed = JSON.parse(endGameData.Data.EndGameObject);
+		var endGameDataParsed = JSON.parse(endGameData.Data.EndSezonObject);
 		var trophyData = server.GetPlayerStatistics(
 		{
 			PlayFabId : currentPlayerId,
