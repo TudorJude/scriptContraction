@@ -1117,6 +1117,9 @@ handlers.buyPremiumChest = function(args, context)
 		InventoryChange : outInventory
 	}	
 
+	//let's publish to the feed
+    publishToLiveFeed(currentPlayerId, "unlockedChest", args.chestId);
+
 	return returnObject;
 }
 handlers.claimDailyMission = function(args, context) 
