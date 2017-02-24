@@ -1809,60 +1809,44 @@ handlers.endGame = function(args, context) {
       };
   return {Result : newPlayerStats};
 }
-// WE CALL THIS ONCE
-handlers.endSeason = function(args, context)
-{
-	//let's get the end game variables
-	var endGameData = server.GetTitleData(
-	{
-		Keys : ["EndSezonObject"]
-	});
-	var endGameDataParsed;
-	var endGameRewardArray;
-	try
-	{
-		endGameDataParsed = JSON.parse(endGameData.Data.EndSezonObject);
-		//log.debug("endGameDataParsed: " + endGameDataParsed);
-		endGameRewardArray = endGameDataParsed.endSezonRewards;
-	}
-	catch(err)
-	{
-		log.debug('err: ' + err);
-		return;
-	}
-	//let's get the users that receive chests
-	var leaderboardData;
-	if(Number(endGameRewardArray.length) > 0)
-		leaderboardData = server.GetLeaderboard(
-		{
-			StatisticName : "TrophyCount",
-			StartPosition : 0,
-			MaxResultsCount : Number(endGameRewardArray.length)
-		});
-
-	if(leaderboardData == undefined) return;
-	var arrayOfRewardees = new Array(leaderboardData.Leaderboard.length);
-	for(var i = 0; i < leaderboardData.Leaderboard.length; i++)
-	{
-		arrayOfRewardees[i] = leaderboardData.Leaderboard[i];
-		server.UpdateUserReadOnlyData(
-		{
-			PlayFabId : arrayOfRewardees[i].PlayFabId,
-			Data : {"EndSeasonChest" : endGameRewardArray[i]}
-		});
-	}
-
-}
+// call this for each user before calling endSeasonUser
 handlers.logLegendRank = function(args, context)
 {
 	try
 	{
+		//let's get the end game variables
+		var endGameData = server.GetTitleData(
+		{
+			Keys : ["EndSezonObject"]
+		});
+		var endGameDataParsed;
+		var endGameRewardArray;
+		try
+		{
+			endGameDataParsed = JSON.parse(endGameData.Data.EndSezonObject);
+			//log.debug("endGameDataParsed: " + endGameDataParsed);
+			endGameRewardArray = endGameDataParsed.endSezonRewards;
+		}
+		catch(err)
+		{
+			log.debug('err: ' + err);
+			return;
+		}
+
 		var pos = server.GetLeaderboardAroundUser(
 		{
 			StatisticName : "TrophyCount",
 			PlayFabId : currentPlayerId,
 			MaxResultsCount : 1
 		}).Leaderboard[0].Position;
+
+		//let's give appropriate chest
+		if(pos < endGameRewardArray.length)
+			server.UpdateUserReadOnlyData(
+			{
+				PlayFabId : currentPlayerId,
+				Data : {"EndSeasonChest" : endGameRewardArray[Number(pos)]}
+			});
 		pos = Number(pos) + 1;
 		server.UpdateUserReadOnlyData(
 		{
