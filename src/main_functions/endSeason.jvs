@@ -145,7 +145,7 @@ handlers.claimEndSeasonReward = function(args, context)
 		})
 
 		if(userData.Data.EndSeasonChest == undefined) return {Result : "OK", Message : "noChest"};
-		var chestId = JSON.parse(userData.Data.EndSeasonChest.Value);
+		var chestId = userData.Data.EndSeasonChest.Value;
 		if(chestId == null) return {Result : "OK", Message : "noChest"};
 
 		//looks like we have a chest. Let's get its data from the catalog
@@ -162,7 +162,8 @@ handlers.claimEndSeasonReward = function(args, context)
 		}
 		if(chestInfo == undefined) return generateErrObj("Could not find chest with id: " + chestId + " in the Chests catalog, or this chest's custom data is undefined");		
 
-		var chestBounty = GenerateChestBounty(currentPlayerId,chestId, 9, chestInfo);
+log.debug("generatung: " + chestId);
+		var chestBounty = GenerateChestBounty(currentPlayerId, chestId, 7, chestInfo);
 
 		var outInventory = server.GetUserInventory({PlayFabId: currentPlayerId});
 
