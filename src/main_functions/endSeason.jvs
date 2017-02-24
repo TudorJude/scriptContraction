@@ -42,6 +42,29 @@ handlers.endSeason = function(args, context)
 	}
 
 }
+handlers.logLegendRank = function(args, context)
+{
+	try
+	{
+		var pos = server.GetLeaderboardAroundUser(
+		{
+			StatisticName : "TrophyCount",
+			PlayFabId : currentPlayerId,
+			MaxResultsCount : 1
+		}).Leaderboard[0].Position;
+		pos = Number(pos) + 1;
+		server.UpdateUserReadOnlyData(
+		{
+			PlayFabId : currentPlayerId,
+			Data : {"RankLastSeason" : pos}
+		});
+	}
+	catch(err)
+	{
+		log.debug("err: " + err);
+		return;
+	}
+}
 //W CALL THIS FOR EACH USER
 handlers.endSeasonUser = function(args, context)
 {
@@ -164,7 +187,7 @@ handlers.claimEndSeasonReward = function(args, context)
 				InventoryChange: outInventory,
 				ChestBounty : chestBounty 
 			}
-		return r
+		return returnObject;
 	}
 	catch(err)
 	{

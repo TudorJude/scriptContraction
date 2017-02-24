@@ -1853,6 +1853,29 @@ handlers.endSeason = function(args, context)
 	}
 
 }
+handlers.logLegendRank = function(args, context)
+{
+	try
+	{
+		var pos = server.GetLeaderboardAroundUser(
+		{
+			StatisticName : "TrophyCount",
+			PlayFabId : currentPlayerId,
+			MaxResultsCount : 1
+		}).Leaderboard[0].Position;
+		pos = Number(pos) + 1;
+		server.UpdateUserReadOnlyData(
+		{
+			PlayFabId : currentPlayerId,
+			Data : {"RankLastSeason" : pos}
+		});
+	}
+	catch(err)
+	{
+		log.debug("err: " + err);
+		return;
+	}
+}
 //W CALL THIS FOR EACH USER
 handlers.endSeasonUser = function(args, context)
 {
@@ -1975,7 +1998,7 @@ handlers.claimEndSeasonReward = function(args, context)
 				InventoryChange: outInventory,
 				ChestBounty : chestBounty 
 			}
-		return r
+		return returnObject;
 	}
 	catch(err)
 	{
@@ -2882,92 +2905,7 @@ handlers.openChest = function(args, context)
 {
   var mC = CheckMaintenanceAndVersion(args);
   if(mC != "OK") return generateMaintenanceOrUpdateObj(mC);
-  
-  //level reward mechanic
-  //args.level == -1 if it's regular open chest operation
-  //args.level >= 0 if it's a reward for leveing up to level args.level
-  if(args.levelUpRewardIndex > 0)
-  {
-  	var lastLvlReward = 0;
-    var lastRewardLevel = server.GetUserReadOnlyData(
-    {
-      PlayFabId : currentPlayerId,
-      Keys : ["LastLevelReward"]
-    });
-    var levelItemDataToUpdate = {};
-    levelItemDataToUpdate["LastLevelReward"] = 0;
-    if(lastRewardLevel.Data.LastLevelReward == undefined)
-    {
-      server.UpdateUserReadOnlyData(
-      {
-        PlayFabId : currentPlayerId, 
-        Data : levelItemDataToUpdate
-      }
-        );      
-    }
-    else
-    {
-    	lastLvlReward = lastRewardLevel.Data.LastLevelReward.Value;
-    }
-    // now let's see if the user gets a reward
-      var lvlThresholds = JSON.parse(getCatalogItem("Balancing", "BalancingItem").CustomData).LevelThresholds;
-        //get current exprience
-      var ps= server.GetPlayerStatistics(
-      {
-            PlayFabId: currentPlayerId,
-            StatisticNames: ["Experience"]
-      }).Statistics;
-      var currentExprience = GetValueFromStatistics(ps, "Experience", 0);
-      if(currentExprience == 0) // this most likely means that the user doesn't have the exp statistic so let's give it to them
-      {
-      	  var suArray = [];
-	      var su = {StatisticName : "Experience", Version : "0", Value: 0};
-	      suArray.push(su);
 
-	      server.UpdatePlayerStatistics(
-	      {
-	        PlayFabId : currentPlayerId,
-	        Statistics: suArray
-	      });
-      }
-      var currLvl = lvlThresholds.length;
-      for(var i = 0; i < lvlThresholds.length; i++)
-      {
-        if(currentExprience >= lvlThresholds[i]) continue;
-        currLvl = i; break;
-      }
-
-      if(Number(args.levelUpRewardIndex) <= Number(lastLvlReward)) return generateFailObj("already got reward for level: " + lastLvlReward);
-
-      if(Number(args.levelUpRewardIndex) <= Number(currLvl))
-      {        
-        lastLvlReward = Number(args.levelUpRewardIndex);
-        levelItemDataToUpdate["LastLevelReward"] = lastLvlReward;
-        server.UpdateUserReadOnlyData(
-        {
-          PlayFabId : currentPlayerId, 
-          Data : levelItemDataToUpdate
-        }
-          );
-        //give bundle to user
-        //ids of bundles are of the form 001, 002, ... , 012 etc so padded with 0s until it has 3 digits
-        var str = "" + lastLvlReward;
-        var pad = "000";
-        var ans = pad.substring(0, pad.length - str.length) + str; 
-        server.GrantItemsToUser(
-        {
-          CatalogVersion : "LevelUpRewards",
-          PlayFabId : currentPlayerId, 
-          ItemIds : ans
-        }
-          );      
-        //let's publish to the feed that the user leveled up
-        if(Number(currLvl) > 2)
-          publishToLiveFeed(currentPlayerId, "levelUp", Number(currLvl));
-      }
-      else return generateFailObj("You haven't reached this level yet");
-
-  }
   var objectsUpdated = [];
   var currencyUpdated = [];
   var invChangeObj;
@@ -2977,21 +2915,6 @@ handlers.openChest = function(args, context)
     }
   );
 
-  //let's check if this is a chest from the store
-  if(args.currCost > 0)
-  {
-    var bO = checkBalance(args.currType, args.currCost, userInventoryObject.VirtualCurrency["SC"], userInventoryObject.VirtualCurrency["HC"])
-    if(bO != "OK") return generateFailObj("not enough money");
-
-    var subtractUserCurrencyResult = server.SubtractUserVirtualCurrency(
-      {
-        PlayFabId: currentPlayerId,
-        VirtualCurrency : args.currType,
-        Amount: args.currCost
-      }
-    );
-    updateCurrencySpentStatistic(args.currType, args.currCost);
-  }
   //currency
   var addUserCurrencyResult;
   for(var p in args.currencyReq)
@@ -3006,167 +2929,16 @@ handlers.openChest = function(args, context)
     );
 
   }
-  var itemData;
-  var itemFound = false;
-  var newAmount = 0;
-  //car cards
-  for(var p in args.carCardsRequest)
-  {
-    //log.debug(p + " : " + args.carCardsRequest[p]);
-    if (args.carCardsRequest.hasOwnProperty(p))
-    {
-      itemFound = false;
-      newAmount = 0;
-      //log.debug("looking for: " +p);
-      for(var i = 0; i < userInventoryObject.Inventory.length; i++)
-      {
-        if((userInventoryObject.Inventory[i].ItemId == p) && (userInventoryObject.Inventory[i].CatalogVersion == "CarCards"))
-        {
-          // log.debug("adding amount to: " + userInventoryObject.Inventory[i].ItemInstanceId);
-          if(userInventoryObject.Inventory[i].CustomData == undefined)
-          {
-            newAmount = Number(args.carCardsRequest[p]);
-          }
-          else
-          {
-            if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)
-            newAmount = Number(args.carCardsRequest[p]);
-            else
-            {
-              if(isNaN(Number(userInventoryObject.Inventory[i].CustomData.Amount)))
-              newAmount = Number(args.carCardsRequest[p]);
-              else
-              newAmount = Number(userInventoryObject.Inventory[i].CustomData.Amount) + Number(args.carCardsRequest[p]);
-            }
-          }
-          itemData = {"Amount" : newAmount};
-          server.UpdateUserInventoryItemCustomData(
-            {
-              PlayFabId: currentPlayerId,
-              ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
-              Data: itemData
-            }
-          );
-          itemFound = true;
-          break;
-        }
-      }
-      if(itemFound == false)
-      {
-        var itemsToGrant = [p];
-        var grantVar = server.GrantItemsToUser(
-          {
-            CatalogVersion : "CarCards",
-            PlayFabId: currentPlayerId,
-            ItemIds : itemsToGrant
-          }
-        );
-
-        itemData = {"Amount" : args.carCardsRequest[p]};
-        server.UpdateUserInventoryItemCustomData(
-          {
-            PlayFabId: currentPlayerId,
-            ItemInstanceId: grantVar.ItemGrantResults[0].ItemInstanceId,
-            Data: itemData
-          }
-        );
-      }
-    }
-  }
-  //part cards
-  for(var p in args.partCardsRequest)
-  {
-    //log.debug(p + " : " + args.partCardsRequest[p]);
-    if (args.partCardsRequest.hasOwnProperty(p))
-    {
-      itemFound = false;
-      newAmount = 0;
-      // log.debug("looking for: " +p);
-      for(var i = 0; i < userInventoryObject.Inventory.length; i++)
-      {
-        if((userInventoryObject.Inventory[i].ItemId == p) && (userInventoryObject.Inventory[i].CatalogVersion == "PartCards"))
-        {
-          // log.debug("adding amount to: " + userInventoryObject.Inventory[i].ItemInstanceId);
-          if(userInventoryObject.Inventory[i].CustomData == undefined)
-          {
-            newAmount = Number(args.partCardsRequest[p]);
-          }
-          else
-          {
-            if(userInventoryObject.Inventory[i].CustomData.Amount == undefined)
-            newAmount = Number(args.partCardsRequest[p]);
-            else
-            {
-              if(isNaN(Number(userInventoryObject.Inventory[i].CustomData.Amount)))
-              newAmount = Number(args.partCardsRequest[p]);
-              else
-              newAmount = Number(userInventoryObject.Inventory[i].CustomData.Amount) + Number(args.partCardsRequest[p]);
-            }
-          }
-          itemData = {"Amount" : newAmount};
-          server.UpdateUserInventoryItemCustomData(
-            {
-              PlayFabId: currentPlayerId,
-              ItemInstanceId: userInventoryObject.Inventory[i].ItemInstanceId,
-              Data: itemData
-            }
-          );
-          itemFound = true;
-          break;
-        }
-      }
-      if(itemFound == false)
-      {
-        var itemsToGrant = [p];
-        var grantVar = server.GrantItemsToUser(
-          {
-            CatalogVersion : "PartCards",
-            PlayFabId: currentPlayerId,
-            ItemIds : itemsToGrant
-          }
-        );
-
-        itemData = {"Amount" : args.partCardsRequest[p]};
-        server.UpdateUserInventoryItemCustomData(
-          {
-            PlayFabId: currentPlayerId,
-            ItemInstanceId: grantVar.ItemGrantResults[0].ItemInstanceId,
-            Data: itemData
-          }
-        );
-      }
-    }
-  }
 
   var outInventory = server.GetUserInventory({PlayFabId: currentPlayerId});
 
-  //give experience for opening chest unless this chest was opened as part of leveling up reward:
-  //if no chest id is provided, it means that this function is used for inventory update
-  if((args.chestId) && (args.levelUpRewardIndex <= 0)){
-    var totalXp = UpdateExperience("Chests", args.chestId, "xpGain", 0, true);
+  outInventory.Experience = totalXp;
 
-    var totalChestsOpened = 0;
-    var sv=server.GetPlayerStatistics(
-    {
-      PlayFabId: currentPlayerId,
-      StatisticNames: ["ChestsOpened"]
-    }).Statistics;
-    totalChestsOpened = Number(GetValueFromStatistics(sv, "ChestsOpened", 0));
-    totalChestsOpened++;
-    var suArray = [];
-    var sut = {StatisticName : "ChestsOpened", Value: totalChestsOpened};
-    suArray.push(sut);
-    var updateRequest = server.UpdatePlayerStatistics(
-    {
-      PlayFabId: currentPlayerId,
-      Statistics: suArray
-    }
-    );
+  var r = {
+    Result: "OK",
+    InventoryChange:inventory
+  };
 
-    outInventory.Experience = totalXp;
-  }
-  if((args.chestId == "DiamondChest") || (args.chestId == "BigGoldChest") || (args.chestId == "BigSilverChest"))
-    publishToLiveFeed(currentPlayerId, "unlockedChest", args.chestId);
   return generateInventoryChange("InventoryUpdated", outInventory);
 };
 handlers.openFreeChest = function(args, context)
