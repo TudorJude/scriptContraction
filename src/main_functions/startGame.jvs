@@ -133,9 +133,10 @@ else
   }
 
   //default recording code
-  var subDivisionLength = 25; // we have 25 possible courses
+  var subDivisionLength = 30; // we have 25 possible courses
   var envCourseArray =
   [
+  0,0,0,0,0,
   0,0,0,0,0,
   0,0,0,0,0,
   0,0,0,0,0,
