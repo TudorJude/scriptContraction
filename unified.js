@@ -1947,7 +1947,7 @@ handlers.claimEndSeasonReward = function(args, context)
 			Keys : ["EndSeasonReward", "EndSeasonChest"]
 		});
 		if(userData.Data.EndSeasonReward == undefined) return generateFailObj("Nothing to claim");
-		var updateObj = JSON.parse(userData.Data.EndSeasonReward);
+		var updateObj = JSON.parse(userData.Data.EndSeasonReward.Value);
 		updateObj.didClaim = true;
 		server.UpdateUserReadOnlyData(
 		{
@@ -1956,7 +1956,7 @@ handlers.claimEndSeasonReward = function(args, context)
 		})
 
 		if(userData.Data.EndSeasonChest == undefined) return {Result : "OK", Message : "noChest"};
-		var chestId = JSON.parse(userData.Data.EndSeasonChest);
+		var chestId = JSON.parse(userData.Data.EndSeasonChest.Value);
 		if(chestId == null) return {Result : "OK", Message : "noChest"};
 
 		//looks like we have a chest. Let's get its data from the catalog
@@ -1976,6 +1976,12 @@ handlers.claimEndSeasonReward = function(args, context)
 		var chestBounty = GenerateChestBounty(currentPlayerId,chestId, 10, chestInfo);
 
 		var outInventory = server.GetUserInventory({PlayFabId: currentPlayerId});
+
+		server.UpdateUserReadOnlyData(
+		{
+			PlayFabId : currentPlayerId,
+			Data : {"EndSeasonChest" : null}
+		});
 
 		var returnObject = {
 				Result : "OK",
