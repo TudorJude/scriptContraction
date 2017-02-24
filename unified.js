@@ -1973,7 +1973,7 @@ handlers.claimEndSeasonReward = function(args, context)
 		}
 		if(chestInfo == undefined) return generateErrObj("Could not find chest with id: " + chestId + " in the Chests catalog, or this chest's custom data is undefined");		
 
-		var chestBounty = GenerateChestBounty(currentPlayerId,chestId, 10, chestInfo);
+		var chestBounty = GenerateChestBounty(currentPlayerId,chestId, 9, chestInfo);
 
 		var outInventory = server.GetUserInventory({PlayFabId: currentPlayerId});
 
