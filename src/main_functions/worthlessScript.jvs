@@ -11,9 +11,10 @@ handlers.worthlessScript = function(args, context)
 	  	//get all players in RecSubdivision1
 		var td = server.GetTitleInternalData(
 		{
-			Keys : ["RecSubdivision1"]
+			Keys : ["RecSubDivision1"]
 		});
-		var recPool = td.Data["RecSubdivision1"];
+		var recPool = td.Data["RecSubDivision1"];
+		log.debug("recPool: " + recPool);
 		var recArray = JSON.parse(recPool);
 		for(var i = 0; i < recArray.length; i++)
 		{
