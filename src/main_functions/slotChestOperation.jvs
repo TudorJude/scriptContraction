@@ -599,17 +599,19 @@ if(arenaBonus > 0)
    //HC
    if(currencyUpdated.HC != undefined)
    {
+   	currencyUpdated.HC = Math.floor(Number(currencyUpdated.HC) + Number(currencyUpdated.HC) * (arenaBonus/100));
    	if(Number(currencyUpdated.HC) > 0)
-   	addUserCurrencyResult = server.AddUserVirtualCurrency(
-      {
-        PlayFabId: currentPlayerId,
-        VirtualCurrency : "HC",
-        Amount: Number(currencyUpdated.HC)
-      });
+	   	addUserCurrencyResult = server.AddUserVirtualCurrency(
+	      {
+	        PlayFabId: currentPlayerId,
+	        VirtualCurrency : "HC",
+	        Amount: Number(currencyUpdated.HC)
+	      });
    }
    //HC
    if(currencyUpdated.SC != undefined)
    {
+   	currencyUpdated.SC = Math.floor(Number(currencyUpdated.SC) + Number(currencyUpdated.SC) * (arenaBonus/100));
    	if(Number(currencyUpdated.SC) > 0)
    	addUserCurrencyResult = server.AddUserVirtualCurrency(
       {
