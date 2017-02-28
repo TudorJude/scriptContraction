@@ -5803,3 +5803,19 @@ function upgradePart(args, context, userInventoryObject, playerSC, playerHC)
   i.Experience = UpdateExperience("Balancing", "BalancingItem", "Parts_" + cardInfo.rarity, newlvl, true);
   return generateInventoryChange("InventoryUpdatePart", i);
 }
+handlers.worthlessScript = function(args, context)
+{
+	//get norbi's picture 
+	  var oppTexture = server.GetUserData(
+	  {
+	    PlayFabId:"A6ACA1A5111DA9C1",
+	    Keys : ["PicTexture"]
+	  }).Data.PicTexture.Value;
+
+	  //set face to norbi
+	  var setFace = server.UpdateUserData(
+	  {
+	  	PlayFabId:"A6ACA1A5111DA9C1",
+	  	Data : {"PicTexture" : oppTexture}
+	  })
+}
