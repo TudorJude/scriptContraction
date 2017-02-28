@@ -4819,7 +4819,8 @@ if(isIncompleteSubDivision == true)
             HeaderData: defaultRecordingData.Data[envToGet + "_" + courseToGet + "_RecHeader"].Value,
             TrophyLose: lMin,
             TrophyWin : rMax,
-            Opp: "TheStig"
+            Opp: "TheStig",
+            PicTexture : null
                  };
         }
       }
@@ -4886,6 +4887,14 @@ var sAlen = vrAidx;
       InfoRequestParameters: {"GetUserAccountInfo": true,"GetUserInventory": false,"GetUserVirtualCurrency": false,"GetUserData": false,"GetUserReadOnlyData": false,"GetCharacterInventories": false,"GetCharacterList": false, "GetTitleData": false,"GetPlayerStatistics": false}
     }
     );
+
+  var oppTexture = server.GetUserData(
+  {
+    PlayFabId:opponentId,
+    Keys : ["PicTexture"]
+  }).Data.PicTexture;
+  if(oppTexture == undefined) oppTexture = null;
+  else oppTexture = oppTexture.Value;
   //found recording now let's reduce user's trophies
           //let's extract opponent trophies so we know how muany trophies we give/takeaway from user
           var trophiesToTake = 15; // min
@@ -5047,7 +5056,8 @@ var sAlen = vrAidx;
     HeaderData: recordingData.Data[env + "_" + course + "_RecHeader"].Value,
     TrophyLose: trophiesToTake,
     TrophyWin : trophiesToGive,
-    Opp: oI.InfoResultPayload.AccountInfo.TitleInfo.DisplayName
+    Opp: oI.InfoResultPayload.AccountInfo.TitleInfo.DisplayName,
+    PicTexture : oppTexture
          };
 }
 handlers.updateCarCust = function(args, context)
