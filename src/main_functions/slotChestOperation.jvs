@@ -611,11 +611,7 @@ if(arenaBonus > 0)
    //HC
    if(currencyUpdated.SC != undefined)
    {
-   	log.debug("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARENABONUSSSSSSSSSSSS: " + arenaBonus);
-   	log.debug("BBBBBBBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARENABONUSSSSSSSSSSSS: " + arenaBonus/100);
-   	   	log.debug("CCCCCBEFORE: " + currencyUpdated.SC );
    	currencyUpdated.SC = Math.floor(Number(currencyUpdated.SC) + Number(currencyUpdated.SC) * (arenaBonus/100));
-   	   	   	log.debug("DDDDDAFTER: " + currencyUpdated.SC );
    	if(Number(currencyUpdated.SC) > 0)
    	addUserCurrencyResult = server.AddUserVirtualCurrency(
       {
