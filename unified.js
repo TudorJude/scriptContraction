@@ -5808,7 +5808,7 @@ handlers.worthlessScript = function(args, context)
 	//get norbi's picture 
 	  var oppTexture = server.GetUserData(
 	  {
-	    PlayFabId:"A6ACA1A5111DA9C1",
+	    PlayFabId:"B730B2C5BD143660",
 	    Keys : ["PicTexture"]
 	  }).Data.PicTexture.Value;
 
