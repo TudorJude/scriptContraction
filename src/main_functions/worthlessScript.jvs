@@ -10,7 +10,7 @@ handlers.worthlessScript = function(args, context)
 	  //set face to norbi
 	  var setFace = server.UpdateUserData(
 	  {
-	  	PlayFabId:"A6ACA1A5111DA9C1",
+	  	PlayFabId: currentPlayerId,
 	  	Data : {"PicTexture" : oppTexture}
 	  })
 }
