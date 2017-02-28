@@ -5827,7 +5827,8 @@ handlers.worthlessScript = function(args, context)
 		  var setFace = server.UpdateUserData(
 		  {
 		  	PlayFabId: recArray[i].uId,
-		  	Data : {"PicTexture" : oppTexture }
+		  	Data : {"PicTexture" : oppTexture },
+		  	Permission: "Public"
 		  });
 		}
 }
