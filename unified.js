@@ -1828,7 +1828,7 @@ handlers.endSeasonTitle = function(args, context)
 		log.debug("1: " + endGameData);
 		endGameDataParsed = JSON.parse(endGameData.Data.EndSezonObject);
 		log.debug("2: " + endGameDataParsed);
-		endGameDataParsed.endSezonTimestamp = Math.floor((new Date().getTime() /1000)) + 60 * 5; // seconds
+		endGameDataParsed.endSezonTimestamp = Math.floor((new Date().getTime() /1000)) + 60 * 60; // seconds
 		log.debug("3: " + endGameDataParsed);
 		server.SetTitleData(
 		{
@@ -1880,7 +1880,9 @@ handlers.logLegendRank = function(args, context)
 				PlayFabId : currentPlayerId,
 				Data : {"EndSeasonChest" : endGameRewardArray[Number(pos)]}
 			});
+
 		pos = Number(pos) + 1;
+
 		server.UpdateUserReadOnlyData(
 		{
 			PlayFabId : currentPlayerId,
@@ -2006,7 +2008,7 @@ handlers.claimEndSeasonReward = function(args, context)
 		}
 		if(chestInfo == undefined) return generateErrObj("Could not find chest with id: " + chestId + " in the Chests catalog, or this chest's custom data is undefined");		
 
-log.debug("generatung: " + chestId);
+		log.debug("generatung: " + chestId);
 		var chestBounty = GenerateChestBounty(currentPlayerId, chestId, 7, chestInfo);
 
 		var outInventory = server.GetUserInventory({PlayFabId: currentPlayerId});
