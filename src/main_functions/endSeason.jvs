@@ -1,4 +1,4 @@
-//call this only once to set title data for current season
+//call this only once to set title data for current season. Call this after logLegendRank and endSeasonUser tasks were called
 handlers.endSeasonTitle = function(args, context)
 {
 	//set time stamp for next month day 1 time 00:00. Sync this with the autmoated task in playfab of resetting the season
@@ -12,13 +12,17 @@ handlers.endSeasonTitle = function(args, context)
 			Keys : ["EndSezonObject"]
 		});
 		var endGameDataParsed;
+		log.debug("1: ");
 		endGameDataParsed = JSON.parse(endGameData.Data.EndSezonObject);
+		log.debug("2: " + endGameDataParsed);
 		endGameDataParsed.endSezonTimestamp = Math.floor((new Date().getTime() /1000)) + 60 * 5; // seconds
+		log.debug("3: " + endGameDataParsed);
 		server.SetTitleData(
 		{
 			Key: "EndSezonObject",
-			Data: JSON.stringify(endGameDataParsed)
+			Value: JSON.stringify(endGameDataParsed)
 		});
+		log.debug("4: " + endGameDataParsed);
 	}
 	catch(err)
 	{
