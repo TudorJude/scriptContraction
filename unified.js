@@ -1923,8 +1923,8 @@ handlers.endSeasonUser = function(args, context)
 		var arrTemp = JSON.parse(endGameData.Data.SubdivisionTrophyRanges).subdivisions;
 		var resetTrophiesValue = arrTemp[arrTemp.length - 1];
 		resetTrophiesValue = Number(resetTrophiesValue) + 1; // i.e. 4001
-		var scToGive = Math.floor(Number(endGameDataParsed.scConversionRate) * (currentTrophies - resetTrophiesValue));
-		var hcToGive = Math.floor(Number(endGameDataParsed.hcConversionRate) * (currentTrophies - resetTrophiesValue));
+		var scToGive = Math.ceil(Number(endGameDataParsed.scConversionRate) * (currentTrophies - resetTrophiesValue));
+		var hcToGive = Math.ceil(Number(endGameDataParsed.hcConversionRate) * (currentTrophies - resetTrophiesValue));
 		endSeasonData = 
 		{
 			"didClaim" : false,
