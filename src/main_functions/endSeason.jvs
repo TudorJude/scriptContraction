@@ -110,8 +110,8 @@ handlers.endSeasonUser = function(args, context)
 		}).Statistics;
 		var currentTrophies = Number(trophyData[0].Value);
 		var arrTemp = JSON.parse(endGameData.Data.SubdivisionTrophyRanges).subdivisions;
-		var resetTrophiesValue = arrTemp[arrTemp.length - 1];
-		resetTrophiesValue = Number(resetTrophiesValue) + 1; // i.e. 4001
+		//var resetTrophiesValue = arrTemp[arrTemp.length - 1]; // code this properly later
+		var resetTrophiesValue = 3001;
 		var scToGive = Math.ceil(Number(endGameDataParsed.scConversionRate) * (currentTrophies - resetTrophiesValue));
 		var hcToGive = Math.ceil(Number(endGameDataParsed.hcConversionRate) * (currentTrophies - resetTrophiesValue));
 		endSeasonData = 
