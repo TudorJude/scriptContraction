@@ -1814,6 +1814,7 @@ handlers.endSeasonTitle = function(args, context)
 {
 	//set time stamp for next month day 1 time 00:00. Sync this with the autmoated task in playfab of resetting the season
 	//TEMP 5 minutes reset ladder
+	log.debug("context: " + context);
 	try
 	{
 		//let's get the end game variables
