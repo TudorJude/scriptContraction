@@ -1812,6 +1812,8 @@ handlers.endGame = function(args, context) {
 //call this only once to set title data for current season. Call this after logLegendRank and endSeasonUser tasks were called
 handlers.endSeasonTitle = function(args, context)
 {
+	//BACKUP
+	//{"endSezonTimestamp":1488382264,"endSezonRewards":["DiamondChest","GoldChest","BigSilverChest"],"scConversionRate":5,"hcConversionRate":1,"defaultChest":"SilverChest"}
 	//set time stamp for next month day 1 time 00:00. Sync this with the autmoated task in playfab of resetting the season
 	//TEMP 5 minutes reset ladder
 	log.debug("context: " + JSON.stringify(context));
@@ -1823,8 +1825,8 @@ handlers.endSeasonTitle = function(args, context)
 			Keys : ["EndSezonObject"]
 		});
 		var endGameDataParsed;
-		log.debug("1: ");
-		endGameDataParsed = JSON.parse(endGameData.Data.EndSezonObject.Value);
+		log.debug("1: " + endGameData);
+		endGameDataParsed = JSON.parse(endGameData.Data.EndSezonObject);
 		log.debug("2: " + endGameDataParsed);
 		endGameDataParsed.endSezonTimestamp = Math.floor((new Date().getTime() /1000)) + 60 * 5; // seconds
 		log.debug("3: " + endGameDataParsed);
@@ -1854,7 +1856,7 @@ handlers.logLegendRank = function(args, context)
 		var endGameRewardArray;
 		try
 		{
-			endGameDataParsed = JSON.parse(endGameData.Data.EndSezonObject.Value);
+			endGameDataParsed = JSON.parse(endGameData.Data.EndSezonObject);
 			//log.debug("endGameDataParsed: " + endGameDataParsed);
 			endGameRewardArray = endGameDataParsed.endSezonRewards;
 		}
