@@ -1824,7 +1824,7 @@ handlers.endSeasonTitle = function(args, context)
 		});
 		var endGameDataParsed;
 		log.debug("1: ");
-		endGameDataParsed = JSON.parse(endGameData.Data.EndSezonObject);
+		endGameDataParsed = JSON.parse(endGameData.Data.EndSezonObject.Value);
 		log.debug("2: " + endGameDataParsed);
 		endGameDataParsed.endSezonTimestamp = Math.floor((new Date().getTime() /1000)) + 60 * 5; // seconds
 		log.debug("3: " + endGameDataParsed);
@@ -1854,7 +1854,7 @@ handlers.logLegendRank = function(args, context)
 		var endGameRewardArray;
 		try
 		{
-			endGameDataParsed = JSON.parse(endGameData.Data.EndSezonObject);
+			endGameDataParsed = JSON.parse(endGameData.Data.EndSezonObject.Value);
 			//log.debug("endGameDataParsed: " + endGameDataParsed);
 			endGameRewardArray = endGameDataParsed.endSezonRewards;
 		}
