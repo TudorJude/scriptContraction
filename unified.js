@@ -3022,7 +3022,16 @@ handlers.openFreeChest = function(args, context)
 
 	var d = new Date();
 	var currentTimeStampSeconds = Math.floor(Number(d.getTime()) /1000);
+	
+	var tempMax = currentTimeStampSeconds;
+	for(var i = 0; i < slotArray.length; i++)
+	{	
+		if(tempMax < slotArray[slotFound].TimeUntilArrival)	
+			tempMax = slotArray[slotFound].TimeUntilArrival;
+	}
+
 	var timeStampOfNextFreeChestArrival = Math.floor(currentTimeStampSeconds + freeOpenTime * 60 * 60);
+
 	slotArray[slotFound].status = 0;
 	slotArray[slotFound].TimeUntilArrival = timeStampOfNextFreeChestArrival;
 
