@@ -2958,13 +2958,6 @@ handlers.openChest = function(args, context)
 
   var outInventory = server.GetUserInventory({PlayFabId: currentPlayerId});
 
-  outInventory.Experience = totalXp;
-
-  var r = {
-    Result: "OK",
-    InventoryChange:inventory
-  };
-
   return generateInventoryChange("InventoryUpdated", outInventory);
 };
 handlers.openFreeChest = function(args, context)
