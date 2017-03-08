@@ -64,8 +64,8 @@ handlers.openFreeChest = function(args, context)
 	var tempMax = currentTimeStampSeconds;
 	for(var i = 0; i < slotArray.length; i++)
 	{	
-		if(tempMax < slotArray[slotFound].TimeUntilArrival)	
-			tempMax = slotArray[slotFound].TimeUntilArrival;
+		if(tempMax < slotArray[i].TimeUntilArrival)	
+			tempMax = slotArray[i].TimeUntilArrival;
 	}
 
 	var timeStampOfNextFreeChestArrival = Math.floor(tempMax + freeOpenTime * 60 * 60);
