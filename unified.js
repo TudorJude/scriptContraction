@@ -1828,7 +1828,7 @@ handlers.endSeasonTitle = function(args, context)
 		log.debug("1: " + endGameData);
 		endGameDataParsed = JSON.parse(endGameData.Data.EndSezonObject);
 		log.debug("2: " + endGameDataParsed);
-		endGameDataParsed.endSezonTimestamp = Math.floor((new Date().getTime() /1000)) + 60 * 60; // seconds
+		endGameDataParsed.endSezonTimestamp = Math.floor((new Date().getTime() /1000)) + 60 * 60; // seconds - 5 minutes differentati
 		log.debug("3: " + endGameDataParsed);
 		server.SetTitleData(
 		{
@@ -3030,7 +3030,7 @@ handlers.openFreeChest = function(args, context)
 			tempMax = slotArray[slotFound].TimeUntilArrival;
 	}
 
-	var timeStampOfNextFreeChestArrival = Math.floor(currentTimeStampSeconds + freeOpenTime * 60 * 60);
+	var timeStampOfNextFreeChestArrival = Math.floor(tempMax + freeOpenTime * 60 * 60);
 
 	slotArray[slotFound].status = 0;
 	slotArray[slotFound].TimeUntilArrival = timeStampOfNextFreeChestArrival;
