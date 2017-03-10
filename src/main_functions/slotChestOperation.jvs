@@ -255,6 +255,9 @@ handlers.slotChestOperation = function(args,context)
 function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
 {
 	var actualChestLeague = Number(league) + Number(chestInfo.arenasAdvance);
+	var minimumCarLeague = actualChestLeague;
+	if(chestInfo.leaguesBehind != undefined) minimumCarLeague = Number(league) - Number(chestInfo.leaguesBehind);
+	minimumCarLeague = Math.min(Math.max(minimumCarLeague, 1), actualChestLeague);
 	var currentStacks = 0;
 	var currencyStacks = 0;
 	var maxStacks = Number(chestInfo.maxCardStacks);
@@ -327,6 +330,7 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
 		if(carInfo == undefined) continue;
 		if(carInfo.unlockedAtRank == undefined) continue;
 		if(Number(carInfo.unlockedAtRank) > Number(actualChestLeague)) continue;
+		if(Number(carInfo.unlockedAtRank) < Number(minimumCarLeague)) continue;
 		if(carInfo.rarity == undefined) continue;
 		switch(Number(carInfo.rarity))
 		{
