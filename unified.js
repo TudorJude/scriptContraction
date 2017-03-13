@@ -4215,10 +4215,12 @@ if(rareCarsListFinal != undefined) currentStacks += rareCarsListFinal.length;
 if(epicCarsListFinal != undefined) currentStacks += epicCarsListFinal.length;
 
 //Generate the random card rewards
+log.debug("== part rarity droprates: " + chestInfo.partRarityDroprates);
 var partRarityDroprates = chestInfo.partRarityDroprates.split(",");
 var sumOfPartWeights = 0;
 for(var i = 0; i < partRarityDroprates.length; i++)
 {
+	log.debug("== part rarity droprate[" + i + "]" + partRarityDroprates[i]);
 	sumOfPartWeights += partRarityDroprates[i];
 }
 var carRarityDroprates = chestInfo.carRarityDroprates.split(",");
@@ -4240,13 +4242,11 @@ for(var i = 0; i < Number(chestInfo.randomCardsReward); i++)
 	if(Math.floor(Math.random() * 100) < partBias) // this is a part
 	{
 		currentRarity = WeightedRandom(partRarityDroprates);
-		log.debug("== we've landed on part of rarity: " + currentRarity);
 		switch(currentRarity)
 		{
 			case 0:
 			{
 				tempString = GetRandomCard(commonPartsList, actualChestLeague);
-				log.debug("== Granting: " + tempString);
 				if (tempString == "ERROR") break;
 				if(commonPartsListFinal == undefined) beforeLn = 0;
 				else beforeLn = commonPartsListFinal.length;
@@ -4258,7 +4258,6 @@ for(var i = 0; i < Number(chestInfo.randomCardsReward); i++)
 			case 1:
 			{
 				tempString = GetRandomCard(rarePartsList, actualChestLeague);
-				log.debug("== Granting: " + tempString);
 				if (tempString == "ERROR") break;
 				if(rarePartsListFinal == undefined) beforeLn = 0
 				else beforeLn = rarePartsListFinal.length;
@@ -4269,7 +4268,6 @@ for(var i = 0; i < Number(chestInfo.randomCardsReward); i++)
 			case 2:
 			{
 				tempString = GetRandomCard(epicPartsList, actualChestLeague);
-				log.debug("== Granting: " + tempString);
 				if (tempString == "ERROR") break;
 				if(epicPartsListFinal == undefined) beforeLn = 0
 				else beforeLn = epicPartsListFinal.length;
