@@ -994,10 +994,12 @@ function WeightedRandom(array, totalweight)
   try
   {
     var totalWeight = 0;
+    log.debug("arr ln: " + array.length);
     for(var i = 0; i < array.length; i++)
     {
       totalWeight += Number(array[i]);
     }
+    log.debug("totial weight: " + totalWeight);
     var rand = Math.floor(Math.random() * totalweight);
     for(var i = 0; i < array.length; i++)
     {
