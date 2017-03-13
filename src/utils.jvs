@@ -999,7 +999,7 @@ function WeightedRandom(array, totalweight)
       totalWeight += Number(array[i]);
     }
     log.debug("totalWeight: " + totalWeight);
-    var rand = Math.floor(Math.random() * Number(totalweight));
+    var rand = Math.floor(Math.random() * Number(totalWeight));
     log.debug("rand: " + rand);
     for(var i = 0; i < array.length; i++)
     {
