@@ -4107,23 +4107,23 @@ function GenerateChestBounty(currentPlayerId, chestId, league, chestInfo)
 			}break;
 			case 1: // rare
 			{
-				rarePartsList.push(carsCatalog.Catalog[i].ItemId);
+				rarePartsList.push(partsCatalog.Catalog[i].ItemId);
 			}break;
 			case 2: // epic
 			{
-				epicPartsList.push(carsCatalog.Catalog[i].ItemId);
+				epicPartsList.push(partsCatalog.Catalog[i].ItemId);
 			}break;
 			default:
 			{
-				epicPartsList.push(carsCatalog.Catalog[i].ItemId);
+				epicPartsList.push(partsCatalog.Catalog[i].ItemId);
 			}
 		}
 	}
-
+log.debug(" === Parts Arrats: Common Ln " + commonPartsList.length + " Rare Ln " + rarePartsList.length + " Epic Ln " + epicPartsList.length);
 // END PARTS LIST
-        //now, we must reserve some stacks for the guaranteed cards (we have to limit the number of stacks used up by guaranteed cards, so we leave room for the random cards)
+//now, we must reserve some stacks for the guaranteed cards (we have to limit the number of stacks used up by guaranteed cards, so we leave room for the random cards)
 
-        //but only if there are any guaranteed car cards in the chest in the first place
+//but only if there are any guaranteed car cards in the chest in the first place
 var chestContainsGuaranteedCarCards = false;
 var totalGuaranteedCarCards = 0;
 var guaranteedCarsPerRarityArr = chestInfo.guaranteedCarsPerRarity.split(",");
